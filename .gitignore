@@ -22,3 +22,9 @@ build/
 # Python virtual environments
 .venv/
 __pycache__/
+
+# Large local artifacts
+.vs/
+*.rar
+*.zip
+*.7z
