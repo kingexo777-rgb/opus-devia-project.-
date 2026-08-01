@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+        <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E0B0FF;stop-opacity:1" /><stop offset="100%" style="stop-color:#800080;stop-opacity:1" /></linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <polygon points="100,45 138,60 155,100 138,140 100,155 62,140 45,100 62,60" fill="none" stroke="#FFB6C1" stroke-width="6" filter="url(#glow)" />
+    <polygon points="100,60 130,100 100,140 70,100" fill="url(#purple)" stroke="white" stroke-width="4" />
+
+</svg>

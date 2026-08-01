@@ -1,0 +1,5 @@
+﻿# Keep secrets and env files out of Cursor index
+.env
+.env.*
+!.env.example
+scripts/set-edge-secrets.local.ps1

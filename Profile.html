@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile page</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="Profile.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <section class="user-info">
+              <h2 class="user-name">KING</h2>
+
+              <span class="status-dot"></span>
+          
+              <button class="settings-btn">
+                <img src="images/settings-icon.png" alt="Settings">
+              </button>
+            </section>
+        </header>
+
+        <section class="profile-info">
+            <h1 class="card-title">Badge Name</h1>
+
+            <section class="badge-carousel">
+                <button class="nav-arrow pre-arrow">
+                    <img src="images/left-arrow.png" alt="Badge">
+                </button>
+
+                <section class="badge-status">
+                    <img src="images/badge.png" alt="Badge">
+                </section>
+
+                <button class="nav-arrow next-arrow">
+                    <img src="images/right-arrow.png" alt="Next">
+                </button>
+            </section>
+
+              <div class="lvl-info">
+                <h1 class="lv-status">LV. 53</h1>
+
+                <section class="xp-info">
+                   <p class="xp-status">420 / 745 XP</p>
+                   <p class="total-xp">Total XP = 20,300 XP</p>
+                </section>
+
+                <div class="xp-progress-bar-container">
+                   <div class="xp-progress-bar-fill"></div>
+                </div>
+              </div>
+
+              <section class="founder-card">
+                 <p class="founder-build">Founder Build</p>
+                 <h2 class="founder-type">The Operator</h2>
+
+                 <div class="divider-line"></div>
+
+                 <div class="founder-row">
+                   <p class="business-fit-score">Business Fit Score</p>
+                   <p class="business-fit-percentage">87%</p>
+                 </div>
+
+                 <div class="progress-bar-container">
+                   <div class="progress-bar-fill"></div>
+                 </div>
+              </section>
+
+              <section class="stats-card">
+                <h3 class="skill-dimensions">Skill Dimensions</h3>
+
+                <div class="skill-divider-line"></div>
+                
+                <section class="stats-container">
+
+                  <div class="stat-row">
+                    <span class="stat-label">Execution</span>
+
+                    <div class="stat-bar-bg">
+                      <div class="stat-bar-fill fill-green" style="width: 91%;"></div>
+                    </div>
+                      <span class="stat-percent">91%</span>
+                  </div>
+
+                  <div class="stat-row">
+                    <span class="stat-label">Systems</span>
+                    
+                    <div class="stat-bar-bg">
+                      <div class="stat-bar-fill fill-green" style="width: 82%;"></div>
+                    </div>
+                      <span class="stat-percent">82%</span>
+                  </div>
+
+                  <div class="stat-row">
+                    <span class="stat-label">Sales</span>
+                    
+                    <div class="stat-bar-bg">
+                      <div class="stat-bar-fill fill-red" style="width: 34%;"></div>
+                    </div>
+                      <span class="stat-percent">34%</span>
+                  </div>
+
+                  <div class="stat-row">
+                    <span class="stat-label">Creativity</span>
+                    
+                    <div class="stat-bar-bg">
+                      <div class="stat-bar-fill fill-yellow" style="width: 58%;"></div>
+                    </div>
+                      <span class="stat-percent">58%</span>
+                  </div>
+                </section>
+
+                <div class="stats-divider-line"></div>
+
+                <div class="path-info">
+                  <p class="best-path">Best path</p>
+                  <p class="stage">Stage</p>
+                </div>
+
+                <div class="business-niche">
+                  <p class="niche">SaaS / Software</p>
+                  <p class="business-stage">Lorem Ipsum</p>
+                </div>
+            </section>
+
+            <section class="streak-section">
+
+              <div class="streak-row">
+                <div class="streak-icon-box bg-maroon">
+                  <img src="images/fire.png" alt="Streak" class="streak-icon">
+                </div>
+              
+                <div class="streak-info">
+                  <h2 class="streak-title">Highest Streak</h2>
+                  <span class="streak-badge">157 Days</span>
+                </div>
+              </div>
+
+              <div class="streak-row">
+                <div class="streak-icon-box bg-dark-gray">
+                  <img src="images/fire.png" alt="Streak" class="streak-icon">
+                </div>
+
+                <div class="streak-info">
+                  <h2 class="streak-title">Current Streak</h2>
+                  <span class="streak-badge">34 Days</span>
+                </div>
+              </div>
+            </section>
+        </section>
+
+        <button class="floating-chat-btn">
+            <img src="images/chat.png" alt="Chat">
+        </button>
+
+           <nav class="bottom-nav">
+             <a href="#" class="nav-item">
+               <img src="images/home.png" alt="Home">
+             </a>
+    
+             <a href="#" class="nav-item">
+               <img src="images/quest.png" alt="Quests">
+             </a>
+    
+             <a href="#" class="nav-item">
+               <img src="images/roadmap.png" alt="Map">
+             </a>
+    
+             <a href="#" class="nav-item active">
+               <img src="images/active-profile.png" alt="Profile">
+               <span class="active-dot"></span>
+             </a>
+           </nav>
+    </div>
+</body>
+</html>

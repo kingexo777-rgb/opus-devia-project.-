@@ -1,0 +1,501 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #0F1015;
+  --bg-card: #181920;
+  --border-red: #F40000;
+  --red: #F40000;
+  --progress-fill: #650800;
+  --mentor-grad-start: #F40000;
+  --mentor-grad-end: #8E0000;
+  --text-primary: #f5f5f5;
+  --text-muted: #8a8a8e;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  background-image: radial-gradient(ellipse 600px 500px at 50% 0%, rgba(244, 0, 0, 0.28) 0%, rgba(143, 0, 0, 0.12) 35%, transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--text-primary);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+/* Type scale, per spec:
+   Default       -> Inter ExtraBold (800)
+   Medium (500)  -> Today's Task / View all, Priority Task / Challenge eyebrows,
+                    mentor subtitle, Time Left / XP Reward labels, nav labels, XP text
+   Bold (700)    -> buttons (Start Task / Take it on)
+   SemiBold (600)-> "3/6 Milestones reached" */
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+body, p, span, label, button, div {
+  font-weight: 800;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  padding: 24px 20px 100px;
+  position: relative;
+}
+
+/* Top bar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-name {
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: 18px;
+}
+
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* Level section */
+.level-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.badge-ring {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: radial-gradient(circle at center, #1a0d0d 0%, #0a0a0a 70%);
+}
+
+.badge-ring::before,
+.badge-ring::after {
+  content: "";
+  position: absolute;
+  background: var(--red);
+}
+
+/* crosshair ticks */
+.badge-ring::before {
+  width: 2px;
+  height: 16px;
+  top: -8px;
+}
+
+.badge-ring::after {
+  width: 16px;
+  height: 2px;
+  left: -8px;
+}
+
+.badge-logo {
+  width: 70px;
+  height: auto;
+  object-fit: contain;
+}
+
+.level-text {
+  margin-top: 18px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.xp-text {
+  margin-top: 4px;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Card base */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-top: 18px;
+}
+
+/* Streak card */
+.streak-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flame {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.streak-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: normal;
+}
+
+.streak-eyebrow {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.week-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.day .check {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.day:not(.done):not(.current) .check {
+  display: none;
+}
+
+.day:not(.done):not(.current)::before {
+  content: "";
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1c1c1e;
+  display: block;
+}
+
+.day.current::before {
+  content: "";
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--text-muted);
+  border-top-color: transparent;
+  display: block;
+}
+
+/* Roadmap card */
+.roadmap-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.roadmap-title h2 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: normal;
+}
+
+.arrow {
+  color: var(--text-muted);
+}
+
+.roadmap-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 12px;
+}
+
+.percent {
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.milestones {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.progress-track {
+  margin-top: 14px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: #e8e8e8;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--progress-fill);
+  border-radius: var(--radius-pill);
+}
+
+/* Section header (Today's Task / View all) */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 22px;
+  padding: 0 2px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.section-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Task stack (single column, full width) */
+.task-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.task-card {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px;
+}
+
+.eyebrow {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.muted-label {
+  color: var(--text-muted);
+}
+
+.task-card h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-top: 2px;
+  letter-spacing: normal;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #2a2a2c;
+  padding-bottom: 14px;
+}
+
+.task-arrow {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.task-desc {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 10px;
+  border-top: 1px solid #2a2a2c;
+  padding-top: 12px;
+}
+
+.task-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 14px 0;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  min-width: 130px;
+}
+
+.btn-filled {
+  background: var(--red);
+  color: #fff;
+}
+
+.task-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.meta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta-text label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.meta-text strong {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Mentor banner */
+.mentor-banner {
+  margin-top: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.mentor-icon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.mentor-text {
+  flex: 1;
+}
+
+.mentor-text h3 {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: normal;
+}
+
+.mentor-text p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Bottom nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 380px;
+  background: #161617;
+  border-radius: var(--radius-pill);
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 8px;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  opacity: 0.55;
+}
+
+.nav-item.active .nav-icon {
+  opacity: 1;
+}
+
+.nav-item.active {
+  color: var(--red);
+}
+
+@media (max-width: 360px) {
+  .badge-ring {
+    width: 110px;
+    height: 110px;
+  }
+  .badge-glyph, .badge-letter {
+    font-size: 30px;
+  }
+}

@@ -1,0 +1,26 @@
+# Opus Devia — Supabase local config
+# Docs: https://supabase.com/docs/guides/cli/config
+
+project_id = "fcewxusbwcynwpgkaunt"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[studio]
+enabled = true
+port = 54323
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+
+# AI secrets are NOT stored here — use Edge Function secrets:
+# Dashboard → Edge Functions → Secrets, or: supabase secrets set KEY=value

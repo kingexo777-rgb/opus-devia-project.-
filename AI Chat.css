@@ -1,0 +1,279 @@
+/* Global Reset */
+body {
+    background-color: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    margin: 0;
+}
+
+:root {
+    --white: #ffffff;
+    --gray: #9F9F9F;
+    --red: #ff4d4d;
+    --glass-red: rgba(109, 14, 14, 0.6);
+}
+
+/* Master Shell App Container Frame */
+.container {
+    max-width: 402px;
+    width: 100%;
+    height: 800px; 
+    background: radial-gradient(
+        300px 1100px at 50% 20%,
+        #510000 0%,
+        #2F0909 52%,
+        #150F0F 100%
+    );
+    border-radius: 10px;
+    box-sizing: border-box; 
+
+    display: flex;
+    flex-direction: column; 
+    align-items: stretch;    
+
+    position: relative;
+    overflow: hidden;
+    padding: 70px 24px 170px 24px; 
+}
+
+/* Profile Status Layout Header */
+.user-info {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    display: flex;
+    align-items: center; 
+    width: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+.user-name {
+    color: var(--white);
+    font-weight: 700;
+    font-size: 20px;
+    margin: 0;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--red);
+    border-radius: 50%;
+    flex-shrink: 0;      
+    margin-left: 8px; 
+}
+
+.settings-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto; 
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.settings-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.settings-btn img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+/* Interior Section Chat Header */
+.chat-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0 20px 0;
+    color: var(--white);
+}
+
+.menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.menu-icon span {
+    width: 22px;
+    height: 2px;
+    background-color: var(--white);
+}
+
+.chat-header h1 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Chat Dynamic Scrolling Section */
+.chat-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    scrollbar-width: none; 
+}
+
+.chat-content::-webkit-scrollbar {
+    display: none; 
+}
+
+/* User Bubble Dialogs */
+.user-message {
+    align-self: flex-end;
+    background-color: #1a1a1a;
+    padding: 12px 20px;
+    border-radius: 24px;
+    max-width: 85%;
+    border: 1px solid #2a2a2a;
+    color: var(--white);
+}
+
+.user-message p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* System Response Blocks */
+.assistant-response {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 100%;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    color: var(--white);
+}
+
+.assistant-response p {
+    margin: 0;
+}
+
+.response-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Floating Footer Box Input Positioning */
+.chat-footer {
+    position: absolute;
+    bottom: 95px; 
+    left: 24px;
+    right: 24px;
+    z-index: 10;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    background-color: #121212;
+    border-radius: 28px;
+    padding: 6px 6px 6px 20px;
+    border: 1px solid #1f1f1f;
+}
+
+.input-container input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--white);
+    font-size: 0.95rem;
+    height: 40px;
+}
+
+.input-container input::placeholder {
+    color: #666666;
+}
+
+.send-btn {
+    background-color: #1a1a1a;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.send-btn:hover {
+    background-color: #2a2a2a;
+}
+
+.send-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--white);
+}
+
+/* Sticky App Base Navigation Control */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 100%;
+    width: 60px;
+    text-decoration: none;
+}
+
+.nav-item img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.6; 
+    transition: all 0.2s ease;
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+<symbol id="lv_100" viewBox="0 0 200 200">
+<defs>
+        <linearGradient id="red" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FF4500;stop-opacity:1" /><stop offset="100%" style="stop-color:#8B0000;stop-opacity:1" /></linearGradient>
+        <filter id="redglow"><feGaussianBlur stdDeviation="5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <circle cx="100" cy="100" r="65" fill="none" stroke="white" stroke-width="3" opacity="0.6" />
+    <line x1="40" y1="100" x2="160" y2="100" stroke="white" stroke-width="1" opacity="0.5" />
+    <line x1="100" y1="40" x2="100" y2="160" stroke="white" stroke-width="1" opacity="0.5" />
+    <polygon points="100,50 140,100 100,150 60,100" fill="url(#red)" filter="url(#redglow)" />
+    <polygon points="100,65 125,100 100,135 75,100" fill="white" opacity="0.8" />
+</symbol>
+<symbol id="lv_10_20" viewBox="0 0 200 200">
+<defs><linearGradient id="bronze" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" /><stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" /></linearGradient></defs>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="url(#bronze)" stroke-width="15" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(45, 100, 100)" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(135, 100, 100)" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(225, 100, 100)" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(315, 100, 100)" />
+    <rect x="90" y="90" width="20" height="20" fill="url(#bronze)" transform="rotate(45, 100, 100)" />
+</symbol>
+<symbol id="lv_1_10" viewBox="0 0 200 200">
+<defs><linearGradient id="bronze" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#CD7F32;stop-opacity:1" /><stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" /></linearGradient></defs>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="url(#bronze)" stroke-width="15" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(0, 100, 100)" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(120, 100, 100)" />
+    <rect x="92" y="30" width="16" height="20" fill="url(#bronze)" transform="rotate(240, 100, 100)" />
+    <polygon points="100,85 115,110 85,110" fill="url(#bronze)" />
+</symbol>
+<symbol id="lv_20_30" viewBox="0 0 200 200">
+<defs><linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#C0C0C0;stop-opacity:1" /><stop offset="100%" style="stop-color:#707070;stop-opacity:1" /></linearGradient></defs>
+    <polygon points="100,40 160,80 140,150 60,150 40,80" fill="none" stroke="url(#silver)" stroke-width="12" />
+    <polygon points="100,85 115,110 85,110" fill="url(#silver)" />
+</symbol>
+<symbol id="lv_30_40" viewBox="0 0 200 200">
+<defs><linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#C0C0C0;stop-opacity:1" /><stop offset="100%" style="stop-color:#707070;stop-opacity:1" /></linearGradient></defs>
+    <polygon points="100,40 160,80 140,150 60,150 40,80" fill="none" stroke="url(#silver)" stroke-width="12" />
+    <circle cx="100" cy="100" r="15" fill="url(#silver)" />
+    <rect x="92" y="30" width="16" height="15" fill="url(#silver)" />
+</symbol>
+<symbol id="lv_40_50" viewBox="0 0 200 200">
+<defs><linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" /><stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" /></linearGradient></defs>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="url(#gold)" stroke-width="8" />
+    <polygon points="100,60 110,85 140,85 115,105 125,135 100,115 75,135 85,105 60,85 90,85" fill="url(#gold)" />
+</symbol>
+<symbol id="lv_50_60" viewBox="0 0 200 200">
+<defs><linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" /><stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" /></linearGradient></defs>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="url(#gold)" stroke-width="8" />
+    <polygon points="100,65 110,80 125,75 120,90 135,100 120,110 125,125 110,120 100,135 90,120 75,125 80,110 65,100 80,90 75,75 90,80" fill="url(#gold)" />
+</symbol>
+<symbol id="lv_70_80" viewBox="0 0 200 200">
+<defs><linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E0B0FF;stop-opacity:1" /><stop offset="100%" style="stop-color:#800080;stop-opacity:1" /></linearGradient></defs>
+    <circle cx="100" cy="100" r="55" fill="none" stroke="white" stroke-width="8" />
+    <polygon points="100,60 130,100 100,140 70,100" fill="url(#purple)" stroke="white" stroke-width="4" />
+</symbol>
+<symbol id="lv_80_99" viewBox="0 0 200 200">
+<defs>
+        <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#E0B0FF;stop-opacity:1" /><stop offset="100%" style="stop-color:#800080;stop-opacity:1" /></linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="3.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <polygon points="100,45 138,60 155,100 138,140 100,155 62,140 45,100 62,60" fill="none" stroke="#FFB6C1" stroke-width="6" filter="url(#glow)" />
+    <polygon points="100,60 130,100 100,140 70,100" fill="url(#purple)" stroke="white" stroke-width="4" />
+</symbol>
+</svg>

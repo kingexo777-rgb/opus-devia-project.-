@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KING Dashboard</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name">KING</span>
+      <span class="brand-dot"></span>
+    </div>
+    <button class="icon-btn" aria-label="Settings">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Level badge -->
+  <section class="level-section">
+    <div class="badge-ring">
+      <img class="badge-logo" src="assets/logo.png" alt="KING logo" />
+    </div>
+    <h1 class="level-text">LV. 53</h1>
+    <p class="xp-text">420 / 745 XP</p>
+  </section>
+
+  <!-- Streak card -->
+  <section class="card streak-card">
+    <div class="streak-header">
+      <img class="flame" src="assets/icon-flame.png" alt="" />
+      <div>
+        <p class="muted streak-eyebrow">93 Day</p>
+        <h2>Streak</h2>
+      </div>
+    </div>
+    <div class="week-row">
+      <div class="day done"><img class="check" src="assets/icon-check.png" alt="done" /><label>Mon</label></div>
+      <div class="day done"><img class="check" src="assets/icon-check.png" alt="done" /><label>Tue</label></div>
+      <div class="day done"><img class="check" src="assets/icon-check.png" alt="done" /><label>Wed</label></div>
+      <div class="day current"><label>Thu</label></div>
+      <div class="day"><label>Fri</label></div>
+      <div class="day"><label>Sat</label></div>
+      <div class="day"><label>Sun</label></div>
+    </div>
+  </section>
+
+  <!-- Roadmap card -->
+  <section class="card roadmap-card">
+    <div class="roadmap-title">
+      <h2>Roadmap Completion</h2>
+      <span class="arrow">↗</span>
+    </div>
+    <div class="roadmap-row">
+      <span class="percent">50%</span>
+      <span class="milestones">3/6 Milestones reached</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:50%"></div>
+    </div>
+  </section>
+
+  <!-- Today's Task header -->
+  <div class="section-header">
+    <span class="section-title">Today's Task</span>
+    <span class="section-link">View all</span>
+  </div>
+
+  <!-- Task cards -->
+  <section class="task-stack">
+
+    <div class="card task-card priority">
+      <p class="eyebrow">Priority Task</p>
+      <h3>Lorem Ipsum <span class="arrow task-arrow">↗</span></h3>
+      <div class="task-footer">
+        <button class="btn btn-filled">Start Task</button>
+        <div class="task-meta">
+          <span class="meta-item"><img class="meta-icon" src="assets/icon-clock.png" alt="" /><span class="meta-text"><label>Time Left</label><strong>2:00:00</strong></span></span>
+          <span class="meta-item"><img class="meta-icon" src="assets/icon-xp.png" alt="" /><span class="meta-text"><label>XP Reward</label><strong>320 XP</strong></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card task-card challenge">
+      <p class="eyebrow">Challenge</p>
+      <h3>Lorem Ipsum <span class="arrow task-arrow">↗</span></h3>
+      <div class="task-footer">
+        <button class="btn btn-filled">Take it on</button>
+        <div class="task-meta">
+          <span class="meta-item"><img class="meta-icon" src="assets/icon-clock.png" alt="" /><span class="meta-text"><label>Time Left</label><strong>1:00:00</strong></span></span>
+          <span class="meta-item"><img class="meta-icon" src="assets/icon-xp.png" alt="" /><span class="meta-text"><label>XP Reward</label><strong>240 XP</strong></span></span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Mentor banner -->
+  <section class="mentor-banner">
+    <img class="mentor-icon" src="assets/icon-mentor.png" alt="" />
+    <div class="mentor-text">
+      <h3>Talk to your Mentor</h3>
+      <p>Directions, Decisions, Roadmap edits</p>
+    </div>
+    <span class="arrow">↗</span>
+  </section>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active">
+      <img class="nav-icon" src="assets/icon-home.png" alt="" />
+      <span>Home</span>
+    </button>
+    <button class="nav-item">
+      <img class="nav-icon" src="assets/icon-quest.png" alt="" />
+      <span>Quest</span>
+    </button>
+    <button class="nav-item">
+      <img class="nav-icon" src="assets/icon-roadmap.png" alt="" />
+      <span>Roadmap</span>
+    </button>
+    <button class="nav-item">
+      <img class="nav-icon" src="assets/icon-profile.png" alt="" />
+      <span>Profile</span>
+    </button>
+  </nav>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+ /* Global */
+body {
+    background-color: #0a0a0a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    margin: 0;
+}
+
+:root {
+    --white: #ffffff;
+    --gray: #9F9F9F;
+    --red: #ff4d4d;
+    --glass-red: rgba(109, 14, 14, 0.6);
+}
+
+.container {
+    max-width: 402px;
+    width: 100%;
+    height: 850px;
+    background: radial-gradient(
+        300px 1100px at 50% 100%,
+        #510000 0%,
+        #2F0909 52%,
+        #150F0F 100%
+    );
+    border-radius: 10px;
+    padding-top: 0px;
+    box-sizing: border-box; 
+
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    
+
+    position: relative;
+    overflow-y: auto;         
+    overflow-x: hidden;        
+
+    padding: 0px 0px 100px 0px; 
+}
+
+.container::-webkit-scrollbar {
+    display: none;
+}
+.container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+ /* Header */
+.user-info {
+  position: absolute;
+  top: 15px;
+  left: 0;
+
+  display: flex;
+  align-items: center; 
+
+  width: 100%;
+
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  z-index: 10;
+}
+
+.user-name {
+    color: var(--white);
+    font-weight: 700;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--red);
+  border-radius: 50%;
+  flex-shrink: 0;      
+  margin-left: 8px; 
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  margin-left: auto; 
+
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.settings-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.settings-btn img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+/* Roadmap content */
+.card-title {    
+    text-align: center;
+    color: var(--white);
+    font-size: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    margin: 80px auto 0px auto; 
+}
+
+.divider-line {
+  display: block;
+  width: 150px;       
+  height: 0.5px;       
+  background-color: var(--red);
+
+  margin: 14px auto; 
+}
+
+
+/* timeline */
+.timeline {
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 50px auto; 
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+.timeline li {
+  position: relative;
+  display: grid !important; 
+  grid-template-columns: 1fr 40px 1fr !important;
+  align-items: center !important; 
+  margin-bottom: 90px; 
+  z-index: 2;
+}
+
+.timeline li:not(.node-bottom)::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 6px;       
+  bottom: -96px;  
+  border-left: 1px dashed var(--red);
+  z-index: 1;
+}
+
+.timeline-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(-1px); 
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.timeline-btn:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}
+
+.timeline .arrow {
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.timeline li::after {
+  content: '';
+  grid-column: 2 !important; 
+  justify-self: center !important; 
+  grid-row: 1 !important;
+  width: 12px;
+  height: 12px;
+  background-color: var(--red);
+  border-radius: 50%;
+  box-sizing: border-box;
+  z-index: 2; 
+}
+
+.timeline .node-left {
+  text-align: right;
+}
+.timeline .node-left .timeline-btn {
+  grid-column: 1 !important; 
+  justify-self: end !important; 
+}
+
+.timeline .node-right {
+  text-align: left;
+}
+.timeline .node-right .timeline-btn {
+  grid-column: 3 !important; 
+  justify-self: start !important; 
+}
+
+.timeline .hollow::after {
+  background-color: #0a0a0a !important; 
+  border: 2px solid var(--red) !important;
+}
+
+.timeline li.node-bottom {
+  margin-bottom: 0;
+  row-gap: 10px; 
+}
+
+.timeline .node-bottom .timeline-btn {
+  grid-column: 1 / span 3 !important; 
+  grid-row: 2 !important; 
+  justify-self: center !important;
+  margin-top: 0 !important; 
+}
+
+.container .timeline .node-bottom::after {
+  background-color: transparent;      
+  border: 2px solid #a1000093;     
+}
+
+.container .timeline li:nth-child(4)::before {
+  bottom: -88px; 
+}
+
+ /* Floating Chat Button */
+.floating-chat-btn {
+    position: absolute;
+    bottom: 100px; 
+    left: 20px;
+    z-index: 1000;   
+    
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+
+    background: radial-gradient(circle, #7d0a0a 0%, #300303 100%);
+    box-shadow: 0 8px 24px rgba(46, 0, 0, 0.4);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.floating-chat-btn:active {
+    transform: scale(0.95); 
+}
+
+.floating-chat-btn img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+}
+
+ /* Navigation */
+.bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    z-index: 999;
+    
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 30px rgba(29, 0, 0, 0.5);
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 100%;
+    width: 60px;
+    text-decoration: none;
+}
+
+.nav-item img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+
+    filter: brightness(0) invert(1);
+    opacity: 0.6; 
+    transition: all 0.2s ease;
+}
+
+.nav-item.active img {
+    opacity: 1;
+
+    filter: invert(13%) sepia(87%) saturate(5412%) hue-rotate(354deg) brightness(89%) contrast(106%);
+}
+
+.active-dot {
+    position: absolute;
+    bottom: 12px; 
+    width: 5px;
+    height: 5px;
+    background-color: var(--red);
+    border-radius: 50%;
+}
