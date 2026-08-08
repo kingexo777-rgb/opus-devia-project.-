@@ -63,6 +63,7 @@ export function useAuth() {
 
     try {
       const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        console.log('onAuthStateChange fired:', _event, 'session exists:', !!session);
         if (cancelled) return;
         setSession(session);
         setUser(session?.user ?? null);
