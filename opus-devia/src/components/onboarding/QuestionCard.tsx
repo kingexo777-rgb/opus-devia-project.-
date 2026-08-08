@@ -74,7 +74,7 @@ export default function QuestionCard({
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ width: "100%", maxWidth: 720 }}>
-          <div style={{ background: "linear-gradient(180deg, rgba(26,26,30,0.98), rgba(14,14,18,0.98))", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 20 }}>
+          <div style={{ background: "linear-gradient(180deg, rgba(26,26,30,0.98), rgba(14,14,18,0.98))", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 20, overflow: "hidden", boxSizing: "border-box" }}>
             <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#F5F5F5" }}>{title}</h2>
             {subtitle && <p style={{ marginTop: 6, color: "#A8A8A8" }}>{subtitle}</p>}
 
