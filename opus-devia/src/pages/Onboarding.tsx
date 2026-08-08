@@ -20,14 +20,15 @@ export default function Onboarding() {
     setResponses((r: any) => ({ ...r, ["slide" + (i + 1)]: { ...(r["slide" + (i + 1)] || {}), text: value, ...extra } }));
   }, []);
 
-  const saveDraft = useCallback(async () => {
+  const saveDraft = useCallback(async (saveIndex?: number) => {
     if (!user?.id) return;
     setSaving(true);
     try {
+      const toSaveIndex = typeof saveIndex === "number" ? saveIndex : index;
       await supabase.from("draft_sessions").upsert({
         user_id: user.id,
         responses,
-        current_question: index + 1,
+        current_question: toSaveIndex + 1,
         updated_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
       setDraftSaved(true);
@@ -40,11 +41,12 @@ export default function Onboarding() {
   }, [user?.id, responses, index]);
 
   const goNext = useCallback(async () => {
-    // save draft after each slide
-    await saveDraft();
-    if (index + 1 >= TOTAL) {
+    const nextIndex = index + 1;
+    // If we're past the last slide, submit
+    if (nextIndex >= TOTAL) {
+      // save final progress (so resume reflects completion)
+      await saveDraft(nextIndex);
       // submit
-      // show building screen briefly
       const answers = mapResponsesToAnswers(responses);
       try {
         await supabase.functions.invoke("roadmap-generator", { body: JSON.stringify({ answers }) });
@@ -54,7 +56,10 @@ export default function Onboarding() {
       navigate("/processing");
       return;
     }
-    setIndex((i) => i + 1);
+
+    // Save the draft as the NEXT slide so resume goes to where the user is heading
+    await saveDraft(nextIndex);
+    setIndex(nextIndex);
   }, [index, saveDraft, responses, navigate]);
 
   const goBack = useCallback(() => {
@@ -84,10 +89,10 @@ export default function Onboarding() {
             </div>
             <div>
               <label style={{ color: "#A8A8A8", fontSize: 12 }}>Where are you based?</label>
-              <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                {["Africa","Asia","Europe","North America","South America","Middle East","Oceania"].map((o) => (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, width: "100%", maxWidth: "100%", marginTop: 6 }}>
+                { ["Africa","Asia","Europe","North America","South America","Middle East","Oceania"].map((o) => (
                   <button key={o} onClick={() => setStructured(0, "region", o)} style={{ padding: "6px 8px", borderRadius: 999, background: (s.region===o)?"#9a0000":"rgba(255,255,255,0.03)", color: "#fff", border: "none" }}>{o}</button>
-                ))}
+                )) }
               </div>
             </div>
           </div>
@@ -119,9 +124,9 @@ export default function Onboarding() {
             <div style={{ marginBottom: 12 }}>
               <label style={{ color: "#A8A8A8", fontSize: 12 }}>Pick the closest match:</label>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
-                {["A business that makes money","A personal brand or audience","A skill that opens doors","Financial independence","A product or app","Something I can't fully explain yet"].map((o) => (
+                { ["A business that makes money","A personal brand or audience","A skill that opens doors","Financial independence","A product or app","Something I can't fully explain yet"].map((o: any) => (
                   <button key={o} onClick={() => setStructured(1, "goalType", o)} style={{ padding: "6px 8px", borderRadius: 999, background: (s.goalType===o)?"#9a0000":"rgba(255,255,255,0.03)", color: "#fff", border: "none" }}>{o}</button>
-                ))}
+                )) }
               </div>
             </div>
             <div>
@@ -155,9 +160,9 @@ export default function Onboarding() {
         structuredContent={(
           <div>
             <div style={{ marginBottom: 12 }}>
-              {["I hit a wall and had to change something","I saw someone else doing what I want to do","I finally have the time or resources","A deadline or pressure forced it","I've been planning this for a while","Honestly I'm not sure — I just feel the urgency"].map((o) => (
+              { ["I hit a wall and had to change something","I saw someone else doing what I want to do","I finally have the time or resources","A deadline or pressure forced it","I've been planning this for a while"].map((o: any) => (
                 <button key={o} onClick={() => setStructured(2, "motivationTrigger", o)} style={{ marginRight: 8, marginBottom: 8, padding: "6px 8px", borderRadius: 999, background: (s.motivationTrigger===o)?"#9a0000":"rgba(255,255,255,0.03)", color: "#fff", border: "none" }}>{o}</button>
-              ))}
+              )) }
             </div>
             <div>
               <label style={{ color: "#A8A8A8", fontSize: 12 }}>How urgent does this feel right now?</label>
@@ -178,8 +183,6 @@ export default function Onboarding() {
       />
     );
   }
-
-  
 
   function renderCurrent() {
     switch (index) {
@@ -284,7 +287,7 @@ export default function Onboarding() {
     const s = responses.slide5 || {};
     const counts = ["0","1–2","3–4","5+"];
     const stages = [
-      "Just an idea, never started","Started but stopped within days","Got a few weeks in then stopped","Built something but never launched","Launched but got no traction","Got traction but couldn't sustain it","N/A — I finished what I started"
+      "Just an idea, never started","Started but stopped within days","Got a few weeks in then stopped","Built something but never launched","Launched but got no traction","Got traction but could have done better",
     ];
 
     return (
@@ -329,7 +332,7 @@ export default function Onboarding() {
   function Slide6() {
     const s = responses.slide6 || {};
     const options = [
-      "Lost motivation when it got hard","Ran out of time","Ran out of money","No one cared or bought","Got distracted by something else","Didn't know what to do next","Fear of it actually working","External circumstances","I self-sabotaged and I know it","Nothing stopped me — I finished"
+      "Lost motivation when it got hard","Ran out of time","Ran out of money","No one cared or bought","Got distracted by something else","Didn't know what to do next","Fear of it actually working",
     ];
 
     const toggle = (opt: string) => {
@@ -371,7 +374,7 @@ export default function Onboarding() {
   function Slide7() {
     const s = responses.slide7 || {};
     const options = [
-      "Go with your gut and adjust later","Research everything before moving","Ask people you trust","Look for the path with least risk","Push forward and figure it out as you go","Freeze and delay as long as possible"
+      "Go with your gut and adjust later","Research everything before moving","Ask people you trust","Look for the path with least risk","Push forward and figure it out as you go","Freeze and delay",
     ];
 
     return (
@@ -465,7 +468,7 @@ export default function Onboarding() {
   function Slide9() {
     const s = responses.slide9 || {};
     const blockers = [
-      "Money — I don't have enough to invest","Network — I don't know the right people","Knowledge — I don't know what I don't know","Confidence — I doubt myself when it counts","Environment — where I live limits options","Accountability — no one around me gets it","Time — I'm genuinely stretched thin","Tools — I lack equipment or access"
+      "Money — I don't have enough to invest","Network — I don't know the right people","Knowledge — I don't know what I don't know","Confidence — I doubt myself when it counts","Environment — I lack support",
     ];
 
     const toggle = (b: string) => {
@@ -507,7 +510,7 @@ export default function Onboarding() {
   function Slide10() {
     const s = responses.slide10 || {};
     const types = [
-      "A founder who built something from nothing","A creator who built an audience","An operator who scaled something massive","A strategist who outthought everyone","A contrarian who broke the rules","Someone in my local context doing real things"
+      "A founder who built something from nothing","A creator who built an audience","An operator who scaled something massive","A strategist who outthought everyone","A contrarian who broke the rules",
     ];
 
     return (
@@ -597,7 +600,7 @@ export default function Onboarding() {
   function Slide12() {
     const s = responses.slide12 || {};
     const options = [
-      "Consistent monthly income from something I built","A product or service people actually pay for","An audience that trusts what I say","A skill level that opens real doors","Financial independence or a clear path to it","Proving to myself I can actually finish something"
+      "Consistent monthly income from something I built","A product or service people actually pay for","An audience that trusts what I say","A skill level that opens real doors","Financial independence",
     ];
 
     return (
@@ -636,8 +639,7 @@ function mapResponsesToAnswers(responses: any) {
     q2: `Goal type: ${r.slide2?.goalType || ""}. Timeline: ${r.slide2?.timeline || ""}. Detail: ${r.slide2?.text || ""}`,
     q3: `Motivation: ${r.slide3?.motivationTrigger || ""}. Urgency: ${r.slide3?.urgency || ""}/10. Detail: ${r.slide3?.text || ""}`,
     q4: `Skills: ${(r.slide4?.skills || []).map((s: any) => `${s.name} (${s.rating}/5)`).join(", ")}. Unique strength: ${r.slide4?.text || ""}`,
-    q5: `Projects started: ${r.slide5?.projectCount || ""}. Furthest stage: ${r.slide5?.furthestStage || ""}. Detail: ${r.slide5?.text || ""}. Failure modes: ${(r.slide6?.failureModes || []).join(", ")}. Pattern: ${r.slide6?.text || ""}`,
-    q6: `Decision style: ${r.slide7?.decisionStyle || ""}. Risk tolerance: ${r.slide7?.riskTolerance || ""}/10. Failure response: ${r.slide7?.text || ""}. Weekly hours: ${r.slide8?.weeklyHours || ""}. Peak time: ${r.slide8?.peakFocusTime || ""}. Energy drains: ${(r.slide8?.energyDrains || []).join(", ")}. Blockers: ${(r.slide9?.primaryBlockers || []).join(", ")}. Limiting belief: ${r.slide9?.text || ""}. Admires: ${r.slide10?.text || ""}. Budget: ${r.slide11?.monthlyBudget || ""}. Team: ${r.slide11?.teamStatus || ""}. Access: ${(r.slide11?.accessList || []).join(", ")}. Winning: ${r.slide12?.text || ""}`,
+    q5: `Projects started: ${r.slide5?.projectCount || ""}. Furthest stage: ${r.slide5?.furthestStage || ""}. Detail: ${r.slide5?.text || ""}. Failure modes: ${(r.slide6?.failureModes || []).join(", ")}`,
+    q6: `Decision style: ${r.slide7?.decisionStyle || ""}. Risk tolerance: ${r.slide7?.riskTolerance || ""}/10. Failure response: ${r.slide7?.text || ""}. Weekly hours: ${r.slide8?.weeklyHours || ""}`,
   };
 }
-
