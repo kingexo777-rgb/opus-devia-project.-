@@ -16,7 +16,10 @@ export default function SignUp() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      // Log a concise validation event, do NOT log raw passwords
+      console.log("ValidationError: passwords do not match");
+      // Append timestamp to force a state change and guarantee a re-render for debugging
+      setError(`Passwords do not match (${new Date().toISOString()})`);
       return;
     }
 
@@ -29,7 +32,10 @@ export default function SignUp() {
       });
 
       if (error) {
-        setError(error.message);
+        // Log the full SDK error object so we can inspect structure in the console
+        console.log("Supabase signUp error object:", error);
+        // Include a timestamp to ensure setError results in a state change for debugging
+        setError(`${error.message} (${new Date().toISOString()})`);
         setLoading(false);
         return;
       }
@@ -48,16 +54,21 @@ export default function SignUp() {
         setLoading(false);
       }
     } catch (err) {
+      // Log the full exception object for diagnostics
+      console.log("signUp exception:", err);
+
       const msg =
         err instanceof Error ? err.message : "Connection failed.";
 
       // Provide a clearer hint for common network/DNS issues
       if (msg === "Failed to fetch" || /could not be resolved/i.test(msg)) {
         setError(
-          "Unable to reach Supabase. Check `VITE_SUPABASE_URL` in opus-devia/.env and your network/DNS settings."
+          `Unable to reach Supabase. Check ` +
+            "`VITE_SUPABASE_URL` in opus-devia/.env and your network/DNS settings." +
+            ` (${new Date().toISOString()})`
         );
       } else {
-        setError(msg ?? "Connection failed. Check your env configuration.");
+        setError(`${msg ?? "Connection failed. Check your env configuration."} (${new Date().toISOString()})`);
       }
 
       setLoading(false);
@@ -105,7 +116,21 @@ export default function SignUp() {
             className="auth-input"
           />
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && (
+            <p
+              className="auth-error"
+              style={{
+                backgroundColor: "#fff3b0",
+                color: "#7a0b0b",
+                padding: "8px",
+                borderRadius: "6px",
+                border: "1px solid #ff9800",
+                fontWeight: 600,
+              }}
+            >
+              {error}
+            </p>
+          )}
 
           <button type="submit" disabled={loading} className="auth-btn">
             {loading ? "Creating account…" : "Create Account"}
