@@ -9,6 +9,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -52,6 +53,7 @@ export default function SignUp() {
       } else {
         // Email confirmation required — stay on page
         setLoading(false);
+        setEmailSent(true);
       }
     } catch (err) {
       // Log the full exception object for diagnostics
@@ -88,59 +90,110 @@ export default function SignUp() {
         {/* Tagline */}
         <p className="auth-tagline -mt-2">Your path. Proven by you.</p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="auth-input"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="auth-input"
-          />
-
-          <input
-            type="password"
-            placeholder="Confirm password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            className="auth-input"
-          />
-
-          {error && (
-            <p
-              className="auth-error"
-              style={{
-                backgroundColor: "#fff3b0",
-                color: "#7a0b0b",
-                padding: "8px",
-                borderRadius: "6px",
-                border: "1px solid #ff9800",
-                fontWeight: 600,
-              }}
-            >
-              {error}
+        {emailSent ? (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            padding: '32px 24px',
+            gap: '16px',
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: 'rgba(154, 0, 0, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '28px',
+            }}>
+              ✉️
+            </div>
+            <h2 style={{ color: '#F5F5F5', fontSize: '20px', fontWeight: 600, margin: 0 }}>
+              Check your email
+            </h2>
+            <p style={{ color: '#A8A8A8', fontSize: '14px', lineHeight: 1.6, maxWidth: '320px', margin: 0 }}>
+              We sent a verification link to <strong style={{ color: '#F5F5F5' }}>{email}</strong>.
+              Open your inbox and tap the link to activate your account.
             </p>
-          )}
+            <p style={{ color: '#A8A8A8', fontSize: '12px', marginTop: '8px' }}>
+              Didn't get it? Check spam, or
+              <button
+                onClick={() => setEmailSent(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#9a0000',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  padding: '0 4px',
+                  fontSize: '12px',
+                }}
+              >
+                try a different email
+              </button>
+            </p>
+          </div>
+        ) : (
+          <>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="auth-input"
+              />
 
-          <button type="submit" disabled={loading} className="auth-btn">
-            {loading ? "Creating account…" : "Create Account"}
-          </button>
-        </form>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="auth-input"
+              />
 
-        <p className="text-center auth-footer-link">
-          Already have an account?{" "}
-          <Link to="/signin">Sign in</Link>
-        </p>
+              <input
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="auth-input"
+              />
+
+              {error && (
+                <p
+                  className="auth-error"
+                  style={{
+                    backgroundColor: "#fff3b0",
+                    color: "#7a0b0b",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    border: "1px solid #ff9800",
+                    fontWeight: 600,
+                  }}
+                >
+                  {error}
+                </p>
+              )}
+
+              <button type="submit" disabled={loading} className="auth-btn">
+                {loading ? "Creating account…" : "Create Account"}
+              </button>
+            </form>
+
+            <p className="text-center auth-footer-link">
+              Already have an account?{" "}
+              <Link to="/signin">Sign in</Link>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
