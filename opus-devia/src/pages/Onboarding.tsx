@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import QuestionCard from "../components/onboarding/QuestionCard";
 import ProcessingScreen from "../components/onboarding/ProcessingScreen";
