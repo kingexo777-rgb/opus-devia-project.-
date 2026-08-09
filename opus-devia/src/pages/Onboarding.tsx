@@ -660,12 +660,9 @@ export default function Onboarding() {
   }
 
   if (stage === 'reveal') {
-    return (
-      <ArchetypeReveal
-        archetype={generatedArchetype || ''}
-        onContinue={() => navigate('/home', { replace: true })}
-      />
-    );
+  return (
+    <ArchetypeReveal archetype={generatedArchetype ?? ''} />
+  );
   }
 
   // stage === 'questions' — normal flow
