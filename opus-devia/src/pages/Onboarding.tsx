@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QuestionCard from "../components/onboarding/QuestionCard";
+import ProcessingScreen from "../components/onboarding/ProcessingScreen";
+import ArchetypeReveal from "../components/onboarding/ArchetypeReveal";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../lib/supabase";
 
@@ -15,6 +17,11 @@ export default function Onboarding() {
   const [draftSaved, setDraftSaved] = useState(false);
 
   const [responses, setResponses] = useState<any>({});
+
+  // Stage management: 'questions' | 'processing' | 'reveal'
+  const [stage, setStage] = useState<'questions' | 'processing' | 'reveal'>('questions');
+  const [generatedArchetype, setGeneratedArchetype] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // on-screen debug panel state
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
@@ -63,25 +70,47 @@ export default function Onboarding() {
     const nextIndex = index + 1;
     // If we're past the last slide, submit
     if (nextIndex >= TOTAL) {
-      // save final progress (so resume reflects completion)
+      debugLog('Submit branch entered');
       await saveDraft(nextIndex);
-      // submit
+      debugLog('Final draft saved');
+
+      setStage('processing');
+      debugLog('Stage set to processing');
+
       const answers = mapResponsesToAnswers(responses);
+
       try {
-        await supabase.functions.invoke("roadmap-generator", { body: JSON.stringify({ answers }) });
-        debugLog('Invoked roadmap-generator function');
+        const result = await supabase.functions.invoke("roadmap-generator", {
+          body: JSON.stringify({ answers }),
+        });
+        debugLog('Roadmap generator response: ' + JSON.stringify(result).slice(0, 200));
+
+        const archetype = result.data?.archetype ?? result.data?.data?.archetype ?? null;
+        setGeneratedArchetype(archetype);
+
+        // Mark onboarding complete in the database now that generation succeeded
+        if (user?.id) {
+          await supabase
+            .from('users')
+            .update({ onboarding_complete: true })
+            .eq('id', user.id);
+          debugLog('User marked onboarding_complete in database');
+        }
+
+        setStage('reveal');
+        debugLog('Stage set to reveal, archetype: ' + archetype);
       } catch (err) {
-        console.error("Roadmap generator invocation failed:", err);
-        debugLog(`Roadmap generator invocation failed: ${String(err)}`);
+        debugLog('Roadmap generator invocation FAILED: ' + (err instanceof Error ? err.message : String(err)));
+        setStage('questions'); // fall back so user isn't stuck on a blank processing screen
+        setError('Something went wrong generating your roadmap. Please try again.');
       }
-      navigate("/processing");
       return;
     }
 
     // Save the draft as the NEXT slide so resume goes to where the user is heading
     await saveDraft(nextIndex);
     setIndex(nextIndex);
-  }, [index, saveDraft, responses, navigate]);
+  }, [index, saveDraft, responses, user?.id, debugLog]);
 
   const goBack = useCallback(() => {
     if (index === 0) return;
@@ -181,7 +210,7 @@ export default function Onboarding() {
         structuredContent={(
           <div>
             <div style={{ marginBottom: 12 }}>
-              { ["I hit a wall and had to change something","I saw someone else doing what I want to do","I finally have the time or resources","A deadline or pressure forced it","I've been planning this for a while and finally started"].map((o) => (
+              { ["I hit a wall and had to change something","I saw someone else doing what I want to do","I finally have the time or resources","A deadline or pressure forced it","I've been planning this for months"].map((o) => (
                 <button key={o} onClick={() => setStructured(2, "motivationTrigger", o)} style={{ marginRight: 8, marginBottom: 8, padding: "6px 8px", borderRadius: 999, background: (s.motivationTrigger===o)?"#9a0000":"rgba(255,255,255,0.03)", color: "#fff", border: "none" }}>{o}</button>
               )) }
             </div>
@@ -283,7 +312,7 @@ export default function Onboarding() {
                   <div style={{ flex: 1 }}>{sk.name}</div>
                   <div style={{ display: "flex", gap: 4 }}>
                     {[1,2,3,4,5].map((n) => (
-                      <button key={n} onClick={() => setSkillRating(sk.name, n)} style={{ width: 28, height: 28, borderRadius: 6, background: sk.rating>=n?"#9a0000":"rgba(255,255,255,0.04)", color: "#fff", border: "none" }}>{n}</button>
+                      <button key={n} onClick={() => setSkillRating(sk.name, n)} style={{ width: 28, height: 28, borderRadius: 6, background: sk.rating>=n?"#9a0000":"rgba(255,255,255,0.04)", color: "#fff", border: "none" }} />
                     ))}
                   </div>
                 </div>
@@ -308,7 +337,7 @@ export default function Onboarding() {
     const s = responses.slide5 || {};
     const counts = ["0","1–2","3–4","5+"];
     const stages = [
-      "Just an idea, never started","Started but stopped within days","Got a few weeks in then stopped","Built something but never launched","Launched but got no traction","Got traction but could have done more",
+      "Just an idea, never started","Started but stopped within days","Got a few weeks in then stopped","Built something but never launched","Launched but got no traction","Got traction but could have scaled more"
     ];
 
     return (
@@ -489,7 +518,7 @@ export default function Onboarding() {
   function Slide9() {
     const s = responses.slide9 || {};
     const blockers = [
-      "Money — I don't have enough to invest","Network — I don't know the right people","Knowledge — I don't know what I don't know","Confidence — I doubt myself when it counts","Environmental / family constraints",
+      "Money — I don't have enough to invest","Network — I don't know the right people","Knowledge — I don't know what I don't know","Confidence — I doubt myself when it counts","Environmental — Family or circumstances don't support this"
     ];
 
     const toggle = (b: string) => {
@@ -531,7 +560,7 @@ export default function Onboarding() {
   function Slide10() {
     const s = responses.slide10 || {};
     const types = [
-      "A founder who built something from nothing","A creator who built an audience","An operator who scaled something massive","A strategist who outthought everyone","A contrarian who broke the rules",
+      "A founder who built something from nothing","A creator who built an audience","An operator who scaled something massive","A strategist who outthought everyone","A contrarian who broke the rules"
     ];
 
     return (
@@ -621,7 +650,7 @@ export default function Onboarding() {
   function Slide12() {
     const s = responses.slide12 || {};
     const options = [
-      "Consistent monthly income from something I built","A product or service people actually pay for","An audience that trusts what I say","A skill level that opens real doors","Financial independence",
+      "Consistent monthly income from something I built","A product or service people actually pay for","An audience that trusts what I say","A skill level that opens real doors","Financial independence"
     ];
 
     return (
@@ -650,8 +679,38 @@ export default function Onboarding() {
     );
   }
 
+  // Render based on stage
+  if (stage === 'processing') {
+    return <ProcessingScreen />;
+  }
+
+  if (stage === 'reveal') {
+    return (
+      <ArchetypeReveal
+        archetype={generatedArchetype || ''}
+        onContinue={() => navigate('/home', { replace: true })}
+      />
+    );
+  }
+
+  // stage === 'questions' — normal flow
   return (
     <>
+      {error && (
+        <div style={{
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          right: 20,
+          background: 'rgba(200, 50, 50, 0.9)',
+          color: '#fff',
+          padding: 16,
+          borderRadius: 8,
+          zIndex: 10000,
+        }}>
+          {error}
+        </div>
+      )}
       {renderCurrent()}
 
       {/* On-screen debug panel (last 10 log lines) */}
@@ -683,6 +742,6 @@ function mapResponsesToAnswers(responses: any) {
     q3: `Motivation: ${r.slide3?.motivationTrigger || ""}. Urgency: ${r.slide3?.urgency || ""}/10. Detail: ${r.slide3?.text || ""}`,
     q4: `Skills: ${(r.slide4?.skills || []).map((s: any) => `${s.name} (${s.rating}/5)`).join(", ")}. Unique strength: ${r.slide4?.text || ""}`,
     q5: `Projects started: ${r.slide5?.projectCount || ""}. Furthest stage: ${r.slide5?.furthestStage || ""}. Detail: ${r.slide5?.text || ""}. Failure modes: ${(r.slide6?.failureModes || []).join(", ")}`,
-    q6: `Decision style: ${r.slide7?.decisionStyle || ""}. Risk tolerance: ${r.slide7?.riskTolerance || ""}/10. Failure response: ${r.slide7?.text || ""}. Weekly hours: ${r.slide8?.weeklyHours || ""}`,
+    q6: `Decision style: ${r.slide7?.decisionStyle || ""}. Risk tolerance: ${r.slide7?.riskTolerance || ""}/10. Failure response: ${r.slide7?.text || ""}. Weekly hours: ${r.slide8?.weeklyHours || ""}. Peak focus time: ${r.slide8?.peakFocusTime || ""}. Energy drains: ${(r.slide8?.energyDrains || []).join(", ")}. Blockers: ${(r.slide9?.primaryBlockers || []).join(", ")}. Admired type: ${r.slide10?.admiredType || ""}. Budget: ${r.slide11?.monthlyBudget || ""}. Team status: ${r.slide11?.teamStatus || ""}. Access: ${(r.slide11?.accessList || []).join(", ")}. Success metric: ${r.slide12?.successMetric || ""}. Vision: ${r.slide12?.text || ""}`,
   };
 }
