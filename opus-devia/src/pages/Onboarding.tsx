@@ -23,23 +23,6 @@ export default function Onboarding() {
   const [generatedArchetype, setGeneratedArchetype] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // on-screen debug panel state
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
-  const debugLog = useCallback((msg: string) => {
-    // keep console.log for server/CI visibility too
-    console.log(msg);
-    setDebugLogs((prev) => [...prev.slice(-9), `${new Date().toLocaleTimeString()}: ${msg}`]);
-  }, []);
-
-  useEffect(() => {
-    debugLog('Onboarding mounted');
-    return () => debugLog('Onboarding unmounted');
-  }, [debugLog]);
-
-  useEffect(() => {
-    debugLog(`index changed: ${index}`);
-  }, [index, debugLog]);
-
   const setSlideText = useCallback((i: number, value: string, extra?: any) => {
     setResponses((r: any) => ({ ...r, ["slide" + (i + 1)]: { ...(r["slide" + (i + 1)] || {}), text: value, ...extra } }));
   }, []);
@@ -57,25 +40,20 @@ export default function Onboarding() {
       }, { onConflict: "user_id" });
       setDraftSaved(true);
       setTimeout(() => setDraftSaved(false), 1200);
-      debugLog(`Saved draft (q=${toSaveIndex + 1})`);
     } catch (err) {
       console.error("Failed to save draft:", err);
-      debugLog(`Failed to save draft: ${String(err)}`);
     } finally {
       setSaving(false);
     }
-  }, [user?.id, responses, index, debugLog]);
+  }, [user?.id, responses, index]);
 
   const goNext = useCallback(async () => {
     const nextIndex = index + 1;
     // If we're past the last slide, submit
     if (nextIndex >= TOTAL) {
-      debugLog('Submit branch entered');
       await saveDraft(nextIndex);
-      debugLog('Final draft saved');
 
       setStage('processing');
-      debugLog('Stage set to processing');
 
       const answers = mapResponsesToAnswers(responses);
 
@@ -83,7 +61,6 @@ export default function Onboarding() {
         const result = await supabase.functions.invoke("roadmap-generator", {
           body: JSON.stringify({ answers }),
         });
-        debugLog('Roadmap generator response: ' + JSON.stringify(result).slice(0, 200));
 
         const archetype = result.data?.archetype ?? result.data?.data?.archetype ?? null;
         setGeneratedArchetype(archetype);
@@ -94,13 +71,11 @@ export default function Onboarding() {
             .from('users')
             .update({ onboarding_complete: true })
             .eq('id', user.id);
-          debugLog('User marked onboarding_complete in database');
         }
 
         setStage('reveal');
-        debugLog('Stage set to reveal, archetype: ' + archetype);
       } catch (err) {
-        debugLog('Roadmap generator invocation FAILED: ' + (err instanceof Error ? err.message : String(err)));
+        console.error("Roadmap generator invocation failed:", err);
         setStage('questions'); // fall back so user isn't stuck on a blank processing screen
         setError('Something went wrong generating your roadmap. Please try again.');
       }
@@ -110,7 +85,7 @@ export default function Onboarding() {
     // Save the draft as the NEXT slide so resume goes to where the user is heading
     await saveDraft(nextIndex);
     setIndex(nextIndex);
-  }, [index, saveDraft, responses, user?.id, debugLog]);
+  }, [index, saveDraft, responses, user?.id]);
 
   const goBack = useCallback(() => {
     if (index === 0) return;
@@ -712,24 +687,6 @@ export default function Onboarding() {
         </div>
       )}
       {renderCurrent()}
-
-      {/* On-screen debug panel (last 10 log lines) */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'rgba(0,0,0,0.9)',
-        color: '#0f0',
-        fontSize: '10px',
-        fontFamily: 'monospace',
-        padding: '8px',
-        maxHeight: '120px',
-        overflowY: 'auto',
-        zIndex: 9999,
-      }}>
-        {debugLogs.map((log, i) => <div key={i}>{log}</div>)}
-      </div>
     </>
   );
 }
