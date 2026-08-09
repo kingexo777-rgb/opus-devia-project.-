@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import QuestionCard from "../components/onboarding/QuestionCard";
 import ProcessingScreen from "../components/onboarding/ProcessingScreen";
 import ArchetypeReveal from "../components/onboarding/ArchetypeReveal";
@@ -10,7 +9,6 @@ const TOTAL = 12;
 
 export default function Onboarding() {
   const { user } = useAuth();
-  import { useNavigate } from "react-router-dom";
 
   const [index, setIndex] = useState(0);
   const [saving, setSaving] = useState(false);
