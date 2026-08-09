@@ -19,12 +19,12 @@ const ARCHETYPE_MAP: Record<
   creator: {
     name: "THE CREATOR",
     description:
-      "You build audiences. Your ideas spread. Your brand is your engine.",
+      "You build audiences. Your ideas spread globally. Your brand is your engine. You are the key.",
   },
   strategist: {
     name: "THE STRATEGIST",
     description:
-      "You see the board before others see the pieces. You play the long game.",
+      "You see the board before others see the pieces. You play the long game returns and risk to reward ratios are your soul",
   },
   operator: {
     name: "THE OPERATOR",
