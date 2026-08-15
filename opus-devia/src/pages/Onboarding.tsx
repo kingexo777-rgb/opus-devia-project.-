@@ -49,15 +49,28 @@ export default function Onboarding() {
     const nextIndex = index + 1;
     // If we're past the last slide, submit
     if (nextIndex >= TOTAL) {
+      if (!user?.id) {
+        console.warn("Cannot submit onboarding — user not authenticated");
+        setError("Session expired. Please refresh and sign in again.");
+        return;
+      }
+
+      const answers = mapResponsesToAnswers(responses);
+
+      const missingFields = missingRequiredFields(responses);
+      if (missingFields.length > 0) {
+        console.warn("Incomplete onboarding responses:", missingFields.join(", "));
+        setError("Some answers are incomplete. Please go back and complete all questions.");
+        return;
+      }
+
       await saveDraft(nextIndex);
 
       setStage('processing');
 
-      const answers = mapResponsesToAnswers(responses);
-
       try {
         const result = await supabase.functions.invoke("roadmap-generator", {
-          body: JSON.stringify({ action: "generate", userId: user?.id, answers }),
+          body: JSON.stringify({ action: "generate", userId: user.id, answers }),
         });
 
         const archetype = result.data?.archetype ?? result.data?.data?.archetype ?? null;
@@ -684,6 +697,32 @@ export default function Onboarding() {
       {renderCurrent()}
     </>
   );
+}
+
+function missingRequiredFields(responses: any): string[] {
+  const r = responses;
+  const missing: string[] = [];
+  const require = (present: boolean, label: string) => {
+    if (!present) missing.push(label);
+  };
+
+  require(!!r.slide1?.age, "slide1.age");
+  require(!!r.slide1?.region, "slide1.region");
+  require(!!r.slide2?.goalType, "slide2.goalType");
+  require(!!r.slide3?.motivationTrigger, "slide3.motivationTrigger");
+  require(Array.isArray(r.slide4?.skills) && r.slide4.skills.length > 0, "slide4.skills");
+  require(!!r.slide5?.projectCount, "slide5.projectCount");
+  require(!!r.slide5?.furthestStage, "slide5.furthestStage");
+  require(Array.isArray(r.slide6?.failureModes) && r.slide6.failureModes.length > 0, "slide6.failureModes");
+  require(!!r.slide7?.decisionStyle, "slide7.decisionStyle");
+  require(!!r.slide8?.peakFocusTime, "slide8.peakFocusTime");
+  require(Array.isArray(r.slide9?.primaryBlockers) && r.slide9.primaryBlockers.length > 0, "slide9.primaryBlockers");
+  require(!!r.slide10?.admiredType, "slide10.admiredType");
+  require(!!r.slide11?.monthlyBudget, "slide11.monthlyBudget");
+  require(!!r.slide11?.teamStatus, "slide11.teamStatus");
+  require(!!r.slide12?.successMetric, "slide12.successMetric");
+
+  return missing;
 }
 
 function mapResponsesToAnswers(responses: any) {
