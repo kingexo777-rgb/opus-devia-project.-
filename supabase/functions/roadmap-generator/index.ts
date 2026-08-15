@@ -152,312 +152,333 @@ interface AIComputedProfile {
 // ─────────────────────────────────────────
 function buildRoadmapSystemPrompt(): string {
   return [
-    "You are RoadmapAI, a business psychology and strategy engine inside Opus Devia.",
-    "Your task is to analyze a user's onboarding answers and output a structured JSON profile.",
+    "You are RoadmapAI, the strategic planning engine inside Opus Devia.",
+    "Your job is to convert a user's actual situation into a realistic progression plan.",
+    "You are NOT a motivational coach, personality quiz, or generic business-advice generator.",
     "",
-    "DATA CONSTRAINT — ABSOLUTE:",
-    "Use ONLY the answers provided. Do not fabricate information.",
-    "Do not insert assumptions about the user's background, finances, or circumstances.",
-    "If an answer is vague, extract what is there and flag low confidence.",
-    "Never insert general statistics or external benchmarks as if they were the user's data.",
+    "CORE PRINCIPLE:",
+    "The user profile is evidence. The roadmap framework is the constraint. Your reasoning chooses the best sequence inside that constraint.",
+    "Never invent user facts. Never assume money, skills, audience, equipment, network, education, experience, location, or access unless explicitly provided.",
+    "When evidence is missing, do not fill the gap with a plausible assumption. Make the dependency something the user must discover or validate.",
     "",
-    "YOUR JOB:",
-    "Read the six free-answer responses and extract a precise business psychology profile.",
-    "Assign archetype scores, compute path compatibility, and generate roadmap inputs.",
+    "PERSONALISATION STANDARD:",
+    "Every phase and task must exist because of something specific about the user's goal, current state, resources, constraints, strengths, weaknesses, psychology, or chosen path.",
+    "A task that could be given unchanged to almost any beginner is a weak task. Replace it with a conditional, evidence-driven task.",
+    "Do not personalize by merely mentioning the user's archetype. Personalize the actual action, difficulty, sequence, scope, and success condition.",
     "",
-    "ARCHETYPES:",
-    "Closer: loves selling, high risk tolerance, gut decisions, people-first, fast revenue focus.",
-    "Creator: loves making things, hates repetition, intuitive, audience-first, content/product driven.",
-    "Strategist: data-driven, low risk, loves planning, vision-first, long game thinker.",
-    "Operator: process-oriented, execution-driven, systems-first, detail focused, consistency over creativity.",
-    "Maverick: contrarian, high risk, dislikes conformity, admires disruptors, cross-domain thinker, breaks rules deliberately.",
+    "ROADMAP LOGIC:",
+    "Build a dependency-aware progression, not a checklist.",
+    "Phase 1 must remove the highest-risk uncertainty or capability bottleneck preventing sensible progress.",
+    "Phase 2 must create real-world evidence: conversations, tests, prototypes, offers, outputs, users, sales, or another observable signal appropriate to the path.",
+    "Phase 3 must convert the strongest validated signal into a repeatable next stage of progress.",
+    "Do not force generic scaling work if the user has not validated the underlying opportunity.",
+    "Do not assign advanced work before its prerequisites are satisfied.",
+    "Prefer the shortest credible route to a meaningful real-world result.",
     "",
-    "SCORING RULES:",
-    "Closer: high risk tolerance + loves selling + gut decisions + people energy.",
-    "Creator: loves making + hates repetition + intuitive + skill in design/dev/writing/content.",
-    "Strategist: data-driven + low risk + loves planning + skill in analytics/finance/research.",
-    "Operator: process-oriented + low risk + loves execution + skill in ops/management/systems.",
-    "Maverick: contrarian answers + high risk + admires disruptors + cross-domain thinking + dislikes structure.",
+    "TASK DESIGN:",
+    "Each task must have one concrete outcome and a visible completion condition.",
+    "Tasks should produce evidence or capability that directly unlocks a later task.",
+    "Prefer actions the user can actually perform over passive research or vague learning.",
+    "If research is necessary, specify exactly what must be learned and what decision the research will inform.",
+    "If a task depends on unknown information, make that discovery the task instead of assuming the answer.",
+    "Do not fabricate customers, markets, prices, conversion rates, regulations, competitors, tools, or benchmarks.",
     "",
-    "PATH COMPATIBILITY MATH:",
-    "For each business path compute:",
-    "compat = 10 × (0.3 × skill_alignment + 0.25 × infrastructure_fit + 0.2 × time_energy + 0.25 × risk_motivation)",
-    "Then adjust the raw score based on:",
-    "- enjoyment_alignment: if high, boost score up to +1.5",
-    "- failure_penalty: if high (user struggles with setbacks), reduce score up to -1.0",
-    "- discipline_level: if low, reduce scores for high-consistency paths up to -1.0",
-    "- ambition_level: if low, reduce scaling-heavy paths up to -0.5",
-    "Final compatibility_rating = adjusted score rounded to one decimal. Cap at 10.",
-    "Do not blindly apply the math. Analyse the answers first, then let the math confirm or adjust.",
+    "FEASIBILITY:",
+    "Respect the user's stated weekly hours, deadline, capital, skill level, and constraints.",
+    "Do not create a roadmap that requires more time than the user can realistically supply.",
+    "Prefer small executable steps early and increase difficulty only when evidence supports it.",
+    "Estimated hours must represent the user's actual workload, not an idealized founder's workload.",
     "",
-    "PATHS TO SCORE (minimum 6):",
-    "Freelance Services, Consulting, Agency, Content Creator, SaaS/Software, Ecommerce,",
-    "Coaching, Digital Products, Community/Membership, Venture/Investing",
+    "VALIDATION-FIRST RULE:",
+    "Never ask a user to build a large asset before the relevant demand, problem, audience, or feasibility assumption has been tested when testing is possible.",
+    "When a path can be tested cheaply before it is built, test first.",
+    "A successful roadmap should reduce uncertainty as it progresses, not merely accumulate completed tasks.",
     "",
-    "DEADLINE ADJUSTMENT:",
-    "E_req = base_effort × (1 + (5 - risk_tolerance) / 10) × (1 + failure_penalty)",
-    "If E_req > weekly_hours: adjusted_deadline = ceil(deadline_months × (E_req / weekly_hours))",
-    "Else: adjusted_deadline = deadline_months",
-    "Include adjusted_deadline_months in roadmap_input.",
+    "PROFILE EXTRACTION RULES:",
+    "Separate what the user explicitly said from what you infer.",
+    "Use scores as signals, not facts. A score cannot create a fact that the questionnaire did not contain.",
+    "Keep archetypes descriptive rather than deterministic. Never let an archetype override explicit constraints or goals.",
+    "Archetypes: Closer = selling/people/revenue oriented; Creator = making/content/product oriented; Strategist = planning/data/long-term oriented; Operator = systems/process/execution oriented; Maverick = contrarian/high-autonomy/cross-domain oriented.",
+    "Score archetypes from evidence in the answers, not stereotypes. A user can have a mixed profile.",
+    "Path compatibility is a recommendation signal, not a prediction. Consider skills, infrastructure, time/energy, risk/motivation, enjoyment, discipline, failure tolerance, and ambition.",
+    "When computing compatibility, do not let a high score override a hard constraint explicitly stated by the user.",
+    "The profile must preserve the user's real constraints in goal_metrics and roadmap_input.",
     "",
-    "OUTPUT FORMAT:",
-    "Return ONLY valid JSON matching this exact structure.",
-    "No markdown, no explanation, no preamble.",
+    "PROFILE OUTPUT SCHEMA:",
+    '{ "extracted_scores": { "skill_alignment": 0, "infrastructure_fit": 0, "time_energy": 0, "risk_motivation": 0, "failure_penalty": 0, "enjoyment_alignment": 0, "discipline_level": 0, "ambition_level": 0 }, "goal_metrics": { "weekly_hours": 0, "deadline_months": 0, "risk_tolerance": 0 }, "archetype_scores": { "Closer": 0, "Creator": 0, "Strategist": 0, "Operator": 0, "Maverick": 0 }, "primary_archetype": "", "secondary_archetype": "", "path_scores": [ { "name": "", "score": 0, "compatibility_rating": 0, "best_for_archetypes": [], "reason": "" } ], "archetype_cases": { "Closer": { "strengths": "", "weaknesses": "", "advantages": "", "blind_spots": "", "case": "" }, "Creator": { "strengths": "", "weaknesses": "", "advantages": "", "blind_spots": "", "case": "" }, "Strategist": { "strengths": "", "weaknesses": "", "advantages": "", "blind_spots": "", "case": "" }, "Operator": { "strengths": "", "weaknesses": "", "advantages": "", "blind_spots": "", "case": "" }, "Maverick": { "strengths": "", "weaknesses": "", "advantages": "", "blind_spots": "", "case": "" } }, "psychology_profile": { "loves": [], "hates": [], "discipline_triggers": [], "known_disruptors": [], "bad_habits": [], "limiting_beliefs": [], "admired_business_approach": "", "decision_style": "", "motivation_depth": "" }, "roadmap_input": { "base_effort_hours": 0, "adjusted_deadline_months": 0, "major_tasks_suggestion": [], "recommended_path": "" } }',
     "",
-    JSON.stringify({
-      extracted_scores: {
-        skill_alignment: 0.0,
-        infrastructure_fit: 0.0,
-        time_energy: 0.0,
-        risk_motivation: 0.0,
-        failure_penalty: 0.0,
-        enjoyment_alignment: 0.0,
-        discipline_level: 0.0,
-        ambition_level: 0.0,
-      },
-      goal_metrics: {
-        weekly_hours: 0,
-        deadline_months: 0,
-        risk_tolerance: 0,
-      },
-      archetype_scores: {
-        Closer: 0.0,
-        Creator: 0.0,
-        Strategist: 0.0,
-        Operator: 0.0,
-        Maverick: 0.0,
-      },
-      primary_archetype: "",
-      secondary_archetype: "",
-      path_scores: [
-        {
-          name: "",
-          score: 0.0,
-          compatibility_rating: 0.0,
-          best_for_archetypes: [],
-          reason: "",
-        },
-      ],
-      archetype_cases: {
-        Closer: {
-          strengths: "",
-          weaknesses: "",
-          advantages: "",
-          blind_spots: "",
-          case: "",
-        },
-        Creator: {
-          strengths: "",
-          weaknesses: "",
-          advantages: "",
-          blind_spots: "",
-          case: "",
-        },
-        Strategist: {
-          strengths: "",
-          weaknesses: "",
-          advantages: "",
-          blind_spots: "",
-          case: "",
-        },
-        Operator: {
-          strengths: "",
-          weaknesses: "",
-          advantages: "",
-          blind_spots: "",
-          case: "",
-        },
-        Maverick: {
-          strengths: "",
-          weaknesses: "",
-          advantages: "",
-          blind_spots: "",
-          case: "",
-        },
-      },
-      psychology_profile: {
-        loves: [],
-        hates: [],
-        discipline_triggers: [],
-        known_disruptors: [],
-        bad_habits: [],
-        limiting_beliefs: [],
-        admired_business_approach: "",
-        decision_style: "",
-        motivation_depth: "",
-      },
-      roadmap_input: {
-        base_effort_hours: 0,
-        adjusted_deadline_months: 0,
-        major_tasks_suggestion: [],
-        recommended_path: "",
-      },
-    }),
+    "OUTPUT:",
+    "Return ONLY valid JSON matching the requested structure.",
+    "No markdown. No explanation outside JSON.",
   ].join("\n")
 }
 
-// ─────────────────────────────────────────
-// PHASE TEMPLATE ENGINE
-// Generates 3 phases × 5 tasks
-// Based on archetype + path combination
-// Falls back to AI suggested tasks if no
-// template match found
-// ─────────────────────────────────────────
-function generatePhaseTemplates(
+async function generatePhaseTemplates(
+  archetype: Archetype,
+  path: string,
+  majorTasksHint: string[],
+  profile?: AIComputedProfile,
+  answers?: QuestionnaireAnswers,
+): Promise<PhaseTemplate[]> {
+  // The old implementation selected a static archetype/path template and only
+  // personalized its explanations afterwards. That made the roadmap itself
+  // largely identical for users with the same path. The engine now asks the
+  // model to construct the roadmap from the structured profile while keeping
+  // the output contract deterministic and validating the result before use.
+  if (!profile || !answers) {
+    return generateFallbackPhases(archetype, path, majorTasksHint)
+  }
+
+  const systemPrompt = [
+    buildRoadmapSystemPrompt(),
+    "",
+    "You are now generating the actual Opus Devia roadmap.",
+    "Use the supplied profile and answers as the complete evidence set.",
+    "The roadmap must contain exactly 3 phases and exactly 5 tasks per phase because the application expects that structure.",
+    "",
+    "PHASE CONTRACT:",
+    "Phase 1 = remove the most important current bottleneck and establish the minimum foundation required for a real test.",
+    "Phase 2 = run the most informative real-world validation or execution loop available to this path.",
+    "Phase 3 = exploit the strongest validated signal and establish the next repeatable operating system.",
+    "These are intents, not templates. The actual content must be derived from this user.",
+    "",
+    "TASK CONTRACT:",
+    "Every task must be concrete, sequential, feasible, and materially useful.",
+    "Do not create filler tasks merely to reach five tasks.",
+    "Do not repeat the same action with different wording.",
+    "Do not use generic tasks such as 'learn about marketing', 'build a brand', 'research competitors', or 'create a business plan' unless the user's specific situation makes that exact action necessary; if used, define the exact decision/output it must produce.",
+    "At least 8 of the 15 tasks should produce external evidence or a tangible artifact.",
+    "At least 3 tasks should explicitly test an assumption that could cause the path to fail.",
+    "Each task should prepare the next task.",
+    "",
+    "SUCCESS CONDITIONS:",
+    "description must say what the user actually does.",
+    "goal_description must explain why this exact task is necessary for this exact user's current position.",
+    "difficulty must be small, medium, or large.",
+    "task_type must be deep or shallow.",
+    "is_major should be true only for consequential milestones.",
+    "estimated_hours must be realistic and sum to no more than roughly 80% of the user's available hours over the stated deadline; leave capacity for unexpected work.",
+    "xp_reward should reflect difficulty and consequence, not task length alone.",
+    "",
+    "HALLUCINATION CONTROL:",
+    "Never state an unsupported fact as if it were true.",
+    "If the roadmap needs information the user did not provide, create a discovery/validation task that obtains that information.",
+    "Do not invent named customers, target demographics, revenue figures, market sizes, prices, conversion rates, competitors, credentials, or resources.",
+    "Do not cite external statistics or benchmarks.",
+    "",
+    'OUTPUT SCHEMA: { "phases": [ { "phase_number": 1, "title": "", "description": "", "unlock_condition": "auto", "tasks": [ { "title": "", "description": "", "goal_description": "", "task_type": "deep", "difficulty": "small", "is_major": false, "xp_reward": 0, "estimated_hours": 0, "order_index": 1 } ] } ] }',
+    "Return only JSON.",
+  ].join("\n")
+
+  const primaryCase = profile.archetype_cases[profile.primary_archetype]
+  const userInput = [
+    "USER EVIDENCE — DO NOT INVENT BEYOND THIS:",
+    JSON.stringify({
+      questionnaire_answers: answers,
+      primary_archetype: profile.primary_archetype,
+      secondary_archetype: profile.secondary_archetype,
+      extracted_scores: profile.extracted_scores,
+      goal_metrics: profile.goal_metrics,
+      path_scores: profile.path_scores,
+      psychology_profile: profile.psychology_profile,
+      roadmap_input: profile.roadmap_input,
+      primary_archetype_case: primaryCase,
+      selected_path: path,
+      major_task_hints: majorTasksHint,
+    }, null, 2),
+    "",
+    "Before writing the roadmap, reason internally through:",
+    "1. What is the user's actual desired outcome?",
+    "2. What is their current starting position?",
+    "3. What is the single largest constraint or failure risk?",
+    "4. What must be proven before significant effort is invested?",
+    "5. What sequence gives this user the highest information and progress per hour?",
+    "6. What should the user deliberately NOT do yet?",
+    "Do not output this reasoning; encode the conclusions in the roadmap.",
+  ].join("\n")
+
+  try {
+    const apiKey = Deno.env.get("GEMINI_API_KEY")!
+    const model = Deno.env.get("GEMINI_MODEL")!
+    const rawBaseUrl = Deno.env.get("GEMINI_BASE_URL")!
+    const isOpenRouter = apiKey.startsWith("sk-or-")
+    const baseUrl = isOpenRouter
+      ? "https://openrouter.ai/api/v1"
+      : rawBaseUrl.replace(/^http:\/\//, "https://")
+
+    let raw = ""
+    if (isOpenRouter) {
+      const response = await fetch(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userInput },
+          ],
+          max_tokens: 6000,
+          temperature: 0.2,
+        }),
+      })
+      const data = await response.json()
+      raw = data.choices?.[0]?.message?.content ?? ""
+    } else {
+      const response = await fetch(`${baseUrl}/models/${model}:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `${systemPrompt}\n\n${userInput}` }] }],
+          generationConfig: {
+            maxOutputTokens: 6000,
+            temperature: 0.2,
+          },
+        }),
+      })
+      const data = await response.json()
+      raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
+    }
+
+    const clean = raw.replace(/```json|```/g, "").trim()
+    const parsed = JSON.parse(clean) as { phases?: PhaseTemplate[] }
+    const validated = validateGeneratedRoadmap(parsed.phases ?? [], profile)
+
+    if (validated.length === 3 && validated.every((p) => p.tasks.length === 5)) {
+      return validated
+    }
+
+    console.warn("Generated roadmap failed structural validation; using deterministic fallback.")
+    return generateFallbackPhases(archetype, path, majorTasksHint)
+  } catch (ex) {
+    console.error("Personalized roadmap generation failed:", ex)
+    return generateFallbackPhases(archetype, path, majorTasksHint)
+  }
+} 
+
+function validateGeneratedRoadmap(
+  phases: PhaseTemplate[],
+  profile: AIComputedProfile,
+): PhaseTemplate[] {
+  const weeklyHours = Math.max(1, Number(profile.goal_metrics.weekly_hours) || 1)
+  const deadlineMonths = Math.max(1, Number(profile.goal_metrics.deadline_months) || 1)
+  const totalCapacity = weeklyHours * 4.345 * deadlineMonths * 0.8
+  const safePhases = Array.isArray(phases) ? phases.slice(0, 3) : []
+  const seenTitles = new Set<string>()
+  let totalHours = 0
+
+  for (let pi = 0; pi < safePhases.length; pi++) {
+    const phase = safePhases[pi]
+    phase.phase_number = pi + 1
+    phase.unlock_condition = "auto"
+    phase.title = String(phase.title || `Phase ${pi + 1}`).trim().slice(0, 120)
+    phase.description = String(phase.description || "").trim().slice(0, 500)
+
+    if (!Array.isArray(phase.tasks)) phase.tasks = []
+    phase.tasks = phase.tasks.slice(0, 5)
+
+    while (phase.tasks.length < 5) {
+      phase.tasks.push({
+        title: `Complete the next ${pi === 0 ? "foundation" : pi === 1 ? "validation" : "execution"} step`,
+        description: "Use the current evidence and constraints to define and complete the smallest necessary next step.",
+        goal_description: "This closes the next gap required by the current phase without assuming facts that have not been established.",
+        difficulty_rationale: "Fallback task used because the generated roadmap did not provide enough valid tasks.",
+        task_type: "shallow",
+        difficulty: "small",
+        difficulty_score: 1,
+        is_major: false,
+        xp_reward: 15,
+        estimated_hours: 1,
+        order_index: phase.tasks.length + 1,
+      })
+    }
+
+    phase.tasks = phase.tasks.map((task, ti) => {
+      let title = String(task.title || "Next actionable step").trim().slice(0, 140)
+      const titleKey = title.toLowerCase()
+      if (seenTitles.has(titleKey)) title = `${title} — iteration ${ti + 1}`
+      seenTitles.add(title.toLowerCase())
+
+      const difficulty: TaskDifficulty = task.difficulty === "large" || task.difficulty === "medium" ? task.difficulty : "small"
+      const taskType: TaskType = task.task_type === "deep" ? "deep" : "shallow"
+      const isMajor = Boolean(task.is_major)
+      const difficultyScore = computeDifficultyScore(difficulty, taskType, isMajor)
+      const estimatedHours = Math.max(0.5, Math.min(40, Number(task.estimated_hours) || 1))
+      const xpReward = Math.max(10, Math.min(250, Number(task.xp_reward) || difficultyScore * 15))
+
+      totalHours += estimatedHours
+      return {
+        title,
+        description: String(task.description || "Complete this task and record the observable result.").trim().slice(0, 800),
+        goal_description: String(task.goal_description || "This task advances the current milestone for this user's roadmap.").trim().slice(0, 600),
+        difficulty_rationale: String(task.difficulty_rationale || `Difficulty is calibrated at ${difficultyScore}/5 based on scope and consequence.`).trim().slice(0, 500),
+        task_type: taskType,
+        difficulty,
+        difficulty_score: difficultyScore,
+        is_major: isMajor,
+        xp_reward: xpReward,
+        estimated_hours: estimatedHours,
+        order_index: ti + 1,
+      }
+    })
+  }
+
+  // Never let a generated roadmap silently consume more time than the user
+  // plausibly has. Scale estimated hours rather than changing the task set.
+  if (totalHours > totalCapacity && totalCapacity > 0) {
+    const scale = Math.max(0.35, totalCapacity / totalHours)
+    for (const phase of safePhases) {
+      for (const task of phase.tasks) {
+        task.estimated_hours = Math.max(0.5, Math.round(task.estimated_hours * scale * 2) / 2)
+      }
+    }
+  }
+
+  return safePhases
+}
+
+function generateFallbackPhases(
   archetype: Archetype,
   path: string,
   majorTasksHint: string[]
 ): PhaseTemplate[] {
-  // Template library — archetype + path combinations
-  // Extend this as you add more paths and archetypes
-  const templates: Record<string, Record<string, PhaseTemplate[]>> = {
-    "Freelance Services": {
-      Closer: [
-        {
-          phase_number: 1,
-          title: "Foundation: Offer and Outreach",
-          description: "Define your service, build credibility, and start reaching out to prospects.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Define your niche offer", description: "Write a clear one sentence value proposition that explains what you do, who for, and the result they get.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 50, estimated_hours: 4, order_index: 1 },
-            { title: "Build a simple portfolio", description: "Create 2-3 samples of your work even if they are speculative. Credibility before outreach.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 5, order_index: 2 },
-            { title: "Map your first 20 prospects", description: "List 20 specific people or businesses who could buy your service. Be specific — names, not categories.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 2, order_index: 3 },
-            { title: "Send your first 10 outreach messages", description: "Personalised, short, and focused on their problem not your credentials.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 30, estimated_hours: 3, order_index: 4 },
-            { title: "Follow up with non-responders", description: "One follow up per prospect. Most deals happen on the follow up not the first message.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 15, estimated_hours: 1, order_index: 5 },
-          ],
-        },
-        {
-          phase_number: 2,
-          title: "Validation: Close Your First Client",
-          description: "Convert interest into a signed agreement and deliver your first paid result.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Send 5 tailored proposals", description: "Each proposal addresses one specific pain point you identified in the prospect. Not a generic deck.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 60, estimated_hours: 5, order_index: 1 },
-            { title: "Get on 3 discovery calls", description: "Listen more than you speak. Your job is to understand their problem deeply.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 3, order_index: 2 },
-            { title: "Close your first client", description: "Sign an agreement. Any amount. Proof of concept is more valuable than the money right now.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 100, estimated_hours: 3, order_index: 3 },
-            { title: "Deliver the first project", description: "Execute and deliver. First impressions set the standard for every referral that follows.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 80, estimated_hours: 10, order_index: 4 },
-            { title: "Request a testimonial", description: "Ask immediately after delivery while the result is fresh. Written or video.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 5 },
-          ],
-        },
-        {
-          phase_number: 3,
-          title: "Scaling: Systematise and Grow",
-          description: "Turn one client into a repeatable system. Raise rates. Get referrals.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Create a delivery checklist", description: "Document every step of your service delivery so you can repeat it consistently and eventually delegate it.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 50, estimated_hours: 4, order_index: 1 },
-            { title: "Ask your first 3 clients for referrals", description: "Referrals from happy clients convert at 3-4x the rate of cold outreach. Ask directly.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 2 },
-            { title: "Raise your rates by 20-30 percent for new clients", description: "You now have proof. Price reflects it. Existing clients stay at old rate.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 30, estimated_hours: 2, order_index: 3 },
-            { title: "Build a simple referral system", description: "Incentivise referrals with a small finder's fee or reciprocal arrangement. Make it automatic.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 40, estimated_hours: 3, order_index: 4 },
-            { title: "Land your third client", description: "Three clients is proof of concept. Pattern recognition begins. Iterate on what worked.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 100, estimated_hours: 5, order_index: 5 },
-          ],
-        },
-      ],
-      Creator: [
-        {
-          phase_number: 1,
-          title: "Foundation: Build Your Voice",
-          description: "Find your angle, start creating, and build an initial audience.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Define your content angle", description: "What unique perspective do you bring? Who specifically are you talking to? One sentence.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 50, estimated_hours: 3, order_index: 1 },
-            { title: "Choose one platform and commit", description: "Pick the platform where your audience already is. Do not spread across five. One only.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 2 },
-            { title: "Publish your first 10 pieces of content", description: "Quantity builds skill faster than perfection. Ship ten before you judge any of them.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 8, order_index: 3 },
-            { title: "Study your top performing piece", description: "What worked and why. Double down on that pattern.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 2, order_index: 4 },
-            { title: "Engage with 20 people in your target audience", description: "Comments, replies, conversations. Audience building is relational before it is algorithmic.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 15, estimated_hours: 2, order_index: 5 },
-          ],
-        },
-        {
-          phase_number: 2,
-          title: "Validation: Monetise the Audience",
-          description: "Convert attention into your first dollar. Validate that people will pay.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Create a simple digital product", description: "A guide, template, or mini course. Price it low to remove friction. $9-49 range.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 80, estimated_hours: 10, order_index: 1 },
-            { title: "Announce it to your audience", description: "Post about it. Email if you have a list. Direct message your most engaged followers.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 2 },
-            { title: "Make your first sale", description: "One person paying for your work changes your psychology permanently. Get to one.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 100, estimated_hours: 3, order_index: 3 },
-            { title: "Collect feedback from buyers", description: "Ask what they needed that you did not cover. This becomes your next product.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 4 },
-            { title: "Reach 100 followers or subscribers", description: "Small number but it represents real humans who chose to follow you. Quality over quantity here.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 6, order_index: 5 },
-          ],
-        },
-        {
-          phase_number: 3,
-          title: "Scaling: Build the Engine",
-          description: "Systematise content creation and stack revenue streams.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Build a content calendar", description: "Batch create and schedule. Consistency beats brilliance at this stage.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 40, estimated_hours: 3, order_index: 1 },
-            { title: "Add a second revenue stream", description: "Affiliate, consulting, higher priced product. Stack income sources that compound.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 80, estimated_hours: 8, order_index: 2 },
-            { title: "Build or start an email list", description: "You do not own social media followers. You own your email list. Start it now if you have not.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 60, estimated_hours: 5, order_index: 3 },
-            { title: "Reach 500 followers or subscribers", description: "The compound effect begins to show at this number.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 10, order_index: 4 },
-            { title: "Review and double down on what converts", description: "Which content drives sales? Which platform drives growth? Eliminate the rest.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 2, order_index: 5 },
-          ],
-        },
-      ],
-    },
-    "Consulting": {
-      Strategist: [
-        {
-          phase_number: 1,
-          title: "Foundation: Position Your Expertise",
-          description: "Define your consulting niche, build authority signals, identify target clients.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Define your consulting niche precisely", description: "Not business consulting. Pick a specific problem for a specific type of business. The narrower the better at this stage.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 50, estimated_hours: 4, order_index: 1 },
-            { title: "Document your methodology", description: "How do you solve the problem? What is your process? Systematise your thinking into a repeatable framework.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 60, estimated_hours: 6, order_index: 2 },
-            { title: "Create one piece of authority content", description: "A detailed article, case study, or analysis that demonstrates your thinking. Not promotional.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 5, order_index: 3 },
-            { title: "Identify 15 potential clients", description: "Businesses that have the problem you solve and can afford to pay for the solution.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 2, order_index: 4 },
-            { title: "Reach out to 5 potential clients", description: "Lead with insight not a pitch. Share something useful about their specific situation.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 30, estimated_hours: 3, order_index: 5 },
-          ],
-        },
-        {
-          phase_number: 2,
-          title: "Validation: Land Your First Engagement",
-          description: "Convert a conversation into a paid consulting engagement.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Conduct 3 diagnostic conversations", description: "Not sales calls. Deep conversations to understand their problem. You are diagnosing not pitching.", task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 4, order_index: 1 },
-            { title: "Write a scoped proposal", description: "Specific problem, specific outcome, specific timeline, specific price. No vague deliverables.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 60, estimated_hours: 5, order_index: 2 },
-            { title: "Close your first consulting engagement", description: "Sign the agreement. Start date confirmed.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 100, estimated_hours: 3, order_index: 3 },
-            { title: "Deliver and document your process", description: "Execute the engagement and document what you did and why. This builds your case study.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 80, estimated_hours: 15, order_index: 4 },
-            { title: "Get a written case study or testimonial", description: "Before and after. What was the problem, what did you do, what was the result.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 30, estimated_hours: 2, order_index: 5 },
-          ],
-        },
-        {
-          phase_number: 3,
-          title: "Scaling: Build Recurring Revenue",
-          description: "Convert project work into retainers and build a pipeline.",
-          unlock_condition: "auto",
-          tasks: [
-            { title: "Propose a retainer to your first client", description: "Ongoing advisory or implementation support. Monthly fee for defined access and output.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 80, estimated_hours: 3, order_index: 1 },
-            { title: "Publish your case study", description: "Share the result publicly with client permission. This is your most powerful marketing asset.", task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 50, estimated_hours: 4, order_index: 2 },
-            { title: "Build a simple referral pipeline", description: "Ask clients who else they know. Accountants, lawyers, and advisors are excellent referral sources.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 3 },
-            { title: "Raise your day rate", description: "With one case study you have proof. Price accordingly for new engagements.", task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1, order_index: 4 },
-            { title: "Land your second client", description: "Second client validation means you have a repeatable model not a lucky break.", task_type: "deep", difficulty: "large", is_major: true, xp_reward: 100, estimated_hours: 5, order_index: 5 },
-          ],
-        },
-      ],
-    },
-  }
-
-  // Check for template match
-  const pathTemplates = templates[path]
-  if (pathTemplates && pathTemplates[archetype]) {
-    return pathTemplates[archetype]
-  }
-
-  // Fallback: generate phases from AI suggested major tasks
-  // Used when no template exists for the path/archetype combination
-  return generateFallbackPhases(archetype, path, majorTasksHint)
+  // Emergency-only fallback. The normal path is AI-constructed and validated.
+  const phaseNames = [
+    { title: `Phase 1: Establish the ${path} Foundation`, description: `Remove the most important current constraint and prepare a testable first step for ${path}.` },
+    { title: `Phase 2: Validate ${path} in the Real World`, description: "Obtain observable evidence before committing significant additional effort." },
+    { title: `Phase 3: Build the Next Repeatable System`, description: "Use the strongest evidence obtained so far to create the next repeatable progression step." },
+  ]
+  const attrs: Array<Omit<TaskTemplate, "title" | "description" | "order_index" | "difficulty_score" | "goal_description" | "difficulty_rationale">> = [
+    { task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 50, estimated_hours: 3 },
+    { task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1 },
+    { task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 35, estimated_hours: 2 },
+    { task_type: "deep", difficulty: "small", is_major: false, xp_reward: 25, estimated_hours: 1.5 },
+    { task_type: "deep", difficulty: "medium", is_major: true, xp_reward: 60, estimated_hours: 3 },
+  ]
+  return phaseNames.map((phase, pi) => ({
+    phase_number: pi + 1,
+    title: phase.title,
+    description: phase.description,
+    unlock_condition: "auto" as const,
+    tasks: attrs.map((a, i) => {
+      const hint = majorTasksHint[pi * 5 + i]
+      const title = hint?.trim() || `Define and complete the next ${pi === 0 ? "foundation" : pi === 1 ? "validation" : "execution"} step`
+      const score = computeDifficultyScore(a.difficulty, a.task_type, a.is_major)
+      return {
+        ...a,
+        title,
+        description: "Complete this step using only information that has been established about your current situation, and record the result.",
+        goal_description: `Emergency fallback for the ${path} path. This step should be replaced by the personalized generation path when the model is available.`,
+        difficulty_rationale: `Fallback difficulty: ${score}/5 based on task scope and consequence.`,
+        difficulty_score: score,
+        order_index: i + 1,
+      }
+    }),
+  }))
 }
 
-// ─────────────────────────────────────────
-// POST-PROCESS: Add difficulty_score,
-// goal_description, and difficulty_rationale
-// defaults to all template tasks.
-// The AI generation step will overwrite
-// goal/rationale with per-task content.
-// ─────────────────────────────────────────
 function enrichDifficultyScores(phases: PhaseTemplate[]): PhaseTemplate[] {
   return phases.map((phase) => ({
     ...phase,
@@ -502,42 +523,36 @@ async function generateTaskGoalsAndRationales(
     }))
 
     const systemPrompt = [
-      "You are RoadmapAI task enrichment engine inside Opus Devia.",
-      "Given a user profile and exactly 5 roadmap tasks from ONE phase, generate two fields for EACH task:",
-      "",
-      "1. goal_description (2-4 sentences):",
-      "   - Explain WHY this SPECIFIC task helps THIS user on their path.",
-      "   - Reference their archetype, strengths, weaknesses, or psychology directly.",
-      "   - Tie it to this exact phase and path.",
-      "   - NEVER use generic phrases. ALWAYS be task-specific.",
-      "",
-      "2. difficulty_rationale (2-4 sentences):",
-      "   - Explain why this task has its EXACT difficulty_score out of 5.",
-      "   - Break down the factors: base label, deep/shallow modifier, major milestone bonus.",
-      "   - Final sentence MUST be: 'Final difficulty score: X/5.' where X is the exact difficulty_score shown.",
-      "   - NEVER contradict the difficulty_score value.",
-      "",
-      "CONSTRAINTS:",
-      "- Return ONLY valid JSON. No markdown. No preamble.",
-      "- Each task output must be unique. No copy-pasting between tasks.",
-      `- There are exactly ${phase.tasks.length} tasks. Return exactly ${phase.tasks.length} enriched tasks.`,
-      "",
-      'OUTPUT: { "tasks": [ { "task_index": 0, "goal_description": "...", "difficulty_rationale": "..." }, ... ] }',
+      "You are the final quality-control and personalization layer inside Opus Devia.",
+      "You are NOT allowed to invent user facts or change the roadmap's underlying task sequence.",
+      "For each supplied task, write a concise goal_description explaining why that exact action matters for this exact user.",
+      "Use the questionnaire evidence and computed profile. Do not merely repeat the archetype label.",
+      "If the data does not justify a personal claim, describe the task's dependency and expected evidence instead.",
+      "Write a difficulty_rationale that agrees exactly with the supplied difficulty_score.",
+      "Do not claim statistics, market facts, customer behaviour, prices, or outcomes that were not supplied.",
+      `There are exactly ${phase.tasks.length} tasks. Return exactly ${phase.tasks.length} results.`,
+      "Return ONLY valid JSON.",
+      '{ "tasks": [ { "task_index": 0, "goal_description": "", "difficulty_rationale": "" } ] }',
     ].join("\n")
 
     const userInput = [
-      "USER PROFILE:",
-      `Path: ${path}`,
-      `Primary Archetype: ${profile.primary_archetype}`,
-      `Strengths: ${profile.archetype_cases[profile.primary_archetype]?.strengths ?? "N/A"}`,
-      `Weaknesses: ${profile.archetype_cases[profile.primary_archetype]?.weaknesses ?? "N/A"}`,
-      `Blind Spots: ${profile.archetype_cases[profile.primary_archetype]?.blind_spots ?? "N/A"}`,
-      `Decision Style: ${profile.psychology_profile.decision_style}`,
-      `Motivation: ${profile.psychology_profile.motivation_depth}`,
-      `Discipline Triggers: ${(profile.psychology_profile.discipline_triggers ?? []).join(", ")}`,
-      `Limiting Beliefs: ${(profile.psychology_profile.limiting_beliefs ?? []).join(", ")}`,
+      "USER ANSWERS:",
+      JSON.stringify(answers, null, 2),
       "",
-      `PHASE ${phase.phase_number} TASKS:`,
+      "COMPUTED PROFILE:",
+      JSON.stringify({
+        primary_archetype: profile.primary_archetype,
+        secondary_archetype: profile.secondary_archetype,
+        extracted_scores: profile.extracted_scores,
+        goal_metrics: profile.goal_metrics,
+        psychology_profile: profile.psychology_profile,
+        roadmap_input: profile.roadmap_input,
+        primary_archetype_case: profile.archetype_cases[profile.primary_archetype],
+      }, null, 2),
+      "",
+      `PATH: ${path}`,
+      `PHASE: ${phase.title}`,
+      "TASKS:",
       JSON.stringify(taskList, null, 2),
     ].join("\n")
 
@@ -550,8 +565,7 @@ async function generateTaskGoalsAndRationales(
         ? "https://openrouter.ai/api/v1"
         : rawBaseUrl.replace(/^http:\/\//, "https://")
 
-      let raw: string
-
+      let raw = ""
       if (isOpenRouter) {
         const response = await fetch(`${baseUrl}/chat/completions`, {
           method: "POST",
@@ -566,24 +580,20 @@ async function generateTaskGoalsAndRationales(
               { role: "user", content: userInput },
             ],
             max_tokens: 2000,
-            temperature: 0.4,
+            temperature: 0.15,
           }),
         })
         const data = await response.json()
         raw = data.choices?.[0]?.message?.content ?? ""
       } else {
-        const fullPrompt = `${systemPrompt}\n\n${userInput}`
-        const response = await fetch(
-          `${baseUrl}/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: fullPrompt }] }],
-              generationConfig: { maxOutputTokens: 2000, temperature: 0.4 },
-            }),
-          }
-        )
+        const response = await fetch(`${baseUrl}/models/${model}:generateContent?key=${apiKey}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `${systemPrompt}\n\n${userInput}` }] }],
+            generationConfig: { maxOutputTokens: 2000, temperature: 0.15 },
+          }),
+        })
         const data = await response.json()
         raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
       }
@@ -592,7 +602,6 @@ async function generateTaskGoalsAndRationales(
       const result = JSON.parse(clean) as {
         tasks: Array<{ task_index: number; goal_description: string; difficulty_rationale: string }>
       }
-
       const enrichedMap = new Map(result.tasks.map((t) => [t.task_index, t]))
 
       enrichedPhases.push({
@@ -601,102 +610,19 @@ async function generateTaskGoalsAndRationales(
           const enriched = enrichedMap.get(ti)
           return {
             ...task,
-            goal_description: enriched?.goal_description || "",
-            difficulty_rationale: enriched?.difficulty_rationale || "",
+            goal_description: enriched?.goal_description?.trim() || task.goal_description || "",
+            difficulty_rationale: enriched?.difficulty_rationale?.trim() || task.difficulty_rationale || `Final difficulty score: ${task.difficulty_score}/5.`,
           }
         }),
       })
     } catch (ex) {
       console.error(`Phase ${phase.phase_number} enrichment failed:`, ex)
-      // Push phase unchanged — frontend handles empty strings gracefully
       enrichedPhases.push(phase)
     }
   }
 
   return enrichedPhases
 }
-
-function generateFallbackPhases(
-  archetype: Archetype,
-  path: string,
-  majorTasksHint: string[]
-): PhaseTemplate[] {
-  const phaseNames = [
-    { title: "Foundation: Build the Base", description: `Establish the core elements of your ${path} business.` },
-    { title: "Validation: Prove the Concept", description: "Get your first real market signal." },
-    { title: "Scaling: Build the Engine", description: "Turn one win into a repeatable system." },
-  ]
-
-  // Default task attrs per phase — always guarantees 5 tasks per phase
-  const defaultAttrs: Record<number, Omit<TaskTemplate, "title" | "description" | "order_index" | "difficulty_score" | "goal_description" | "difficulty_rationale">[]> = {
-    1: [
-      { task_type: "deep", difficulty: "large", is_major: true, xp_reward: 80, estimated_hours: 6 },
-      { task_type: "shallow", difficulty: "medium", is_major: false, xp_reward: 50, estimated_hours: 3 },
-      { task_type: "deep", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1 },
-      { task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1 },
-      { task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 30, estimated_hours: 2 },
-    ],
-    2: [
-      { task_type: "deep", difficulty: "large", is_major: true, xp_reward: 100, estimated_hours: 5 },
-      { task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 50, estimated_hours: 3 },
-      { task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1 },
-      { task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 40, estimated_hours: 3 },
-      { task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1 },
-    ],
-    3: [
-      { task_type: "deep", difficulty: "large", is_major: true, xp_reward: 120, estimated_hours: 6 },
-      { task_type: "deep", difficulty: "large", is_major: false, xp_reward: 80, estimated_hours: 4 },
-      { task_type: "deep", difficulty: "medium", is_major: false, xp_reward: 50, estimated_hours: 3 },
-      { task_type: "shallow", difficulty: "medium", is_major: false, xp_reward: 30, estimated_hours: 1 },
-      { task_type: "shallow", difficulty: "small", is_major: false, xp_reward: 20, estimated_hours: 1 },
-    ],
-  }
-
-  return phaseNames.map((phase, phaseIndex) => {
-    const pn = phaseIndex + 1
-    const hintStart = phaseIndex * 5
-    const hints = majorTasksHint.slice(hintStart, hintStart + 5)
-
-    // Always use padding pools — hints only replace titles if available
-    const paddingPool = pn === 2 ? PHASE2_PADDING_TASKS : pn === 3 ? PHASE3_PADDING_TASKS : null
-    const attrs = defaultAttrs[pn] ?? defaultAttrs[1]
-
-    const tasks: TaskTemplate[] = attrs.map((dt, i) => {
-      // Use hint title if available, otherwise use padding pool, otherwise generic
-      const title = hints[i]
-        ?? paddingPool?.[i]?.title
-        ?? `${phase.title.split(":")[0]} milestone ${i + 1}`
-
-      const description = paddingPool?.[i]?.desc
-        ?? `Complete this task as part of your ${phase.title.split(":")[0].toLowerCase()} phase.`
-
-      const score = computeDifficultyScore(dt.difficulty, dt.task_type, dt.is_major)
-
-      return {
-        title,
-        description,
-        goal_description: "",
-        difficulty_rationale: "",
-        task_type: dt.task_type,
-        difficulty: dt.difficulty,
-        difficulty_score: score,
-        is_major: dt.is_major,
-        xp_reward: dt.xp_reward,
-        estimated_hours: dt.estimated_hours,
-        order_index: i + 1,
-      }
-    })
-
-    return {
-      phase_number: pn,
-      title: phase.title,
-      description: phase.description,
-      unlock_condition: "auto" as const,
-      tasks,
-    }
-  })
-}
-
 // ─────────────────────────────────────────
 // CALL GEMINI 2.5 FLASH
 // Uses GEMINI environment variables
@@ -720,20 +646,29 @@ async function callGeminiForProfile(
   const apiKey = Deno.env.get("GEMINI_API_KEY")!
   const model = Deno.env.get("GEMINI_MODEL")!
   const rawBaseUrl = Deno.env.get("GEMINI_BASE_URL")!
-
-  // Detect OpenRouter by API key prefix (sk-or-v1-...)
   const isOpenRouter = apiKey.startsWith("sk-or-")
-
-  // OpenRouter's correct API base is openrouter.ai (NOT api.openrouter.ai)
   const baseUrl = isOpenRouter
     ? "https://openrouter.ai/api/v1"
     : rawBaseUrl.replace(/^http:\/\//, "https://")
 
+  // Timeout wrapper — prevents hanging forever if the upstream
+  // provider stalls instead of returning an error. 25s leaves
+  // headroom inside Supabase Edge Function's execution limit.
+  async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 25000): Promise<Response> {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal })
+      return res
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
   if (isOpenRouter) {
-    // ── OpenRouter: OpenAI-compatible chat completions ──
-    const response = await fetch(
-      `${baseUrl}/chat/completions`,
-      {
+    let response: Response
+    try {
+      response = await fetchWithTimeout(`${baseUrl}/chat/completions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -748,84 +683,103 @@ async function callGeminiForProfile(
           max_tokens: maxTokens,
           temperature: 0.3,
         }),
-      }
-    )
+      })
+    } catch (err) {
+      const reason = err instanceof Error && err.name === "AbortError" ? "timed out after 25s" : String(err)
+      throw new Error(`Gemini request failed to reach OpenRouter: ${reason}`)
+    }
+
+    if (!response.ok) {
+      const errBody = await response.text().catch(() => "")
+      throw new Error(`OpenRouter returned ${response.status}: ${errBody.slice(0, 500)}`)
+    }
 
     const data = await response.json()
     const raw = data.choices?.[0]?.message?.content ?? ""
+    if (!raw) {
+      throw new Error(`OpenRouter returned no content. Full response: ${JSON.stringify(data).slice(0, 500)}`)
+    }
 
-    // Parse JSON — retry once if fails
     try {
-      const clean = raw.replace(/```json|```/g, "").trim()
-      return JSON.parse(clean) as AIComputedProfile
+      return JSON.parse(raw.replace(/```json|```/g, "").trim()) as AIComputedProfile
     } catch {
-      const retryResponse = await fetch(
-        `${baseUrl}/chat/completions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userInput + "\n\nReturn ONLY valid JSON. No markdown, no explanation." },
-            ],
-            max_tokens: maxTokens,
-            temperature: 0.1,
-          }),
-        }
-      )
+      const retryResponse = await fetchWithTimeout(`${baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userInput + "\n\nReturn ONLY valid JSON. No markdown, no explanation." },
+          ],
+          max_tokens: maxTokens,
+          temperature: 0.1,
+        }),
+      })
+      if (!retryResponse.ok) {
+        const errBody = await retryResponse.text().catch(() => "")
+        throw new Error(`OpenRouter retry returned ${retryResponse.status}: ${errBody.slice(0, 500)}`)
+      }
       const retryData = await retryResponse.json()
       const retryRaw = retryData.choices?.[0]?.message?.content ?? ""
-      const retryClean = retryRaw.replace(/```json|```/g, "").trim()
-      return JSON.parse(retryClean) as AIComputedProfile
+      if (!retryRaw) {
+        throw new Error(`OpenRouter retry returned no content: ${JSON.stringify(retryData).slice(0, 500)}`)
+      }
+      return JSON.parse(retryRaw.replace(/```json|```/g, "").trim()) as AIComputedProfile
     }
   }
 
-  // ── Native Gemini API ──
   const fullPrompt = `${systemPrompt}\n\n${userInput}`
-
-  const response = await fetch(
-    `${baseUrl}/models/${model}:generateContent?key=${apiKey}`,
-    {
+  let response: Response
+  try {
+    response = await fetchWithTimeout(`${baseUrl}/models/${model}:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: fullPrompt }] }],
-        generationConfig: {
-          maxOutputTokens: maxTokens,
-          temperature: 0.3,
-        },
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.3 },
       }),
-    }
-  )
+    })
+  } catch (err) {
+    const reason = err instanceof Error && err.name === "AbortError" ? "timed out after 25s" : String(err)
+    throw new Error(`Gemini request failed to reach Google: ${reason}`)
+  }
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => "")
+    throw new Error(`Gemini returned ${response.status}: ${errBody.slice(0, 500)}`)
+  }
 
   const data = await response.json()
   const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
+  if (!raw) {
+    throw new Error(`Gemini returned no content. Full response: ${JSON.stringify(data).slice(0, 500)}`)
+  }
 
-  // Parse JSON — retry once if fails
   try {
-    const clean = raw.replace(/```json|```/g, "").trim()
-    return JSON.parse(clean) as AIComputedProfile
+    return JSON.parse(raw.replace(/```json|```/g, "").trim()) as AIComputedProfile
   } catch {
-    const retryResponse = await fetch(
-      `${baseUrl}/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: fullPrompt + "\n\nReturn ONLY valid JSON. No markdown, no explanation." }] }],
-          generationConfig: { maxOutputTokens: maxTokens, temperature: 0.1 },
-        }),
-      }
-    )
+    const retryResponse = await fetchWithTimeout(`${baseUrl}/models/${model}:generateContent?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: `${fullPrompt}\n\nReturn ONLY valid JSON. No markdown, no explanation.` }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.1 },
+      }),
+    })
+    if (!retryResponse.ok) {
+      const errBody = await retryResponse.text().catch(() => "")
+      throw new Error(`Gemini retry returned ${retryResponse.status}: ${errBody.slice(0, 500)}`)
+    }
     const retryData = await retryResponse.json()
     const retryRaw = retryData.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
-    const retryClean = retryRaw.replace(/```json|```/g, "").trim()
-    return JSON.parse(retryClean) as AIComputedProfile
+    if (!retryRaw) {
+      throw new Error(`Gemini retry returned no content: ${JSON.stringify(retryData).slice(0, 500)}`)
+    }
+    return JSON.parse(retryRaw.replace(/```json|```/g, "").trim()) as AIComputedProfile
   }
 }
 
@@ -1088,10 +1042,12 @@ serve(async (req) => {
       "Freelance Services"
 
     // Generate phase templates
-    const rawPhases = generatePhaseTemplates(
+    const rawPhases = await generatePhaseTemplates(
       computedProfile.primary_archetype,
       path,
-      computedProfile.roadmap_input.major_tasks_suggestion
+      computedProfile.roadmap_input.major_tasks_suggestion,
+      computedProfile,
+      answers
     )
     const scoredPhases = enrichDifficultyScores(rawPhases)
 
@@ -1512,29 +1468,15 @@ serve(async (req) => {
     const { taskId, roadmapId } = payload
 
     // Fetch task XP reward before marking complete
-    const { data: task, error: taskFetchError } = await supabase
+    const { data: task } = await supabase
       .from("tasks")
       .select("xp_reward")
       .eq("id", taskId)
       .eq("user_id", userId)
       .single()
 
-    if (taskFetchError) {
-      return cors(
-        JSON.stringify({ error: "task_fetch_failed", reason: taskFetchError.message }),
-        { status: 500 }
-      )
-    }
-
-    if (!task) {
-      return cors(
-        JSON.stringify({ error: "task_not_found", reason: "Task not found for this user." }),
-        { status: 404 }
-      )
-    }
-
     // Mark task complete
-    const { error: taskUpdateError } = await supabase
+    await supabase
       .from("tasks")
       .update({
         is_completed: true,
@@ -1544,17 +1486,10 @@ serve(async (req) => {
       .eq("id", taskId)
       .eq("user_id", userId)
 
-    if (taskUpdateError) {
-      return cors(
-        JSON.stringify({ error: "task_update_failed", reason: taskUpdateError.message }),
-        { status: 500 }
-      )
-    }
-
     // Award XP via billing manager with explicit amount
-    const xpReward = task.xp_reward ?? 50
+    const xpReward = task?.xp_reward ?? 0
     if (xpReward > 0) {
-      const billingResp = await fetch(
+      await fetch(
         `${Deno.env.get("SUPABASE_URL")}/functions/v1/billing-manager`,
         {
           method: "POST",
@@ -1571,28 +1506,6 @@ serve(async (req) => {
           }),
         }
       )
-
-      if (!billingResp.ok) {
-        const billingText = await billingResp.text();
-        return cors(
-          JSON.stringify({
-            error: "billing_manager_failed",
-            reason: billingText || billingResp.statusText,
-          }),
-          { status: billingResp.status }
-        )
-      }
-
-      const billingData = await billingResp.json().catch(() => null)
-      if (!billingData || billingData.success !== true) {
-        return cors(
-          JSON.stringify({
-            error: "billing_manager_failed",
-            reason: billingData?.reason ?? JSON.stringify(billingData) ?? "unknown",
-          }),
-          { status: 500 }
-        )
-      }
     }
 
     // Check and auto unlock next phase
