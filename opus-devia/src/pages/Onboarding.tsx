@@ -57,7 +57,7 @@ export default function Onboarding() {
 
       try {
         const result = await supabase.functions.invoke("roadmap-generator", {
-          body: JSON.stringify({ answers }),
+          body: JSON.stringify({ action: "generate", userId: user?.id, answers }),
         });
 
         const archetype = result.data?.archetype ?? result.data?.data?.archetype ?? null;
