@@ -202,7 +202,7 @@ EXTRACT INTO JSON:
 RETURN ONLY VALID JSON. No preamble.`
 
 export const MEMORY_TAGGING_PROMPT = `Assign tags to a single memory record. Available tags:
-discipline, procrastination, execution, business, fitness, focus, consistency, roadmap, stress, burnout, confidence, momentum, avoidance, financial, relationships, clarity, time_management, identity, [...]
+discipline, procrastination, execution, business, fitness, focus, consistency, roadmap, stress, burnout, confidence, momentum, avoidance, financial, relationships, clarity, time_management, identity, fear, breakthrough, failure, recovery, growth
 
 OUTPUT JSON ONLY:
 {
