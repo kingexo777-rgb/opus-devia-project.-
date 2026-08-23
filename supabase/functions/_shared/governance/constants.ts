@@ -5,8 +5,9 @@ export type ModelProviderId =
   | "ASSISTANT"
   | "GEMINI"
   | "DEEPSEEK"
-  | "OPENAI_TTS"
-  | "OPENAI_WHISPER"
+  | "DEEPSEEK_VISION"
+  | "DEEPGRAM_STT"
+  | "DEEPGRAM_TTS"
 
 export type FeatureRole =
   | "mentor_message"
@@ -14,6 +15,7 @@ export type FeatureRole =
   | "roadmap_assistant_message"
   | "journal_assistant_message"
   | "image_upload"
+  | "document_upload"
   | "roadmap_generation"
   | "roadmap_recalibration"
   | "weekly_review"
@@ -63,7 +65,6 @@ export const GOVERNANCE = {
         "assistant_message",
         "roadmap_assistant_message",
         "journal_assistant_message",
-        "image_upload",
       ] as FeatureRole[],
       isUserFacing: true,
     },
@@ -94,28 +95,39 @@ export const GOVERNANCE = {
         "journal_classification",
         "intent_detection",
         "chat_pattern_analysis",
+        "document_upload",
       ] as FeatureRole[],
       isUserFacing: false,
       backgroundJobsOnly: true,
     },
-    OPENAI_TTS: {
-      provider: "OPENAI_TTS" as const,
-      apiKeyVar: "OPENAI_API_KEY",
-      model: "tts-1",
-      voice: "onyx",
-      intendedBackend: "OpenAI TTS",
-      roles: ["voice_output"] as FeatureRole[],
-      scope: "mentor_responses_only",
+    DEEPSEEK_VISION: {
+      provider: "DEEPSEEK_VISION" as const,
+      apiKeyVar: "DEEPSEEK_VISION_API_KEY",
+      baseUrlVar: "DEEPSEEK_VISION_BASE_URL",
+      modelVar: "DEEPSEEK_VISION_MODEL",
+      intendedBackend: "DeepSeek Vision",
+      roles: ["image_upload"] as FeatureRole[],
       isUserFacing: true,
     },
-    OPENAI_WHISPER: {
-      provider: "OPENAI_WHISPER" as const,
-      apiKeyVar: "OPENAI_2_API_KEY",
-      model: "whisper-1",
-      intendedBackend: "OpenAI Whisper",
+    DEEPGRAM_STT: {
+      provider: "DEEPGRAM_STT" as const,
+      apiKeyVar: "DEEPGRAM_API_KEY",
+      baseUrlVar: "DEEPGRAM_BASE_URL",
+      modelVar: "DEEPGRAM_MODEL",
+      intendedBackend: "Deepgram Nova-3 (STT)",
       roles: ["voice_input"] as FeatureRole[],
       scope: "mentor_sessions_only",
       audioPolicy: "discard_after_transcription",
+      isUserFacing: true,
+    },
+    DEEPGRAM_TTS: {
+      provider: "DEEPGRAM_TTS" as const,
+      apiKeyVar: "DEEPGRAM_API_KEY_OUTPUT",
+      baseUrlVar: "DEEPGRAM_BASE_URL",
+      modelVar: "DEEPGRAM_MODEL_OUTPUT",
+      intendedBackend: "Deepgram Aura-2-Asteria (TTS)",
+      roles: ["voice_output"] as FeatureRole[],
+      scope: "mentor_responses_only",
       isUserFacing: true,
     },
   },
@@ -283,13 +295,13 @@ export const GOVERNANCE = {
 
   // Voice I/O configuration
   VOICE: {
-    inputModel: "OPENAI_WHISPER",
-    outputModel: "OPENAI_TTS",
+    inputModel: "DEEPGRAM_STT",
+    outputModel: "DEEPGRAM_TTS",
     inputScope: "mentor_sessions_only",
     outputScope: "mentor_text_responses_only",
     audioRetention: "none",
-    transcriptionFlow: "audio_in → whisper → text → mentor_pipeline",
-    outputFlow: "mentor_text_response → tts → audio_out",
+    transcriptionFlow: "audio_in → deepgram_stt → text → mentor_pipeline",
+    outputFlow: "mentor_text_response → deepgram_tts → audio_out",
   },
 
   // Performance review configuration
@@ -351,6 +363,7 @@ export const BILLING_TIERS = {
       "daily_review",
       "voice_input",
       "voice_output",
+      "document_upload",
     ] as FeatureRole[],
     voiceSupport: true,
     mentorSupport: true,
@@ -376,6 +389,7 @@ export const BILLING_TIERS = {
       "chat_pattern_analysis",
       "voice_input",
       "voice_output",
+      "document_upload",
     ] as FeatureRole[],
     voiceSupport: true,
     mentorSupport: true,
@@ -401,6 +415,7 @@ export const BILLING_TIERS = {
       "chat_pattern_analysis",
       "voice_input",
       "voice_output",
+      "document_upload",
     ] as FeatureRole[],
     voiceSupport: true,
     mentorSupport: true,
