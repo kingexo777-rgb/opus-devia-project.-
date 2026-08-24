@@ -12,6 +12,7 @@ const ESTIMATED_XP_COST: Record<string, number> = {
   roadmap_assistant_message: 2,
   journal_assistant_message: 1,
   image_upload: 3,
+  document_upload: 2,
   roadmap_generation: 10,
   roadmap_recalibration: 8,
   weekly_review: 6,

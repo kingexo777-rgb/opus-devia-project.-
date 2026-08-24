@@ -65,13 +65,8 @@ const BASE_URL_ALIASES: Record<string, string[]> = {
   ASSISTANT_BASE_URL: ["ASSISTANT_BASE_URL", "ASSISTANT_API_BASE_URL"],
   GEMINI_BASE_URL: ["GEMINI_BASE_URL", "GEMINI_API_BASE_URL"],
   DEEPSEEK_BASE_URL: ["DEEPSEEK_BASE_URL", "DEEPSEEK_API_BASE_URL"],
-  OPENAI_BASE_URL: ["OPENAI_BASE_URL", "OPENAI_API_BASE_URL"],
-  OPENAI_2_BASE_URL: [
-    "OPENAI_2_BASE_URL",
-    "OPENAI_2_API_BASE_URL",
-    "OPENAI_BASE_URL",
-    "OPENAI_API_BASE_URL",
-  ],
+  DEEPSEEK_VISION_BASE_URL: ["DEEPSEEK_VISION_BASE_URL"],
+  DEEPGRAM_BASE_URL: ["DEEPGRAM_BASE_URL"],
 };
 
 function readBaseUrl(canonical: keyof typeof BASE_URL_ALIASES): string {
@@ -85,27 +80,26 @@ export function getProviderCredentials(
   const config = GOVERNANCE.MODELS[providerId];
 
   switch (providerId) {
-    case "OPENAI_TTS": {
+    case "DEEPGRAM_STT": {
       return {
         provider: providerId,
         apiKey: readEnv(config.apiKeyVar),
         baseUrl: readEnvFirstOptional(
-          BASE_URL_ALIASES.OPENAI_BASE_URL,
-          "https://api.openai.com/v1",
+          BASE_URL_ALIASES.DEEPGRAM_BASE_URL,
+          "https://api.deepgram.com",
         ),
-        model: config.model,
-        voice: config.voice,
+        model: readEnv(config.modelVar),
       };
     }
-    case "OPENAI_WHISPER": {
+    case "DEEPGRAM_TTS": {
       return {
         provider: providerId,
         apiKey: readEnv(config.apiKeyVar),
         baseUrl: readEnvFirstOptional(
-          BASE_URL_ALIASES.OPENAI_2_BASE_URL,
-          "https://api.openai.com/v1",
+          BASE_URL_ALIASES.DEEPGRAM_BASE_URL,
+          "https://api.deepgram.com",
         ),
-        model: config.model,
+        model: readEnv(config.modelVar),
       };
     }
     default: {
@@ -146,8 +140,9 @@ export function validateAllModelSecrets(): {
     "ASSISTANT",
     "GEMINI",
     "DEEPSEEK",
-    "OPENAI_TTS",
-    "OPENAI_WHISPER",
+    "DEEPSEEK_VISION",
+    "DEEPGRAM_STT",
+    "DEEPGRAM_TTS",
   ];
   const missing: string[] = [];
 
@@ -181,8 +176,9 @@ export function secretsHealthSummary(): Record<
     "ASSISTANT",
     "GEMINI",
     "DEEPSEEK",
-    "OPENAI_TTS",
-    "OPENAI_WHISPER",
+    "DEEPSEEK_VISION",
+    "DEEPGRAM_STT",
+    "DEEPGRAM_TTS",
   ] as ModelProviderId[]) {
     try {
       const creds = getProviderCredentials(providerId);
@@ -223,8 +219,14 @@ export const REQUIRED_SECRET_ENV_VARS = [
   "DEEPSEEK_API_KEY",
   "DEEPSEEK_BASE_URL",
   "DEEPSEEK_MODEL",
-  "OPENAI_API_KEY",
-  "OPENAI_2_API_KEY",
+  "DEEPSEEK_VISION_API_KEY",
+  "DEEPSEEK_VISION_BASE_URL",
+  "DEEPSEEK_VISION_MODEL",
+  "DEEPGRAM_API_KEY",
+  "DEEPGRAM_BASE_URL",
+  "DEEPGRAM_MODEL",
+  "DEEPGRAM_API_KEY_OUTPUT",
+  "DEEPGRAM_MODEL_OUTPUT",
   "SUPABASE_URL",
   "SUPABASE_SERVICE_ROLE_KEY",
 ] as const;
