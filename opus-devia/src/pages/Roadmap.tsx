@@ -174,10 +174,12 @@ export default function Roadmap() {
         return;
       }
 
-      /* ---- 2. Phases + tasks via join — one query ---- */
+      /* ---- 2. Phases + tasks via join — one query ----
+         NOTE: tasks has two FKs to roadmap_phases (phase_id and roadmap_phase_id),
+         so the embedded relationship must be disambiguated by constraint name. */
       const { data: phases, error: phasesErr } = await supabase
         .from("roadmap_phases")
-        .select("id, title, description, phase_order, is_completed, status, tasks(*)")
+        .select("id, title, description, phase_order, is_completed, status, tasks!tasks_roadmap_phase_id_fkey(*)")
         .eq("roadmap_id", activeRoadmap.id)
         .order("phase_order", { ascending: true });
 
