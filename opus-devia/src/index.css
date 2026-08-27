@@ -551,7 +551,7 @@ ANIMATION SYSTEM
         box-shadow: 0 0 0 rgba(154, 0, 0, 0);
     }
     50% {
-        box-shadow: 0 0 18px rgba(154, 0, 0, 0.3);
+        box-shadow: 0 0 18px rgba(154, 0, 0, 0);
     }
 }
 
@@ -1532,7 +1532,7 @@ LIQUID GLASS DOCK (Bottom Nav)
 
 .dock-item.active img {
     filter:
-        drop-shadow(0 4px 12px rgba(0, 0, 0, .9)) drop-shadow(0 0 12px rgba(154, 0, 0, .35));
+        drop-shadow(0 4px 12px rgba(0, 0, 0, .9)) drop-shadow(0 0 12px rgba(154, 0, 0, 0));
 }
 
 @keyframes dockPulse {
@@ -1586,6 +1586,7 @@ AUTH SCREENS (Keep existing)
 
 /* Glass card — Black Sapphire Engine */
 .auth-card {
+    padding: 35px;
     position: relative;
     overflow: hidden;
     z-index: 1;
@@ -1626,7 +1627,7 @@ AUTH SCREENS (Keep existing)
 .auth-logo {
     display: block;
     margin: 0 auto;
-    height: 52px;
+    height: 68px;
     width: auto;
     max-width: 100%;
     object-fit: contain;
@@ -1651,6 +1652,7 @@ AUTH SCREENS (Keep existing)
 .auth-input {
     width: 100%;
     background: rgba(0, 0, 0, 0.65);
+    box-sizing: border-box;
     color: #F5F5F5;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 8px;
@@ -1674,6 +1676,7 @@ AUTH SCREENS (Keep existing)
 .auth-btn {
     width: 100%;
     background: #660000;
+    box-sizing: border-box;
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -2038,4 +2041,57 @@ MENTOR CHAT — Message Entry Animations
     .dock-item span {
         color: inherit !important;
     }
+}
+
+.streak-card {
+  width: 100%;
+  max-width: 410px;
+  box-sizing: border-box;
+
+  padding: 20px 30px 30px;
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  border: none;
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.roadmap-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 24px 30px 26px;
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  border: none;
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.priority-task {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 24px;
+  padding: 20px 24px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: none;
+  overflow: hidden;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    0 5px 15px rgba(0, 0, 0, 0.2);
 }

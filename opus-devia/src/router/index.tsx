@@ -146,6 +146,18 @@ function AppRoutes() {
           )
         }
       />
+
+      {/* Development preview routes */}
+<Route path="/dev/home" element={<Home />} />
+<Route path="/dev/onboarding" element={<Onboarding />} />
+<Route path="/dev/roadmap" element={<Roadmap />} />
+<Route path="/dev/tasks" element={<Tasks />} />
+<Route path="/dev/profile" element={<Profile />} />
+<Route path="/dev/settings" element={<Settings />} />
+<Route path="/dev/mentor" element={<MentorChat />} />
+<Route path="/dev/journal" element={<Journal />} />
+<Route path="/dev/community" element={<Community />} />
+
       <Route path="*" element={<Navigate to="/signin" replace />} />
     </Routes>
   );

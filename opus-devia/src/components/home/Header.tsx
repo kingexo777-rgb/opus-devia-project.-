@@ -13,7 +13,7 @@ export default function Header({ username, earnedXP, totalXP, loading }: HeaderP
   void totalXP;
 
   return (
-    <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 0 2px" }}>
+    <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 0 2px", marginTop: "16px" }}>
       {/* Left: Brand */}
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <span style={{ fontWeight: 800, letterSpacing: 0.6, fontSize: 14, color: "#F5F5F5" }}>
@@ -24,7 +24,7 @@ export default function Header({ username, earnedXP, totalXP, loading }: HeaderP
 
       {/* Right: Settings gear */}
       <Link
-        to="/profile"
+        to="/settings"
         style={{ color: "#A8A8A8", padding: 2 }}
         aria-label="Settings"
       >

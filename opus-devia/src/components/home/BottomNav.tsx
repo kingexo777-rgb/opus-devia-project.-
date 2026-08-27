@@ -102,7 +102,7 @@ export default function BottomNav() {
               textDecoration: "none",
               opacity: isActive ? 1 : 0.85,
               transition: "opacity 0.25s ease, color 0.25s ease, transform 0.3s var(--ease-snappy)",
-              filter: isActive ? "drop-shadow(0 0 10px var(--theme-accent-glow, rgba(193,0,0,0.7)))" : "drop-shadow(0 1px 2px rgba(0,0,0,0.3))",
+              filter: isActive ? "drop-shadow(0 0 10px var(--theme-accent-glow, rgba(193,0,0,0.1)))" : "drop-shadow(0 1px 2px rgba(0,0,0,0.3))",
             }}
           >
             {/* Glass icon container — subtle hug */}
@@ -113,7 +113,7 @@ export default function BottomNav() {
               border: isActive ? "0.5px solid rgba(255,255,255,0.12)" : "0.5px solid rgba(255,255,255,0.05)",
               backdropFilter: "blur(4px)",
               WebkitBackdropFilter: "blur(4px)",
-              boxShadow: isActive ? "inset 0 1px 0 rgba(255,255,255,0.06)" : "inset 0 1px 0 rgba(255,255,255,0.02)",
+              boxShadow: isActive ? "inset 0 1px 0 rgba(255,255,255,0.03)" : "inset 0 1px 0 rgba(255,255,255,0.02)",
               transition: "background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease",
               display: "flex",
               alignItems: "center",

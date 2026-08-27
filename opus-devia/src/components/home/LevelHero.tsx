@@ -67,8 +67,8 @@ export default function LevelHero({ level, archetype, earnedXP, totalXP, loading
           src={badgeSrc}
           alt={`Level ${level} badge`}
           style={{
-            width: 82,
-            height: 82,
+            width: 130,
+            height: 130,
             objectFit: "contain",
             filter: `drop-shadow(${glow})`,
             transform: "rotateX(10deg) rotateY(-5deg) translateZ(2px)",

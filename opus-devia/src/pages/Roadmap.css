@@ -1,44 +1,84 @@
-/* ==================================================
-   ROADMAP PAGE — Timeline + Phase Nodes
-   ================================================== */
+/* =========================================================
+   ROADMAP PAGE
+   ========================================================= */
 
 .roadmap-page {
   position: relative;
+  width: 100%;
   max-width: 430px;
-  margin: 0 auto;
   min-height: 100vh;
-  padding: 28px 10px 100px;
+  margin: 0 auto;
+
+  padding: 28px 8px 120px;
+
+  box-sizing: border-box;
+
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
+
+  font-family: "Inter", sans-serif;
+
   overflow-x: hidden;
 }
 
-/* ---- Header ---- */
+
+/* =========================================================
+   GLOBAL SAFETY
+   ========================================================= */
+
+.roadmap-page *,
+.roadmap-page *::before,
+.roadmap-page *::after {
+  box-sizing: border-box;
+}
+
+.roadmap-page img,
+.roadmap-page svg {
+  max-width: 100%;
+}
+
+.roadmap-page button {
+  font-family: inherit;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .roadmap-header {
+  width: 100%;
+  max-width: 430px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px 0 4px;
+
+  padding: 0 4px;
+
+  box-sizing: border-box;
 }
 
 .roadmap-header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 .roadmap-username {
   font-weight: 800;
   font-size: 14px;
-  letter-spacing: 0.6px;
-  color: #F5F5F5;
+  letter-spacing: 0.5px;
+  color: #f5f5f5;
 }
 
 .roadmap-status-dot {
   width: 5px;
   height: 5px;
+
   border-radius: 50%;
+
   background: var(--theme-accent, #9a0000);
+
   display: inline-block;
   flex-shrink: 0;
 }
@@ -46,48 +86,84 @@
 .roadmap-settings-btn {
   background: none;
   border: none;
+
   padding: 6px;
+
   cursor: pointer;
-  color: #A8A8A8;
+
+  color: #a8a8a8;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 50%;
-  transition: background 0.2s ease;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .roadmap-settings-btn:hover {
   background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
 }
 
-/* ---- Title ---- */
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
 .roadmap-title {
+  width: 100%;
+  max-width: 400px;
+
   text-align: center;
+
   font-size: 24px;
   font-weight: 800;
-  letter-spacing: 0.6px;
-  margin: 60px auto 0;
+
+  letter-spacing: 0.5px;
+  line-height: 1.22;
+
+  margin: 58px auto 0;
+
   color: #ffffff;
+
+  box-sizing: border-box;
 }
 
 .roadmap-divider {
   display: block;
+
   width: 150px;
   height: 1px;
+
   background: var(--theme-accent, #9a0000);
+
   margin: 12px auto 0;
 }
 
-/* ---- Loading / Empty / Error ---- */
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
 .roadmap-status-msg {
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
+
   gap: 12px;
+
   padding: 60px 20px;
+
   text-align: center;
-  color: #A8A8A8;
+
+  color: #a8a8a8;
+
   font-size: 13px;
 }
 
@@ -97,14 +173,19 @@
 
 .roadmap-retry-btn {
   padding: 8px 20px;
+
   border-radius: 999px;
+
   background: var(--theme-accent, #9a0000);
-  color: #fff;
+
+  color: #ffffff;
+
   border: none;
+
   font-size: 12px;
   font-weight: 700;
+
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
 .roadmap-retry-btn:hover {
@@ -112,84 +193,294 @@
   filter: brightness(1.15);
 }
 
-/* ---- Timeline ---- */
+
+/* =========================================================
+   TIMELINE
+   ========================================================= */
+
 .roadmap-timeline {
   position: relative;
+
   list-style: none;
-  padding: 0;
-  margin: 40px auto 0;
+
   width: 100%;
-  max-width: 380px;
+  max-width: 430px;
+
+  margin: 38px auto 120px;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+  overflow: visible;
 }
 
-/* Central dashed spine */
+
+/* =========================================================
+   CENTRAL SPINE
+   ========================================================= */
+
 .roadmap-timeline::before {
-  content: '';
+  content: "";
+
   position: absolute;
+
   left: 50%;
-  transform: translateX(-50%);
+
   top: 8px;
-  bottom: 60px;
-  border-left: 1px dashed var(--theme-accent-dim, rgba(154, 0, 0, 0.5));
+  bottom: 50px;
+
+  transform: translateX(-50%);
+
+  border-left:
+    1px dashed
+    var(
+      --theme-accent-dim,
+      rgba(154, 0, 0, 0.5)
+    );
+
   z-index: 0;
+
   pointer-events: none;
 }
 
+
+/* =========================================================
+   TIMELINE NODE
+
+   IMPORTANT:
+   LEFT     SPINE     RIGHT
+   1fr       24px      1fr
+
+   Do NOT widen this.
+   ========================================================= */
+
 .roadmap-node {
   position: relative;
+
   display: grid;
-  grid-template-columns: 1fr 40px 1fr;
-  align-items: center;
-  margin-bottom: 72px;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    24px
+    minmax(0, 1fr);
+
+  width: 100%;
+  max-width: 100%;
+
+  box-sizing: border-box;
+
+  align-items: start;
+
+  margin-bottom: 64px;
+
   z-index: 2;
+
+  animation:
+    roadmapFadeUp
+    0.5s
+    ease
+    backwards;
 }
 
 .roadmap-node:last-child {
   margin-bottom: 0;
 }
 
-/* ---- Node circle ---- */
+
+/* =========================================================
+   NODE CIRCLE
+   ========================================================= */
+
 .roadmap-node-circle {
   grid-column: 2;
+  grid-row: 1;
+
   justify-self: center;
+  align-self: start;
+
   width: 12px;
   height: 12px;
+
+  box-sizing: border-box;
+
   border-radius: 50%;
-  z-index: 2;
+
+  z-index: 3;
+
   flex-shrink: 0;
 }
 
 .roadmap-node-circle.completed {
   background: var(--theme-accent, #9a0000);
-  box-shadow: 0 0 8px var(--theme-accent, #9a0000);
+
+  box-shadow:
+    0 0 8px
+    var(--theme-accent, #9a0000);
 }
 
 .roadmap-node-circle.pending {
   background: #0a0a0a;
-  border: 2px solid var(--theme-accent, rgba(154, 0, 0, 0.6));
+
+  border:
+    2px solid
+    var(
+      --theme-accent,
+      rgba(154, 0, 0, 0.6)
+    );
 }
 
 .roadmap-node-circle.locked {
   background: #0a0a0a;
-  border: 2px solid rgba(120, 120, 130, 0.35);
+
+  border:
+    2px solid
+    rgba(120, 120, 130, 0.35);
 }
 
-/* ---- Node button ---- */
-.roadmap-node-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  cursor: pointer;
-  white-space: nowrap;
-  display: inline-flex;
+
+/* =========================================================
+   NODE BODY
+   ========================================================= */
+
+.roadmap-node-body {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  overflow: visible;
+}
+
+
+/* =========================================================
+   LEFT NODE
+   ========================================================= */
+
+.roadmap-node.left .roadmap-node-body.body-left {
+  grid-column: 1;
+  grid-row: 1;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  justify-self: stretch;
+
+  align-items: flex-start;
+
+  text-align: left;
+
+  padding-right: 6px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   RIGHT NODE
+   ========================================================= */
+
+.roadmap-node.right .roadmap-node-body.body-right {
+  grid-column: 3;
+  grid-row: 1;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  justify-self: stretch;
+
+  align-items: flex-start;
+
+  text-align: left;
+
+  padding-left: 6px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   LAST NODE
+   ========================================================= */
+
+.roadmap-node.last-node {
+  margin-bottom: 0;
+}
+
+.roadmap-node.last-node .roadmap-node-circle {
+  grid-row: 1;
+}
+
+.roadmap-node.last-node .roadmap-node-body.body-last {
+  grid-column: 1 / span 3;
+  grid-row: 2;
+
+  width: 100%;
+  max-width: 100%;
+
+  justify-self: center;
+
   align-items: center;
-  gap: 6px;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  text-align: center;
+
+  margin-top: 8px;
+
+  padding: 0 12px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PHASE TITLE
+   ========================================================= */
+
+.roadmap-node-btn {
+  display: block;
+
+  width: 100%;
+  max-width: 100%;
+
+  box-sizing: border-box;
+
+  white-space: normal;
+
+  word-break: normal;
+
+  overflow-wrap: break-word;
+
+  text-align: left;
+
+  line-height: 1.25;
+
+  border: none;
+
+  background: none;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  padding: 0;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .roadmap-node-btn:hover {
@@ -197,12 +488,27 @@
   transform: translateY(-1px);
 }
 
-/* ---- Locked card ---- */
+
+/* =========================================================
+   LOCKED PHASE
+   ========================================================= */
+
 .roadmap-node-btn.locked-card {
   color: rgba(255, 255, 255, 0.45);
+
   cursor: default;
+
   font-weight: 600;
+
   opacity: 0.7;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 6px;
+
+  text-align: left;
 }
 
 .roadmap-node-btn.locked-card:hover {
@@ -212,292 +518,271 @@
 
 .roadmap-lock-icon {
   display: inline-flex;
+
   align-items: center;
+  justify-content: center;
+
   color: rgba(255, 255, 255, 0.3);
+
+  flex-shrink: 0;
 }
 
 .roadmap-node-body.body-locked {
   opacity: 0.65;
 }
 
-/* ---- Node subtitle ---- */
+
+/* =========================================================
+   SUBTITLE
+   ========================================================= */
+
 .roadmap-node-subtitle {
   font-size: 10px;
+
   color: #7b7f88;
+
   font-weight: 500;
+
   margin-top: 2px;
+
   display: block;
-}
 
-/* ---- Last node (bottom) ---- */
-.roadmap-node.last-node {
-  margin-bottom: 0;
-}
-
-.roadmap-node.last-node .roadmap-node-circle {
-  grid-row: 1;
-}
-
-/* ---- Floating Mentor button ---- */
-.roadmap-floating-mentor {
-  position: fixed;
-  bottom: 100px;
-  left: max(20px, calc((100vw - 430px) / 2 + 10px));
-  z-index: 1000;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  background: radial-gradient(circle at 35% 35%, var(--theme-accent, #7d0a0a) 0%, color-mix(in srgb, var(--theme-accent, #300303) 18%, #000) 100%);
-  box-shadow: 0 6px 24px var(--theme-accent-glow, rgba(46, 0, 0, 0.5));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.roadmap-floating-mentor:active {
-  transform: scale(0.95);
-}
-
-.roadmap-floating-mentor svg {
-  width: 26px;
-  height: 26px;
-}
-
-/* ---- Bottom Nav ---- */
-.roadmap-bottom-nav {
-  position: fixed;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 20px);
-  max-width: 413px;
-  border-radius: 999px;
-  display: flex;
-  justify-content: space-around;
-  padding: 9px 6px;
-  z-index: 1000;
-  background: linear-gradient(180deg, rgba(26, 26, 30, 0.95) 0%, rgba(14, 14, 18, 0.97) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.4);
-}
-
-/* Top edge highlight */
-.roadmap-bottom-nav::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 999px 999px 0 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.roadmap-nav-item {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  color: #C8C8C8;
-  text-decoration: none;
-  background: none;
-  border: none;
-  transition: color 0.2s ease, transform 0.3s ease;
-}
-
-.roadmap-nav-item svg {
-  transition: transform 0.35s ease, filter 0.35s ease;
-}
-
-.roadmap-nav-item:hover svg {
-  transform: translateY(-2px);
-  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.08));
-}
-
-.roadmap-nav-item-label {
-  font-size: 9px;
-  font-weight: 500;
-}
-
-.roadmap-nav-item.active {
-  color: #c10000;
-  transform: scale(1.08);
-}
-
-.roadmap-nav-item.active svg {
-  filter: drop-shadow(0 0 10px rgba(154, 0, 0, 0.55));
-}
-
-.roadmap-nav-item.active .roadmap-nav-item-label {
-  font-weight: 600;
-}
-
-/* Active nav glow */
-.roadmap-nav-item.active::before {
-  content: '';
-  position: absolute;
-  inset: -6px -10px;
-  border-radius: 18px;
-  background: radial-gradient(ellipse at center, rgba(154, 0, 0, 0.12) 0%, transparent 70%);
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* ---- Animations ---- */
-@keyframes roadmapFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.roadmap-node {
-  animation: roadmapFadeUp 0.5s ease backwards;
-}
-
-.roadmap-node:nth-child(1) { animation-delay: 0.05s; }
-.roadmap-node:nth-child(2) { animation-delay: 0.10s; }
-.roadmap-node:nth-child(3) { animation-delay: 0.15s; }
-.roadmap-node:nth-child(4) { animation-delay: 0.20s; }
-.roadmap-node:nth-child(5) { animation-delay: 0.25s; }
-.roadmap-node:nth-child(6) { animation-delay: 0.30s; }
-.roadmap-node:nth-child(7) { animation-delay: 0.35s; }
-.roadmap-node:nth-child(8) { animation-delay: 0.40s; }
-.roadmap-node:nth-child(9) { animation-delay: 0.45s; }
-.roadmap-node:nth-child(10) { animation-delay: 0.50s; }
-
-/* ---- Node body (phase title + tasks wrapper) ---- */
-.roadmap-node-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.roadmap-node.left .roadmap-node-body.body-left {
-  grid-column: 1;
-  justify-self: end;
-  align-items: flex-end;
-  text-align: right;
-}
-
-.roadmap-node.right .roadmap-node-body.body-right {
-  grid-column: 3;
-  justify-self: start;
-  align-items: flex-start;
   text-align: left;
 }
 
-.roadmap-node.last-node .roadmap-node-body.body-last {
-  grid-column: 1 / span 3;
-  grid-row: 2;
-  justify-self: center;
-  align-items: center;
-  text-align: center;
-  margin-top: 8px;
-}
 
-/* ---- Task count pill ---- */
+/* =========================================================
+   TASK COUNT
+   ========================================================= */
+
 .roadmap-task-count {
   font-size: 9px;
+
   color: #7b7f88;
+
   font-weight: 500;
+
   letter-spacing: 0.04em;
+
+  line-height: 1.2;
+
+  text-align: left;
 }
 
-/* ---- Arrow indicator ---- */
-.roadmap-node-btn .arrow {
-  display: inline-block;
-  font-size: 9px;
-  transition: transform 0.25s ease;
-}
 
-.roadmap-node-btn .arrow.expanded {
-  color: #9a0000;
-}
+/* =========================================================
+   TASK LIST
+   ========================================================= */
 
-/* ---- Expandable task list (height/opacity via inline style) ---- */
+.roadmap-task-list {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  overflow: visible;
+
+  text-align: left;
+
+  flex-shrink: 1;
+}
 
 .roadmap-task-list-inner {
-  /* inner wrapper for expandable content */
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  overflow: visible;
 }
 
-/* ---- Task items ---- */
+
+/* =========================================================
+   TASK CARD
+
+   IMPORTANT:
+   The OUTER width is unchanged.
+
+   The contents are now arranged internally:
+
+   CHECKBOX | TITLE | BADGE
+
+   ========================================================= */
+
 .roadmap-task-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 5px 10px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  transition: background 0.2s ease, border-color 0.2s ease;
-  margin-bottom: 3px;
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    20px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: start;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  padding: 10px 9px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  margin-bottom: 8px;
+
   cursor: pointer;
+
+  overflow: hidden;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .roadmap-task-item:last-child {
   margin-bottom: 0;
 }
 
-.roadmap-task-item.done {
-  opacity: 0.5;
+.roadmap-task-item:hover {
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  border-color:
+    rgba(154, 0, 0, 0.35);
 }
+
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
 
 .roadmap-task-check {
-  flex-shrink: 0;
-  font-size: 11px;
-  margin-top: 1px;
+  grid-column: 1;
+  grid-row: 1;
+
+  position: static;
+
+  width: 20px;
+
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: center;
+
+  padding-top: 1px;
+
+  font-size: 9px;
+
+  line-height: 1.4;
+
+  text-align: center;
+
   color: #7b7f88;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
 }
 
-.roadmap-task-check.checked {
-  color: #1d9e75;
-}
+
+/* =========================================================
+   TASK TITLE
+
+   The title gets the flexible middle column.
+   This is what prevents the badge from crushing it.
+   ========================================================= */
 
 .roadmap-task-title {
+  grid-column: 2;
+  grid-row: 1;
+
+  display: block;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  padding:
+    0
+    8px
+    0
+    4px;
+
   font-size: 11px;
-  font-weight: 500;
-  color: #C8C8C8;
-  line-height: 1.35;
-  flex: 1;
+
+  font-weight: 600;
+
+  line-height: 1.4;
+
+  color: #c8c8c8;
+
+  text-align: left;
+
+  white-space: normal;
+
+  word-break: normal;
+
+  overflow-wrap: break-word;
 }
 
-.roadmap-task-item.done .roadmap-task-title {
-  text-decoration: line-through;
-  color: #7b7f88;
-}
 
-/* Difficulty badge (small number badge on task item) */
+/* =========================================================
+   DIFFICULTY BADGE
+
+   NO absolute positioning.
+   It lives in its own grid column.
+   ========================================================= */
+
 .roadmap-task-diff-badge {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
+  grid-column: 3;
+  grid-row: 1;
+
+  position: static;
+
+  align-self: start;
+
+  height: 21px;
+
+  padding: 0 7px;
+
+  border-radius: 7px;
+
   display: flex;
+
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+
+  box-sizing: border-box;
+
+  font-size: 9px;
+
   font-weight: 700;
-  letter-spacing: 0.2px;
-  margin-left: auto;
+
+  white-space: nowrap;
+
+  flex-shrink: 0;
+
+  z-index: 2;
 }
 
-/* ---- Task clickable hint ---- */
-.roadmap-task-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(154, 0, 0, 0.3);
-}
+
+/* =========================================================
+   SYNTHETIC TASK
+   ========================================================= */
 
 .roadmap-task-item.synthetic {
   border-style: dashed;
@@ -509,185 +794,777 @@
   border-style: solid;
 }
 
-/* ---- Phase Completion Overlay ---- */
-.phase-complete-overlay {
+
+/* =========================================================
+   FLOATING MENTOR BUTTON
+   ========================================================= */
+
+.roadmap-floating-mentor {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 9999;
+
+  bottom: 100px;
+
+  left:
+    max(
+      20px,
+      calc(
+        (100vw - 430px) / 2 + 10px
+      )
+    );
+
+  z-index: 1000;
+
+  width: 58px;
+  height: 58px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  cursor: pointer;
+
+  background:
+    radial-gradient(
+      circle at 35% 35%,
+      var(--theme-accent, #7d0a0a) 0%,
+      color-mix(
+        in srgb,
+        var(--theme-accent, #300303) 18%,
+        #000
+      ) 100%
+    );
+
+  box-shadow:
+    0 6px 24px
+    var(
+      --theme-accent-glow,
+      rgba(46, 0, 0, 0.5)
+    );
+
   display: flex;
+
   align-items: center;
   justify-content: center;
-  animation: phaseCompleteOverlayFadeOut 600ms ease-out 2000ms forwards;
+
+  transition:
+    transform 0.2s ease;
+}
+
+.roadmap-floating-mentor:active {
+  transform: scale(0.95);
+}
+
+.roadmap-floating-mentor svg {
+  width: 25px;
+  height: 25px;
+}
+
+
+/* =========================================================
+   BOTTOM NAV
+   ========================================================= */
+
+.roadmap-bottom-nav {
+  position: fixed;
+
+  bottom: 8px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width:
+    calc(100% - 20px);
+
+  max-width: 413px;
+
+  height: auto;
+
+  border-radius: 999px;
+
+  display: flex;
+
+  justify-content: space-around;
+
+  padding: 8px 6px;
+
+  box-sizing: border-box;
+
+  z-index: 1000;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(26, 26, 30, 0.95) 0%,
+      rgba(14, 14, 18, 0.97) 100%
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.7),
+
+    0 0 0 1px
+    rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   NAV HIGHLIGHT
+   ========================================================= */
+
+.roadmap-bottom-nav::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 1px;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  border-radius:
+    999px 999px 0 0;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* =========================================================
+   NAV ITEM
+   ========================================================= */
+
+.roadmap-nav-item {
+  position: relative;
+
+  z-index: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 3px;
+
+  color: #c8c8c8;
+
+  text-decoration: none;
+
+  background: none;
+
+  border: none;
+
+  padding: 3px 12px;
+
+  transition:
+    color 0.2s ease,
+    transform 0.3s ease;
+}
+
+.roadmap-nav-item svg {
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.roadmap-nav-item:hover svg {
+  transform: translateY(-2px);
+
+  filter:
+    drop-shadow(
+      0 2px 6px
+      rgba(255, 255, 255, 0.08)
+    );
+}
+
+.roadmap-nav-item-label {
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.roadmap-nav-item.active {
+  color: #c10000;
+
+  transform: scale(1.05);
+}
+
+.roadmap-nav-item.active svg {
+  filter:
+    drop-shadow(
+      0 0 10px
+      rgba(154, 0, 0, 0.55)
+    );
+}
+
+.roadmap-nav-item.active
+.roadmap-nav-item-label {
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   ACTIVE NAV GLOW
+   ========================================================= */
+
+.roadmap-nav-item.active::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -6px -10px;
+
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(154, 0, 0, 0.12) 0%,
+      transparent 70%
+    );
+
+  z-index: -1;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes roadmapFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.roadmap-node:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.roadmap-node:nth-child(2) {
+  animation-delay: 0.10s;
+}
+
+.roadmap-node:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.roadmap-node:nth-child(4) {
+  animation-delay: 0.20s;
+}
+
+.roadmap-node:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.roadmap-node:nth-child(6) {
+  animation-delay: 0.30s;
+}
+
+.roadmap-node:nth-child(7) {
+  animation-delay: 0.35s;
+}
+
+.roadmap-node:nth-child(8) {
+  animation-delay: 0.40s;
+}
+
+.roadmap-node:nth-child(9) {
+  animation-delay: 0.45s;
+}
+
+.roadmap-node:nth-child(10) {
+  animation-delay: 0.50s;
+}
+
+
+/* =========================================================
+   PHASE COMPLETE OVERLAY
+   ========================================================= */
+
+.phase-complete-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(0, 0, 0, 0.85);
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  animation:
+    phaseCompleteOverlayFadeOut
+    600ms
+    ease-out
+    2000ms
+    forwards;
+
   pointer-events: none;
 }
 
 .phase-complete-content {
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   text-align: center;
+
   padding: 32px;
 }
 
-/* ---- Task Detail Modal ---- */
+@keyframes phaseCompleteOverlayFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+
+/* =========================================================
+   UNLOCK ANIMATION
+   ========================================================= */
+
+@keyframes unlockShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  15% {
+    transform: translateX(-6px);
+  }
+
+  35% {
+    transform: translateX(6px);
+  }
+
+  55% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
+
+  90% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes unlockGlowPulse {
+  0% {
+    box-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    box-shadow:
+      0 0 20px
+      var(
+        --theme-accent-glow,
+        rgba(154, 0, 0, 0.6)
+      );
+  }
+
+  100% {
+    box-shadow: 0 0 0 transparent;
+  }
+}
+
+@keyframes unlockTitleFade {
+  from {
+    color: #a8a8a8;
+  }
+
+  to {
+    color: #ffffff;
+  }
+}
+
+@keyframes lockIconDissolve {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.roadmap-node.unlocking
+.roadmap-node-body.body-locked {
+  animation:
+    unlockShake
+    400ms
+    ease-out,
+
+    unlockGlowPulse
+    800ms
+    ease-out
+    400ms;
+
+  background: #1a1d27;
+
+  opacity: 1;
+}
+
+.roadmap-node.unlocking
+.locked-card {
+  animation:
+    unlockTitleFade
+    300ms
+    ease-out
+    forwards;
+}
+
+.roadmap-node.unlocking
+.roadmap-lock-icon {
+  animation:
+    lockIconDissolve
+    300ms
+    ease-out
+    forwards;
+}
+
+
+/* =========================================================
+   TASK MODAL
+   ========================================================= */
+
 .task-modal-overlay {
   position: fixed;
+
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+
+  background:
+    rgba(0, 0, 0, 0.7);
+
   backdrop-filter: blur(6px);
+
   -webkit-backdrop-filter: blur(6px);
+
   z-index: 2000;
+
   display: flex;
+
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  animation: modalFadeIn 0.2s ease;
+
+  padding: 12px;
+
+  animation:
+    modalFadeIn
+    0.2s
+    ease;
 }
 
 @keyframes modalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .task-modal-card {
-  background: linear-gradient(180deg, rgba(26, 26, 30, 0.98) 0%, rgba(14, 14, 18, 0.99) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(26, 26, 30, 0.98) 0%,
+      rgba(14, 14, 18, 0.99) 100%
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.10);
+
   border-radius: 20px;
-  padding: 12px 24px 28px;
+
+  padding:
+    12px
+    20px
+    28px;
+
   width: 100%;
+
   max-width: 410px;
-  max-height: 82vh;
+
+  max-height: 86vh;
+
   overflow-y: auto;
+
   position: relative;
-  animation: modalScaleIn 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  box-sizing: border-box;
+
+  animation:
+    modalScaleIn
+    0.25s
+    cubic-bezier(
+      0.22,
+      0.61,
+      0.36,
+      1
+    );
+
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 20px 60px
+    rgba(0, 0, 0, 0.7),
+
+    0 0 0 1px
+    rgba(0, 0, 0, 0.3),
+
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.03);
 }
 
 @keyframes modalScaleIn {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.97);
+
+    transform:
+      translateY(20px)
+      scale(0.97);
   }
+
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+
+    transform:
+      translateY(0)
+      scale(1);
   }
 }
 
-/* Handle / close row */
+
+/* =========================================================
+   MODAL HANDLE / CLOSE
+   ========================================================= */
+
 .task-modal-handle-row {
   display: flex;
+
   align-items: center;
   justify-content: center;
+
   position: relative;
+
   height: 24px;
+
   margin-bottom: 6px;
 }
 
 .task-modal-handle {
   width: 36px;
   height: 4px;
+
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.15);
+
+  background:
+    rgba(255, 255, 255, 0.15);
 }
 
 .task-modal-close {
   position: absolute;
+
   top: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #A8A8A8;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  color: #a8a8a8;
+
   width: 32px;
   height: 32px;
+
   border-radius: 50%;
+
   cursor: pointer;
+
   display: flex;
+
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .task-modal-close:hover {
-  background: rgba(154, 0, 0, 0.2);
-  border-color: rgba(154, 0, 0, 0.3);
-  color: #fff;
+  background:
+    rgba(154, 0, 0, 0.2);
+
+  border-color:
+    rgba(154, 0, 0, 0.3);
+
+  color: #ffffff;
 }
+
+
+/* =========================================================
+   MODAL TITLE
+   ========================================================= */
 
 .task-modal-title {
   font-size: 18px;
+
   font-weight: 800;
-  color: #F5F5F5;
+
+  color: #f5f5f5;
+
   letter-spacing: 0.3px;
+
   margin: 0 0 6px;
+
   line-height: 1.3;
 }
 
 .task-modal-synthetic-tag {
   display: inline-block;
+
   font-size: 10px;
+
   font-weight: 600;
-  color: #9B30FF;
-  background: rgba(138, 43, 226, 0.12);
-  padding: 2px 10px;
+
+  color: #9b30ff;
+
+  background:
+    rgba(138, 43, 226, 0.12);
+
+  padding:
+    2px
+    10px;
+
   border-radius: 999px;
+
   margin-bottom: 10px;
+
   letter-spacing: 0.4px;
 }
 
 .task-modal-desc {
   font-size: 13px;
-  color: #A8A8A8;
+
+  color: #a8a8a8;
+
   line-height: 1.55;
+
   margin: 0 0 18px;
 }
 
+
+/* =========================================================
+   MODAL META
+   ========================================================= */
+
 .task-modal-meta {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 8px;
+
   margin-bottom: 20px;
 }
 
 .task-modal-badge {
   display: inline-block;
-  padding: 5px 12px;
+
+  padding:
+    5px
+    12px;
+
   border-radius: 999px;
+
   font-size: 11px;
+
   font-weight: 600;
+
   letter-spacing: 0.3px;
 }
 
 .task-modal-badge.task-diff-badge {
-  border: 1px solid transparent;
+  border:
+    1px solid
+    transparent;
 }
 
 .task-modal-badge.task-type-badge {
-  background: rgba(100, 149, 237, 0.12);
+  background:
+    rgba(100, 149, 237, 0.12);
+
   color: #6495ed;
 }
 
 .task-modal-badge.task-xp-badge {
-  background: linear-gradient(135deg, rgba(154, 0, 0, 0.2) 0%, rgba(200, 0, 0, 0.15) 100%);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(154, 0, 0, 0.2) 0%,
+      rgba(200, 0, 0, 0.15) 100%
+    );
+
   color: #ff4d4d;
+
   font-weight: 700;
 }
 
 .task-modal-badge.task-done-badge {
-  background: rgba(29, 158, 117, 0.15);
+  background:
+    rgba(29, 158, 117, 0.15);
+
   color: #1d9e75;
 }
 
-/* Goal & difficulty sections */
+
+/* =========================================================
+   MODAL SECTIONS
+   ========================================================= */
+
 .task-modal-section {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.06);
+
   border-radius: 14px;
-  padding: 16px 18px;
+
+  padding:
+    16px
+    18px;
+
   margin-bottom: 12px;
 }
 
@@ -697,64 +1574,479 @@
 
 .task-modal-section-heading {
   display: flex;
+
   align-items: center;
+
   gap: 8px;
+
   font-size: 13px;
+
   font-weight: 700;
-  color: #C8C8C8;
+
+  color: #c8c8c8;
+
   margin: 0 0 8px;
+
   letter-spacing: 0.3px;
 }
 
 .task-modal-section-heading svg {
-  color: #DC143C;
+  color: #dc143c;
+
   flex-shrink: 0;
 }
 
 .task-modal-section-text {
   font-size: 12px;
+
   color: #8b8f98;
+
   line-height: 1.6;
+
   margin: 0;
 }
 
 
-/* ------------------------------------------------------------------ */
-/*  Phase cards & roadmap styles                                       */
-/* ------------------------------------------------------------------ */
+/* =========================================================
+   MODAL COMPLETE BUTTON
+   ========================================================= */
 
-/* ---- Task modal complete button ---- */
 .task-modal-complete-btn {
   display: flex;
+
   align-items: center;
   justify-content: center;
+
   gap: 8px;
+
   width: 100%;
+
   margin-top: 16px;
+
   padding: 12px 0;
-  border: 1.5px solid rgba(154, 0, 0, 0.45);
+
+  border:
+    1.5px solid
+    rgba(154, 0, 0, 0.45);
+
   border-radius: 10px;
-  background: rgba(154, 0, 0, 0.08);
+
+  background:
+    rgba(154, 0, 0, 0.08);
+
   color: #dc143c;
-  font-family: 'Inter', sans-serif;
+
+  font-family: "Inter", sans-serif;
+
   font-weight: 600;
+
   font-size: 14px;
+
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .task-modal-complete-btn:hover {
-  background: rgba(154, 0, 0, 0.18);
-  border-color: rgba(220, 20, 60, 0.7);
+  background:
+    rgba(154, 0, 0, 0.18);
+
+  border-color:
+    rgba(220, 20, 60, 0.7);
 }
 
 .task-modal-complete-btn.completed {
-  border-color: rgba(120, 200, 130, 0.45);
-  background: rgba(120, 200, 130, 0.08);
+  border-color:
+    rgba(120, 200, 130, 0.45);
+
+  background:
+    rgba(120, 200, 130, 0.08);
+
   color: #78c882;
 }
 
 .task-modal-complete-btn.completed:hover {
-  background: rgba(120, 200, 130, 0.16);
-  border-color: rgba(120, 200, 130, 0.7);
+  background:
+    rgba(120, 200, 130, 0.16);
+
+  border-color:
+    rgba(120, 200, 130, 0.7);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  /* -------------------------------------------------------
+     KEEP ROADMAP WIDTH UNCHANGED
+     ------------------------------------------------------- */
+
+  .roadmap-page {
+    width: 100%;
+    max-width: 430px;
+
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+
+  /* -------------------------------------------------------
+     TASK CARD
+
+     ONLY THE INNER LAYOUT CHANGES.
+     ------------------------------------------------------- */
+
+  .roadmap-task-item {
+    display: grid;
+
+    grid-template-columns:
+      20px
+      minmax(0, 1fr)
+      auto;
+
+    align-items: start;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    padding:
+      10px
+      9px;
+
+    min-height: 56px;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+  }
+
+
+  /* -------------------------------------------------------
+     CHECKBOX
+     ------------------------------------------------------- */
+
+  .roadmap-task-check {
+    grid-column: 1;
+    grid-row: 1;
+
+    position: static;
+
+    width: 20px;
+
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    padding-top: 1px;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+
+    color: #7b7f88;
+  }
+
+
+  /* -------------------------------------------------------
+     TITLE
+     ------------------------------------------------------- */
+
+  .roadmap-task-title {
+    grid-column: 2;
+    grid-row: 1;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    padding:
+      0
+      8px
+      0
+      4px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    line-height: 1.4;
+
+    color: #c8c8c8;
+
+    text-align: left;
+
+    white-space: normal;
+
+    word-break: normal;
+
+    overflow-wrap: break-word;
+  }
+
+
+  /* -------------------------------------------------------
+     BADGE
+     ------------------------------------------------------- */
+
+  .roadmap-task-diff-badge {
+    grid-column: 3;
+    grid-row: 1;
+
+    position: static;
+
+    align-self: start;
+
+    height: 21px;
+
+    padding:
+      0
+      7px;
+
+    border-radius: 7px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
+  }
+
+
+  /* -------------------------------------------------------
+     LOCKED NODE
+     ------------------------------------------------------- */
+
+  .roadmap-node-body.body-locked {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .roadmap-node-btn.locked-card {
+    width: 100%;
+    max-width: 100%;
+
+    white-space: normal;
+
+    line-height: 1.3;
+
+    text-align: left;
+  }
+
+
+  /* -------------------------------------------------------
+     LAST PHASE
+     ------------------------------------------------------- */
+
+  .roadmap-node.last-node
+  .roadmap-node-body.body-last {
+    grid-column:
+      1 / span 3;
+
+    width: 100%;
+    max-width: 100%;
+
+    margin-top: 8px;
+
+    padding:
+      0
+      12px;
+
+    box-sizing: border-box;
+
+    align-items: center;
+
+    text-align: center;
+  }
+
+
+  /* -------------------------------------------------------
+     FLOATING MENTOR
+     ------------------------------------------------------- */
+
+  .roadmap-floating-mentor {
+    left: 20px;
+
+    bottom: 100px;
+
+    width: 58px;
+    height: 58px;
+  }
+
+
+  /* -------------------------------------------------------
+     BOTTOM NAV
+     ------------------------------------------------------- */
+
+  .roadmap-bottom-nav {
+    width:
+      calc(100% - 20px);
+
+    max-width: 413px;
+
+    bottom: 8px;
+  }
+
+
+  /* -------------------------------------------------------
+     MODAL
+     ------------------------------------------------------- */
+
+  .task-modal-overlay {
+    padding: 12px;
+  }
+
+  .task-modal-card {
+    width: 100%;
+
+    max-width: 410px;
+
+    max-height: 86vh;
+
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .roadmap-page {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+
+  .roadmap-title {
+    font-size: 21px;
+  }
+
+
+  .roadmap-node {
+    grid-template-columns:
+      minmax(0, 1fr)
+      22px
+      minmax(0, 1fr);
+  }
+
+
+  .roadmap-node.left
+  .roadmap-node-body.body-left {
+    padding-right: 5px;
+  }
+
+
+  .roadmap-node.right
+  .roadmap-node-body.body-right {
+    padding-left: 5px;
+  }
+
+
+  /* -------------------------------------------------------
+     SMALL PHONE TASK CARD
+
+     Still does NOT widen the card.
+     ------------------------------------------------------- */
+
+  .roadmap-task-item {
+    grid-template-columns:
+      18px
+      minmax(0, 1fr)
+      auto;
+
+    padding:
+      8px
+      6px;
+
+    min-height: 52px;
+
+    border-radius: 10px;
+  }
+
+
+  .roadmap-task-check {
+    width: 18px;
+
+    font-size: 8px;
+  }
+
+
+  .roadmap-task-title {
+    padding:
+      0
+      6px
+      0
+      3px;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+  }
+
+
+  .roadmap-task-diff-badge {
+    height: 18px;
+
+    padding:
+      0
+      5px;
+
+    font-size: 7px;
+
+    border-radius: 6px;
+  }
+
+
+  .roadmap-bottom-nav {
+    width:
+      calc(100% - 12px);
+  }
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 601px) {
+
+  .roadmap-page {
+    width: 430px;
+
+    max-width: 430px;
+
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .roadmap-timeline {
+    width: 100%;
+
+    max-width: 430px;
+  }
+
+  .roadmap-node {
+    width: 100%;
+
+    max-width: 430px;
+  }
 }

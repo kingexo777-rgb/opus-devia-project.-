@@ -21,15 +21,11 @@ export default function RoadmapBar({ completionPercentage, loading }: RoadmapBar
   return (
     <div style={{ margin: "0 12px" }}>
       <Link to="/roadmap" style={{ textDecoration: "none" }}>
-        <div className="card-glass" style={{ padding: "6px 10px", cursor: "pointer" }}>
+        <div className="roadmap-card" style={{ cursor: "pointer" }}>
           {/* Title row */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <h2 style={{ fontSize: 13, fontWeight: 800, letterSpacing: "normal", color: "#F5F5F5" }}>Roadmap Completion</h2>
             <span style={{ color: "#A8A8A8", fontSize: 13, fontWeight: 700 }}>View roadmap ↗</span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-            <span style={{ color: "#A8A8A8", fontSize: 11 }}>Tap the roadmap card to open it.</span>
-            <span style={{ color: "var(--theme-accent, #9a0000)", fontSize: 12, fontWeight: 700 }}>Open now</span>
           </div>
 
         {/* Stats row */}
@@ -53,7 +49,6 @@ export default function RoadmapBar({ completionPercentage, loading }: RoadmapBar
           }} />
         </div>
 
-        <p style={{ marginTop: 10, color: "#A8A8A8", fontSize: 11 }}>Tap anywhere on this card to open the roadmap.</p>
       </div>
     </Link>
   </div>
