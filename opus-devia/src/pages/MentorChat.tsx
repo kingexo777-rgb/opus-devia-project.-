@@ -51,111 +51,43 @@ function formatSessionTitle(title: string, createdAt: string) {
   return title || `New chat · ${new Date(createdAt).toLocaleDateString()}`;
 }
 
-// ── Message formatter: raw LLM text → styled HTML ──
 function formatMessage(raw: string): string {
-  let text = raw
-    .replace(/—/g, "—")
-    .replace(/–/g, "–")
-    .replace(/[—–]/g, "-");
-
+  let text = raw.replace(/—/g, "—").replace(/–/g, "–").replace(/[—–]/g, "-");
   const lines = text.split("\n");
   const out: string[] = [];
   let inList = false;
   let listTag: "ul" | "ol" | null = null;
   let i = 0;
-
-  const flushList = () => {
-    if (inList && listTag) {
-      out.push(`</${listTag}>`);
-      inList = false;
-      listTag = null;
-    }
-  };
-
+  const flushList = () => { if (inList && listTag) { out.push(`</${listTag}>`); inList = false; listTag = null; } };
   while (i < lines.length) {
     const line = lines[i];
     const trimmed = line.trim();
-
-    if (trimmed === "") {
-      flushList();
-      i++;
-      continue;
-    }
-
+    if (trimmed === "") { flushList(); i++; continue; }
     const bulletMatch = trimmed.match(/^[-*•]\s+(.+)$/);
-    if (bulletMatch) {
-      if (!inList || listTag !== "ul") {
-        flushList();
-        out.push("<ul>");
-        inList = true;
-        listTag = "ul";
-      }
-      out.push(`<li>${inlineFormat(bulletMatch[1])}</li>`);
-      i++;
-      continue;
-    }
-
+    if (bulletMatch) { if (!inList || listTag !== "ul") { flushList(); out.push("<ul>"); inList = true; listTag = "ul"; } out.push(`<li>${inlineFormat(bulletMatch[1])}</li>`); i++; continue; }
     const numMatch = trimmed.match(/^\d+[.)]\s+(.+)$/);
-    if (numMatch) {
-      if (!inList || listTag !== "ol") {
-        flushList();
-        out.push("<ol>");
-        inList = true;
-        listTag = "ol";
-      }
-      out.push(`<li>${inlineFormat(numMatch[1])}</li>`);
-      i++;
-      continue;
-    }
-
+    if (numMatch) { if (!inList || listTag !== "ol") { flushList(); out.push("<ol>"); inList = true; listTag = "ol"; } out.push(`<li>${inlineFormat(numMatch[1])}</li>`); i++; continue; }
     flushList();
-
     const paraLines: string[] = [];
-    while (i < lines.length && lines[i].trim() !== "" && !lines[i].trim().match(/^[-*•]\s+/) && !lines[i].trim().match(/^\d+[.)]\s+/)) {
-      paraLines.push(lines[i]);
-      i++;
-    }
-    if (paraLines.length > 0) {
-      const body = paraLines.map((l) => inlineFormat(l.trim())).join("<br/>");
-      out.push(`<p>${body}</p>`);
-    }
+    while (i < lines.length && lines[i].trim() !== "" && !lines[i].trim().match(/^[-*•]\s+/) && !lines[i].trim().match(/^\d+[.)]\s+/)) { paraLines.push(lines[i]); i++; }
+    if (paraLines.length > 0) { const body = paraLines.map((l) => inlineFormat(l.trim())).join("<br/>"); out.push(`<p>${body}</p>`); }
   }
-
   flushList();
   return out.join("\n");
 }
 
 function inlineFormat(text: string): string {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, "<em>$1</em>")
-    .replace(/`([^`\n]+?)`/g, "<code>$1</code>");
+  return text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, "<em>$1</em>").replace(/`([^`\n]+?)`/g, "<code>$1</code>");
 }
 
 const ALLOWED_IMAGE_MIMES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-const ALLOWED_DOCUMENT_MIMES = [
-  "application/pdf",
-  "text/plain",
-  "text/markdown",
-  "text/x-markdown",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
+const ALLOWED_DOCUMENT_MIMES = ["application/pdf", "text/plain", "text/markdown", "text/x-markdown", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
 const URL_REGEX = /(https?:\/\/[^\s]+)/i;
 
-function readFileAsDataUrl(
-  file: File,
-): Promise<{ dataUrl: string; base64: string; mimeType: string }> {
+function readFileAsDataUrl(file: File): Promise<{ dataUrl: string; base64: string; mimeType: string }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const comma = dataUrl.indexOf(",");
-      resolve({
-        dataUrl,
-        base64: comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl,
-        mimeType: file.type,
-      });
-    };
+    reader.onload = () => { const dataUrl = reader.result as string; const comma = dataUrl.indexOf(","); resolve({ dataUrl, base64: comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl, mimeType: file.type }); };
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
@@ -165,13 +97,7 @@ export default function MentorChat() {
   const { user, profile } = useAuth();
   const displayName = profile?.display_name || "KING";
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Welcome back, KING. I'm your mentor — here to push you past every limit. Ask me anything or tell me what you're working on.",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([{ id: "welcome", role: "assistant", content: "Welcome back, KING. I'm your mentor — here to push you past every limit. Ask me anything or tell me what you're working on." }]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -199,8 +125,6 @@ export default function MentorChat() {
   const [hasLoadedSessions, setHasLoadedSessions] = useState(false);
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
-
-  // ── Voice state ──
   const [isRecording, setIsRecording] = useState(false);
   const [voiceAmplitude, setVoiceAmplitude] = useState(0);
   const [selectedVoice, setSelectedVoice] = useState("aura-2-asteria");
@@ -327,10 +251,7 @@ export default function MentorChat() {
     if (!file) return;
     if (!ALLOWED_IMAGE_MIMES.includes(file.type)) { setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: "That file type isn't supported for images. Use JPEG, PNG, GIF, or WebP.", isError: true }]); return; }
     if (file.size > 32 * 1024 * 1024) { setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: "That image is too large (max 32 MB).", isError: true }]); return; }
-    try {
-      const { dataUrl, base64, mimeType } = await readFileAsDataUrl(file);
-      setAttachment({ base64, mimeType, previewUrl: dataUrl, fileName: file.name });
-    } catch { setAttachment(null); }
+    try { const { dataUrl, base64, mimeType } = await readFileAsDataUrl(file); setAttachment({ base64, mimeType, previewUrl: dataUrl, fileName: file.name }); } catch { setAttachment(null); }
   }, []);
 
   const handleScreenshot = useCallback(async () => {
@@ -351,15 +272,11 @@ export default function MentorChat() {
     if (!file) return;
     if (!ALLOWED_DOCUMENT_MIMES.includes(file.type)) { setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: "That file type isn't supported for documents. Use PDF, Markdown, DOCX, or plain text.", isError: true }]); return; }
     if (file.size > 32 * 1024 * 1024) { setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: "That document is too large (max 32 MB).", isError: true }]); return; }
-    try {
-      const { dataUrl, base64, mimeType } = await readFileAsDataUrl(file);
-      setAttachment({ base64, mimeType, previewUrl: dataUrl, fileName: file.name, isDocument: true });
-    } catch { setAttachment(null); }
+    try { const { dataUrl, base64, mimeType } = await readFileAsDataUrl(file); setAttachment({ base64, mimeType, previewUrl: dataUrl, fileName: file.name, isDocument: true }); } catch { setAttachment(null); }
   }, []);
 
   const handleDocumentOption = useCallback(() => { setAttachMenuOpen(false); documentInputRef.current?.click(); }, []);
 
-  // ── Voice recording ──
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -418,21 +335,11 @@ export default function MentorChat() {
       const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/model-router`;
       try {
         const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "" }, body: JSON.stringify({ feature: "voice_input", audioBase64 }) });
-        if (res.ok) {
-          const data = await res.json();
-          const transcription = (data.transcription ?? "") as string;
-          if (transcription) setInput(transcription);
-        }
+        if (res.ok) { const data = await res.json(); const transcription = (data.transcription ?? "") as string; if (transcription) setInput(transcription); }
       } catch (err) { console.error("Voice input failed:", err); }
-    } else {
-      await startRecording();
-    }
+    } else { await startRecording(); }
   }, [isRecording, startRecording, stopRecording]);
 
-  // ── Voice output (TTS) ──
-  // TTS is handled server-side in model-router when voiceOutput flag is set.
-
-  // Close voice menu on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (voiceMenuRef.current && !voiceMenuRef.current.contains(e.target as Node)) setVoiceMenuOpen(false); };
     if (voiceMenuOpen) document.addEventListener("mousedown", handler);
@@ -460,7 +367,6 @@ export default function MentorChat() {
       const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}`, apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "" };
       let finalPrompt = text;
 
-      // ── Pre-flight: analyze image ──
       if (pendingAttachment && !pendingAttachment.isDocument) {
         const visionRes = await fetch(endpoint, { method: "POST", headers, body: JSON.stringify({ feature: "image_upload", imageBase64: pendingAttachment.base64, imageMimeType: pendingAttachment.mimeType, prompt: text }) });
         if (!visionRes.ok) { const errBody = await visionRes.json().catch(() => ({})); const reason: string = errBody?.error ?? errBody?.reason ?? ""; fail(reason === "insufficient_xp" ? "You don't have enough XP to analyze images." : "I couldn't read that image."); return; }
@@ -470,7 +376,6 @@ export default function MentorChat() {
         finalPrompt = `[The user shared an image. Here is a factual description of what is visible in it:]\n${imageDescription}\n\nUser's message: ${text || "(no text)"}`;
       }
 
-      // ── Pre-flight: extract document ──
       if (pendingAttachment && pendingAttachment.isDocument) {
         const docRes = await fetch(endpoint, { method: "POST", headers, body: JSON.stringify({ feature: "document_upload", documentBase64: pendingAttachment.base64, documentMimeType: pendingAttachment.mimeType, documentFileName: pendingAttachment.fileName }) });
         if (!docRes.ok) { const errBody = await docRes.json().catch(() => ({})); const reason: string = errBody?.error ?? errBody?.reason ?? ""; fail(reason === "insufficient_xp" ? "You don't have enough XP to process documents." : "I couldn't read that document."); return; }
@@ -481,7 +386,6 @@ export default function MentorChat() {
         finalPrompt = `[The user shared a document${docFileName ? ` named "${docFileName}"` : ""}. Here is the extracted text content:]\n\n${docText}\n\nUser's message: ${text || "(no text)"}`;
       }
 
-      // ── Pre-flight: fetch link ──
       if (!pendingAttachment) {
         const urlMatch = text.match(URL_REGEX);
         if (urlMatch) {
@@ -494,7 +398,6 @@ export default function MentorChat() {
         }
       }
 
-      // ── Stream mentor response ──
       const res = await fetch(endpoint, { method: "POST", headers, body: JSON.stringify({ sessionId, feature, prompt: finalPrompt }) });
       if (!res.ok) { const errBody = await res.json().catch(() => ({})); const reason: string = errBody?.error ?? errBody?.reason ?? ""; fail(reason === "insufficient_xp" ? "You don't have enough XP for this." : `Mentor engine error (${res.status}).`); return; }
       if (!res.body) throw new Error("No response body");
@@ -514,10 +417,7 @@ export default function MentorChat() {
           if (!trimmed.startsWith("data: ")) continue;
           const jsonStr = trimmed.slice(6).trim();
           if (jsonStr === "[DONE]") continue;
-          try {
-            const data = JSON.parse(jsonStr);
-            if (data.delta) { fullContent += data.delta; setMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: fullContent } : m)); }
-          } catch { /* skip */ }
+          try { const data = JSON.parse(jsonStr); if (data.delta) { fullContent += data.delta; setMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: fullContent } : m)); } } catch { /* skip */ }
         }
       }
       setMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, isStreaming: false } : m));
@@ -563,7 +463,7 @@ export default function MentorChat() {
                 <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 600 }}>Model</div>
                 <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                   {(["MENTOR", "ASSISTANT"] as ModelId[]).map((m) => (
-                    <button key={m} onClick={() => { setActiveModel(m); setMenuOpen(false); }} style={{ flex: 1, background: activeModel === m ? "var(--theme-accent, #ff3b30)" : "rgba(255,255,255,0.06)", border: "none", color: "#fff", padding: "8px 0", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{MODEL_INFO[m].label}</button>
+                    <button key={m} onClick={() => { switchModel(m); setMenuOpen(false); }} style={{ flex: 1, background: activeModel === m ? "var(--theme-accent, #ff3b30)" : "rgba(255,255,255,0.06)", border: "none", color: "#fff", padding: "8px 0", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{MODEL_INFO[m].label}</button>
                   ))}
                 </div>
               </div>
@@ -627,7 +527,6 @@ export default function MentorChat() {
       )}
 
       <div style={{ position: "absolute", bottom: 94, left: 12, right: 12, background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(18,18,18,0.35) 100%)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderRadius: 28, display: "flex", alignItems: "center", padding: "6px 8px 6px 8px", border: "1px solid rgba(255,59,48,0.5)", boxShadow: "0 0 0 1px rgba(255,59,48,0.4), 0 0 16px rgba(255,59,48,0.25), 0 0 40px rgba(255,59,48,0.08), 0 8px 32px rgba(0,0,0,0.6)" }}>
-        {/* Attach button with icon */}
         <div ref={attachMenuRef} style={{ position: "relative", flexShrink: 0 }}>
           <button type="button" onClick={() => setAttachMenuOpen((o) => !o)} aria-label="Add attachment" style={{ background: attachMenuOpen ? "var(--theme-accent-dim, rgba(255,59,48,0.2))" : "rgba(255,255,255,0.08)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", padding: 0 }}>
             <img src={attachIcon} alt="Attach" style={{ width: 18, height: 18, opacity: 0.7 }} />
@@ -642,7 +541,6 @@ export default function MentorChat() {
           )}
         </div>
 
-        {/* Mic button with sound wave */}
         <div style={{ position: "relative", flexShrink: 0, marginLeft: 4 }}>
           {isRecording && (
             <div style={{ position: "absolute", bottom: 44, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "flex-end", gap: 2, height: 32, background: "rgba(12,12,14,0.9)", borderRadius: 12, padding: "6px 10px", border: "1px solid rgba(255,59,48,0.3)" }}>
@@ -656,7 +554,6 @@ export default function MentorChat() {
 
         <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={isRecording ? "Listening..." : attachment ? "Add a caption (optional)..." : `Message ${MODEL_INFO[activeModel].label.toLowerCase()}...`} disabled={sending || isRecording} style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: 15, padding: "0 8px", minWidth: 0 }} />
 
-        {/* Voice selection */}
         <div ref={voiceMenuRef} style={{ position: "relative", flexShrink: 0, marginRight: 4 }}>
           <button type="button" onClick={() => setVoiceMenuOpen((o) => !o)} aria-label="Select voice" style={{ background: "rgba(255,255,255,0.06)", border: "none", width: 30, height: 30, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", fontSize: 12, color: "#B0B0B0" }}>🔊</button>
           {voiceMenuOpen && (
