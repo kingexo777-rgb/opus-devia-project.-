@@ -122,9 +122,9 @@ serve(async (req) => {
     source,
   } = await req.json()
 
-  // ─────────────────────────────────────────
+  // ──────────────────────────────────────────
   // PREFLIGHT — check XP and lock reservation
-  // ─────────────────────────────────────────
+  // ──────────────────────────────────────────
   if (action === "preflight") {
     const estimate = ESTIMATED_XP_COST[feature] ?? 2
 
