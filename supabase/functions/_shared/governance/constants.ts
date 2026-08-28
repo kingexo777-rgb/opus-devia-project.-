@@ -295,13 +295,13 @@ export const GOVERNANCE = {
 
   // Voice I/O configuration
   VOICE: {
-    inputModel: "DEEPGRAM_STT",
-    outputModel: "DEEPGRAM_TTS",
+    inputModel: "OPENAI_WHISPER",
+    outputModel: "OPENAI_TTS",
     inputScope: "mentor_sessions_only",
     outputScope: "mentor_text_responses_only",
     audioRetention: "none",
-    transcriptionFlow: "audio_in → deepgram_stt → text → mentor_pipeline",
-    outputFlow: "mentor_text_response → deepgram_tts → audio_out",
+    transcriptionFlow: "audio_in → whisper → text → mentor_pipeline",
+    outputFlow: "mentor_text_response → tts → audio_out",
   },
 
   // Performance review configuration
@@ -316,7 +316,7 @@ export const GOVERNANCE = {
     dataSource: "user_generated_only",
     externalDataProhibited: true,
     badWeekRedirect:
-      "Talk to your mentor, adjust approach, dont let it compound.",
+      "Talk to your mentor, adjust approach, don't let it compound.",
     growthAreaSource: "deepseek_v4_flash_chat_pattern_analysis",
   },
 } as const

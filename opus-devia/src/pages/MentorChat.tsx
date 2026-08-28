@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+﻿import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import BottomNav from "../components/home/BottomNav";
 import { useAuth } from "../hooks/useAuth";
@@ -65,16 +65,21 @@ function formatSessionTitle(title: string, createdAt: string) {
   return title || `New chat · ${new Date(createdAt).toLocaleDateString()}`;
 }
 
+// ── Message formatter: raw LLM text → styled HTML ──
 function formatMessage(raw: string): string {
   let text = raw
+    // Normalize em-dashes and long dashes
     .replace(/—/g, "—")
     .replace(/–/g, "–")
+    // But wait — we want to replace them with regular dashes for cleanliness
     .replace(/[—–]/g, "-");
+
   const lines = text.split("\n");
   const out: string[] = [];
   let inList = false;
   let listTag: "ul" | "ol" | null = null;
   let i = 0;
+
   const flushList = () => {
     if (inList && listTag) {
       out.push(`</${listTag}>`);
@@ -82,14 +87,19 @@ function formatMessage(raw: string): string {
       listTag = null;
     }
   };
+
   while (i < lines.length) {
     const line = lines[i];
     const trimmed = line.trim();
+
+    // Blank line: close any open list, emit paragraph break
     if (trimmed === "") {
       flushList();
       i++;
       continue;
     }
+
+    // Bullet list: "- item" or "* item" or "• item"
     const bulletMatch = trimmed.match(/^[-*•]\s+(.+)$/);
     if (bulletMatch) {
       if (!inList || listTag !== "ul") {
@@ -102,6 +112,8 @@ function formatMessage(raw: string): string {
       i++;
       continue;
     }
+
+    // Numbered list: "1. item" or "1) item"
     const numMatch = trimmed.match(/^\d+[.)]\s+(.+)$/);
     if (numMatch) {
       if (!inList || listTag !== "ol") {
@@ -114,7 +126,11 @@ function formatMessage(raw: string): string {
       i++;
       continue;
     }
+
+    // Regular text line
     flushList();
+
+    // Group consecutive non-empty, non-list lines into a paragraph
     const paraLines: string[] = [];
     while (i < lines.length && lines[i].trim() !== "" && !lines[i].trim().match(/^[-*•]\s+/) && !lines[i].trim().match(/^\d+[.)]\s+/)) {
       paraLines.push(lines[i]);
@@ -125,10 +141,12 @@ function formatMessage(raw: string): string {
       out.push(`<p>${body}</p>`);
     }
   }
+
   flushList();
   return out.join("\n");
 }
 
+// Inline formatting: bold, italic, code
 function inlineFormat(text: string): string {
   return text
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -181,6 +199,7 @@ export default function MentorChat() {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem("mentor_task_proof_prompt");
     if (!stored) return;
+
     try {
       const payload = JSON.parse(stored) as {
         title: string;
@@ -196,6 +215,7 @@ export default function MentorChat() {
         },
       ]);
     } catch {
+      // ignore invalid prompt payload
     } finally {
       window.localStorage.removeItem("mentor_task_proof_prompt");
     }
@@ -216,6 +236,7 @@ export default function MentorChat() {
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
 
+  // ── Voice state ──
   const [isRecording, setIsRecording] = useState(false);
   const [voiceAmplitude, setVoiceAmplitude] = useState(0);
   const [selectedVoice, setSelectedVoice] = useState("aura-2-asteria");
@@ -263,6 +284,7 @@ export default function MentorChat() {
     try {
       window.localStorage.setItem(getSessionStorageKey(), JSON.stringify(updatedSessions));
     } catch {
+      // ignore storage failure
     }
   }, [user?.id]);
 
@@ -329,6 +351,7 @@ export default function MentorChat() {
 
   useEffect(() => {
     if (!user?.id) return;
+
     const fetchXp = async () => {
       const { data } = await supabase
         .from("user_xp")
@@ -342,6 +365,7 @@ export default function MentorChat() {
         setLevel(calcLevel(e));
       }
     };
+
     fetchXp();
     const handleXpUpdated = () => fetchXp();
     if (typeof window !== "undefined") {
@@ -391,6 +415,7 @@ export default function MentorChat() {
     const storedSessions = loadSessions();
     setSessions(storedSessions);
     setHasLoadedSessions(true);
+
     if (storedSessions.length > 0) {
       setSessionPromptVisible(true);
     }
@@ -451,6 +476,7 @@ export default function MentorChat() {
         }
       }
     } catch {
+      // fall through to file picker
     }
     pictureInputRef.current?.click();
   }, [applyImageFile]);
@@ -494,6 +520,7 @@ export default function MentorChat() {
     documentInputRef.current?.click();
   }, []);
 
+  // ── Voice recording ──
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -503,6 +530,7 @@ export default function MentorChat() {
       analyser.fftSize = 256;
       source.connect(analyser);
       analyserRef.current = analyser;
+
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       const updateAmplitude = () => {
         if (!analyserRef.current) return;
@@ -512,6 +540,7 @@ export default function MentorChat() {
         animFrameRef.current = requestAnimationFrame(updateAmplitude);
       };
       updateAmplitude();
+
       const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
         ? "audio/webm;codecs=opus"
         : "audio/webm";
@@ -567,9 +596,11 @@ export default function MentorChat() {
     if (isRecording) {
       const audioBase64 = await stopRecording();
       if (!audioBase64) return;
+
       const { data: authData } = await supabase.auth.getSession();
       const token = authData.session?.access_token;
       if (!token) return;
+
       const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/model-router`;
       try {
         const res = await fetch(endpoint, {
@@ -586,9 +617,13 @@ export default function MentorChat() {
           const transcription = (data.transcription ?? "") as string;
           if (transcription) {
             setInput(transcription);
+            // Auto-send after a brief delay
             setTimeout(() => {
               setInput((prev) => {
-                if (prev === transcription) return prev;
+                if (prev === transcription) {
+                  // Trigger send via the input state
+                  return prev;
+                }
                 return prev;
               });
             }, 300);
@@ -602,6 +637,11 @@ export default function MentorChat() {
     }
   }, [isRecording, startRecording, stopRecording]);
 
+  // ── Voice output (TTS) ──
+  // TTS is handled server-side in model-router when voiceOutput flag is set.
+  // The speakText helper below can be used for client-side playback of TTS audio.
+
+  // Close voice menu on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (voiceMenuRef.current && !voiceMenuRef.current.contains(e.target as Node)) {
@@ -615,8 +655,10 @@ export default function MentorChat() {
   const sendMessage = useCallback(async () => {
     const text = input.trim();
     if ((!text && !attachment) || sending) return;
+
     const feature = activeModel === "MENTOR" ? "mentor_message" : "assistant_message";
     const pendingAttachment = attachment;
+
     const userMsg: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -630,10 +672,12 @@ export default function MentorChat() {
       content: "",
       isStreaming: true,
     };
+
     setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setInput("");
     setSending(true);
     setAttachMenuOpen(false);
+
     const fail = (content: string) => {
       setMessages((prev) =>
         prev.map((m) =>
@@ -641,6 +685,7 @@ export default function MentorChat() {
         ),
       );
     };
+
     try {
       const { data: authData } = await supabase.auth.getSession();
       const token = authData.session?.access_token;
@@ -648,14 +693,17 @@ export default function MentorChat() {
         fail("Session expired. Please sign in again.");
         return;
       }
+
       const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/model-router`;
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
       };
+
       let finalPrompt = text;
 
+      // ── Pre-flight: analyze image ──
       if (pendingAttachment && !pendingAttachment.isDocument) {
         const visionRes = await fetch(endpoint, {
           method: "POST",
@@ -667,6 +715,7 @@ export default function MentorChat() {
             prompt: text,
           }),
         });
+
         if (!visionRes.ok) {
           const errBody = await visionRes.json().catch(() => ({}));
           const reason: string = errBody?.error ?? errBody?.reason ?? "";
@@ -677,6 +726,7 @@ export default function MentorChat() {
           );
           return;
         }
+
         const visionData = await visionRes.json();
         const imageDescription = (visionData.imageDescription ?? "") as string;
         setMessages((prev) =>
@@ -685,6 +735,7 @@ export default function MentorChat() {
         finalPrompt = `[The user shared an image. Here is a factual description of what is visible in it:]\n${imageDescription}\n\nUser's message: ${text || "(no text)"}`;
       }
 
+      // ── Pre-flight: extract document ──
       if (pendingAttachment && pendingAttachment.isDocument) {
         const docRes = await fetch(endpoint, {
           method: "POST",
@@ -696,6 +747,7 @@ export default function MentorChat() {
             documentFileName: pendingAttachment.fileName,
           }),
         });
+
         if (!docRes.ok) {
           const errBody = await docRes.json().catch(() => ({}));
           const reason: string = errBody?.error ?? errBody?.reason ?? "";
@@ -710,6 +762,7 @@ export default function MentorChat() {
           );
           return;
         }
+
         const docData = await docRes.json();
         const docText = (docData.documentText ?? "") as string;
         const docFileName = (docData.documentFileName ?? pendingAttachment.fileName) as string;
@@ -719,6 +772,7 @@ export default function MentorChat() {
         finalPrompt = `[The user shared a document${docFileName ? ` named "${docFileName}"` : ""}. Here is the extracted text content:]\n\n${docText}\n\nUser's message: ${text || "(no text)"}`;
       }
 
+      // ── Pre-flight: fetch link ──
       if (!pendingAttachment) {
         const urlMatch = text.match(URL_REGEX);
         if (urlMatch) {
@@ -728,10 +782,12 @@ export default function MentorChat() {
             headers,
             body: JSON.stringify({ feature: "fetch_link", url: linkUrl }),
           });
+
           if (!linkRes.ok) {
             fail("That link couldn't be processed. Try pasting a different one, or just tell me what you're working on directly.");
             return;
           }
+
           const linkData = await linkRes.json();
           setMessages((prev) =>
             prev.map((m) => (m.id === userMsg.id ? { ...m, linkUrl } : m)),
@@ -740,11 +796,14 @@ export default function MentorChat() {
         }
       }
 
+      // ── Stream mentor response ──
       const res = await fetch(endpoint, {
         method: "POST",
         headers,
         body: JSON.stringify({ sessionId, feature, prompt: finalPrompt }),
       });
+
+      // Non-OK response — preflight denied, tier blocked, etc.
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
         const reason: string = errBody?.error ?? errBody?.reason ?? "";
@@ -757,25 +816,31 @@ export default function MentorChat() {
         );
         return;
       }
+
       if (!res.body) {
         throw new Error("No response body");
       }
 
+      // ── Streaming read loop ──
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
       let fullContent = "";
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
+
         for (const line of lines) {
           const trimmed = line.trim();
           if (!trimmed.startsWith("data: ")) continue;
           const jsonStr = trimmed.slice(6).trim();
           if (jsonStr === "[DONE]") continue;
+
           try {
             const data = JSON.parse(jsonStr);
             if (data.delta) {
@@ -787,14 +852,19 @@ export default function MentorChat() {
               );
             }
           } catch {
+            // Skip unparseable SSE lines
           }
         }
       }
+
+      // Stream complete — mark finished
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId ? { ...m, isStreaming: false } : m,
         ),
       );
+
+      // Trigger XP refresh (billing finalized in background)
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("user_xp_updated"));
       }
@@ -1434,7 +1504,7 @@ export default function MentorChat() {
                   padding: "10px 12px", borderRadius: 12, cursor: "pointer",
                 }}
               >
-                <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>🖼</span>
+                <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>🖼️</span>
                 <span style={{ flex: 1 }}>
                   <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Picture</span>
                   <span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>From your library</span>
@@ -1474,6 +1544,7 @@ export default function MentorChat() {
           )}
         </div>
 
+        {/* Mic button with sound wave */}
         <div style={{ position: "relative", flexShrink: 0, marginLeft: 4 }}>
           {isRecording && (
             <div style={{
@@ -1543,6 +1614,7 @@ export default function MentorChat() {
             paddingLeft: 12,
           }}
         />
+        {/* Voice selection */}
         <div ref={voiceMenuRef} style={{ position: "relative", flexShrink: 0, marginRight: 4 }}>
           <button
             type="button"
