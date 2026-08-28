@@ -109,9 +109,7 @@ function readFileAsDataUrl(file: File): Promise<{ dataUrl: string; base64: strin
 export default function MentorChat() {
   const { user, profile } = useAuth();
   const displayName = profile?.display_name || "KING";
-
   const [messages, setMessages] = useState<Message[]>([{ id: "welcome", role: "assistant", content: "Welcome back, KING. I'm your mentor — here to push you past every limit. Ask me anything or tell me what you're working on." }]);
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem("mentor_task_proof_prompt");
@@ -119,10 +117,9 @@ export default function MentorChat() {
     try {
       const payload = JSON.parse(stored) as { title: string; description: string; xpReward: number };
       setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: `You just submitted proof for \"${payload.title}\". Tell me what you built and attach any image or proof you have.` }]);
-    } catch { /* ignore */ }
+    } catch { }
     finally { window.localStorage.removeItem("mentor_task_proof_prompt"); }
   }, []);
-
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [activeModel, setActiveModel] = useState<ModelId>("MENTOR");
@@ -142,7 +139,6 @@ export default function MentorChat() {
   const [voiceAmplitude, setVoiceAmplitude] = useState(0);
   const [selectedVoice, setSelectedVoice] = useState("aura-2-asteria");
   const [voiceMenuOpen, setVoiceMenuOpen] = useState(false);
-
   const DEEPGRAM_VOICES = [
     { id: "aura-2-asteria", label: "Asteria (F)", description: "Warm, engaging" },
     { id: "aura-2-orion", label: "Orion (M)", description: "Deep, authoritative" },
@@ -151,7 +147,6 @@ export default function MentorChat() {
     { id: "aura-2-stella", label: "Stella (F)", description: "Bright, energetic" },
     { id: "aura-2-angus", label: "Angus (M)", description: "Rich, resonant" },
   ];
-
   const chatRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -166,7 +161,6 @@ export default function MentorChat() {
   const voiceMenuRef = useRef<HTMLDivElement>(null);
 
   const getSessionStorageKey = () => `mentor-chat-sessions-${user?.id ?? "anonymous"}`;
-
   const loadSessions = useCallback(() => {
     if (typeof window === "undefined") return [] as ChatSession[];
     try {
@@ -175,19 +169,16 @@ export default function MentorChat() {
       return parsed.slice().sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
     } catch { return [] as ChatSession[]; }
   }, [user?.id]);
-
   const saveSessions = useCallback((updatedSessions: ChatSession[]) => {
     if (typeof window === "undefined") return;
-    try { window.localStorage.setItem(getSessionStorageKey(), JSON.stringify(updatedSessions)); } catch { /* ignore */ }
+    try { window.localStorage.setItem(getSessionStorageKey(), JSON.stringify(updatedSessions)); } catch { }
   }, [user?.id]);
-
   const deriveSessionTitle = useCallback((msgs: Message[]): string => {
     const firstUser = msgs.find((m) => m.role === "user");
     if (!firstUser) return "New chat";
     const raw = firstUser.content.trim();
     return raw.length > 50 ? raw.slice(0, 47) + "..." : raw;
   }, []);
-
   const persistCurrentSession = useCallback((updatedMessages: Message[], updatedModel: ModelId) => {
     setSessions((prev) => {
       const now = new Date().toISOString();
@@ -200,7 +191,6 @@ export default function MentorChat() {
       return next;
     });
   }, [activeSessionId, deriveSessionTitle, saveSessions]);
-
   const createNewSession = useCallback(() => {
     const newId = crypto.randomUUID();
     setSessionId(newId);
@@ -211,7 +201,6 @@ export default function MentorChat() {
     saveSessions([newSession, ...sessions.filter((s) => s.id !== newId)]);
     setSessionPromptVisible(false);
   }, [activeModel, saveSessions, sessions]);
-
   const loadSession = useCallback((id: string) => {
     const session = sessions.find((s) => s.id === id);
     if (!session) return;
@@ -221,7 +210,6 @@ export default function MentorChat() {
     setMessages(session.messages);
     setSessionPromptVisible(false);
   }, [sessions]);
-
   useEffect(() => {
     if (!user?.id) return;
     const fetchXp = async () => {
@@ -233,23 +221,18 @@ export default function MentorChat() {
     if (typeof window !== "undefined") window.addEventListener("user_xp_updated", handleXpUpdated);
     return () => { if (typeof window !== "undefined") window.removeEventListener("user_xp_updated", handleXpUpdated); };
   }, [user?.id]);
-
   useEffect(() => { if (profile?.assertiveness_level != null) setAssertiveness(profile.assertiveness_level); }, [profile?.assertiveness_level]);
-
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false); };
     if (menuOpen) document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
-
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (attachMenuRef.current && !attachMenuRef.current.contains(e.target as Node)) setAttachMenuOpen(false); };
     if (attachMenuOpen) document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [attachMenuOpen]);
-
   useEffect(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [messages]);
-
   useEffect(() => {
     if (!user?.id || hasLoadedSessions) return;
     const storedSessions = loadSessions();
@@ -257,7 +240,6 @@ export default function MentorChat() {
     setHasLoadedSessions(true);
     if (storedSessions.length > 0) setSessionPromptVisible(true);
   }, [hasLoadedSessions, loadSessions, user?.id]);
-
   useEffect(() => { if (!hasLoadedSessions) return; persistCurrentSession(messages, activeModel); }, [activeModel, hasLoadedSessions, messages, persistCurrentSession]);
 
   const applyImageFile = useCallback(async (file: File | undefined) => {
@@ -277,7 +259,7 @@ export default function MentorChat() {
           if (imageType) { const blob = await item.getType(imageType); const file = new File([blob], "screenshot.png", { type: imageType }); await applyImageFile(file); return; }
         }
       }
-    } catch { /* fall through */ }
+    } catch { }
     pictureInputRef.current?.click();
   }, [applyImageFile]);
 
@@ -406,7 +388,7 @@ export default function MentorChat() {
           const linkRes = await fetch(endpoint, { method: "POST", headers, body: JSON.stringify({ feature: "fetch_link", url: linkUrl }) });
           if (!linkRes.ok) { fail("That link couldn't be processed."); return; }
           const linkData = await linkRes.json();
-          setMessages((prev) => prev.map((m) => (m.id === userMsg.id ? { ...m, linkUrl } : m)));
+          setMessages((prev) => prev.map((m) => (m.id === userMsg.id ? { ...m, linkUrl } : m));
           finalPrompt = `[The user shared a link: ${linkUrl}]\nHere is a summary of that page:\n${linkData.summary ?? ""}\n\nUser's message: ${text}`;
         }
       }
@@ -430,7 +412,7 @@ export default function MentorChat() {
           if (!trimmed.startsWith("data: ")) continue;
           const jsonStr = trimmed.slice(6).trim();
           if (jsonStr === "[DONE]") continue;
-          try { const data = JSON.parse(jsonStr); if (data.delta) { fullContent += data.delta; setMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: fullContent } : m)); } } catch { /* skip */ }
+          try { const data = JSON.parse(jsonStr); if (data.delta) { fullContent += data.delta; setMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, content: fullContent } : m)); } } catch { }
         }
       }
       setMessages((prev) => prev.map((m) => m.id === assistantId ? { ...m, isStreaming: false } : m));
@@ -457,69 +439,84 @@ export default function MentorChat() {
             <h2 style={{ color: "#ffffff", marginBottom: 12, fontSize: 24 }}>Continue your last chat?</h2>
             <p style={{ color: "#B0B0B0", marginBottom: 24, fontSize: 14 }}>Pick up where you left off with your most recent conversation, or start a fresh chat.</p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-              <button onClick={() => { if (sessions.length > 0) loadSession(sessions[0].id); else setSessionPromptVisible(false); }} style={{ background: "var(--theme-accent, #ff3b30)", border: "none", color: "#fff", padding: "12px 24px", borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: "pointer" }}>Continue</button>
-              <button onClick={createNewSession} style={{ background: "rgba(255,255,255,0.08)", border: "none", color: "#B0B0B0", padding: "12px 24px", borderRadius: 14, fontSize: 15, fontWeight: 600, cursor: "pointer" }}>New Chat</button>
+              <button onClick={() => { if (sessions.length > 0) loadSession(sessions[0].id); }} style={{ background: "var(--theme-accent, #ff3b30)", color: "#ffffff", border: "none", borderRadius: 14, padding: "12px 18px", cursor: sessions.length > 0 ? "pointer" : "not-allowed", opacity: sessions.length > 0 ? 1 : 0.5 }}>Continue last chat</button>
+              <button onClick={createNewSession} style={{ background: "rgba(255,255,255,0.08)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: "12px 18px", cursor: "pointer" }}>Start new chat</button>
             </div>
           </div>
         </div>
       )}
 
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px 8px", position: "relative", zIndex: 10 }}>
-        <div style={{ position: "relative" }} ref={menuRef}>
-          <button onClick={() => setMenuOpen((o) => !o)} aria-label="Menu" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 4 }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 20px 8px 20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button onClick={() => setMenuOpen((o) => !o)} aria-label="Menu" style={{ background: "rgba(255,255,255,0.04)", border: "none", width: 38, height: 38, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
           </button>
-          <span style={{ color: "#ffffff", fontWeight: 700, fontSize: 18, marginLeft: 8 }}>{displayName}</span>
-          {menuOpen && (
-            <div style={{ position: "absolute", top: 44, left: 0, width: 280, background: "rgba(18,18,20,0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.6)", zIndex: 300 }}>
-              <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 600 }}>Model</div>
-                <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                  {(["MENTOR", "ASSISTANT"] as ModelId[]).map((m) => (
-                    <button key={m} onClick={() => { switchModel(m); setMenuOpen(false); }} style={{ flex: 1, background: activeModel === m ? "var(--theme-accent, #ff3b30)" : "rgba(255,255,255,0.06)", border: "none", color: "#fff", padding: "8px 0", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>{MODEL_INFO[m].label}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Assertiveness</div>
-                <input type="range" min="1" max="5" value={assertiveness} onChange={(e) => saveAssertiveness(Number(e.target.value))} style={{ width: "100%" }} />
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#8A8A8F" }}><span>Supportive</span><span>Blunt</span></div>
-              </div>
-              <div style={{ padding: "12px 14px" }}>
-                <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Sessions</div>
-                {sessions.slice(0, 5).map((s) => (
-                  <button key={s.id} onClick={() => { loadSession(s.id); setMenuOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", background: s.id === activeSessionId ? "rgba(255,59,48,0.12)" : "transparent", border: "none", color: s.id === activeSessionId ? "#ff3b30" : "#B0B0B0", padding: "8px 10px", borderRadius: 8, fontSize: 13, cursor: "pointer", marginBottom: 2 }}>{formatSessionTitle(s.title, s.createdAt)}</button>
-                ))}
-                <button onClick={() => { createNewSession(); setMenuOpen(false); }} style={{ width: "100%", background: "rgba(255,255,255,0.06)", border: "none", color: "#B0B0B0", padding: "8px 0", borderRadius: 10, fontSize: 13, cursor: "pointer", marginTop: 6 }}>+ New Chat</button>
-              </div>
-            </div>
-          )}
+          <span style={{ color: "#ffffff", fontSize: 22, fontWeight: 900, letterSpacing: "0.5px" }}>{displayName}</span>
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--theme-accent, #ff3b30)", boxShadow: "0 0 8px var(--theme-accent-glow, rgba(255,59,48,0.6))" }} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ color: "var(--theme-accent, #ff3b30)", fontSize: 20, fontWeight: 800 }}>{level}</div>
-            <div style={{ color: "#8A8A8F", fontSize: 11 }}>{fmt(totalXP)} XP</div>
+          <div style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", background: `conic-gradient(var(--theme-accent, #ff3b30) ${(earnedXP % 100)}%, transparent ${(earnedXP % 100)}% 100%)`, display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#0a0a0a", display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <span style={{ color: "#ef9f27", fontSize: 11, fontWeight: 700 }}>{level}</span>
+            </div>
           </div>
-          <Link to="/settings" style={{ color: "#B0B0B0" }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span style={{ color: "#ef9f27", fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em" }}>{fmt(earnedXP)} XP</span>
+          <Link to="/settings" aria-label="Settings" style={{ background: "rgba(255,255,255,0.04)", border: "none", width: 38, height: 38, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B0B0B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </Link>
         </div>
       </header>
 
-      <div ref={chatRef} style={{ padding: "0 16px", overflowY: "auto", maxHeight: "calc(100vh - 220px)" }}>
+      {menuOpen && (
+        <div ref={menuRef} style={{ position: "absolute", top: 0, left: 0, width: 280, height: "100vh", background: "var(--settings-card-bg, rgba(22, 14, 14, 0.95))", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: "1px solid var(--theme-accent-dim, rgba(255,59,48,0.2))", zIndex: 100, padding: "24px 20px", display: "flex", flexDirection: "column", gap: 24, overflowY: "auto" }}>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}><button onClick={() => setMenuOpen(false)} style={{ background: "transparent", border: "none", color: "#B0B0B0", fontSize: 20, cursor: "pointer" }}>✕</button></div>
+          <div>
+            <span style={{ display: "block", fontSize: 10, color: "#8A8A8F", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Model</span>
+            {(Object.keys(MODEL_INFO) as ModelId[]).map((model) => (
+              <button key={model} onClick={() => { switchModel(model); setMenuOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 16px", borderRadius: 12, border: activeModel === model ? "1px solid var(--theme-accent, #ff3b30)" : "1px solid transparent", background: activeModel === model ? "var(--theme-accent-dim, rgba(255,59,48,0.12))" : "rgba(255,255,255,0.03)", color: "#e0e0e0", fontSize: 14, cursor: "pointer", marginBottom: 6 }}>
+                <div style={{ fontWeight: 600 }}>{MODEL_INFO[model].label}</div>
+                <div style={{ fontSize: 11, color: "#8A8A8F", marginTop: 2 }}>{MODEL_INFO[model].subtitle}</div>
+              </button>
+            ))}
+          </div>
+          <div>
+            <span style={{ display: "block", fontSize: 10, color: "#8A8A8F", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Assertiveness: {assertiveness}/10</span>
+            <input type="range" min={1} max={10} value={assertiveness} onChange={(e) => saveAssertiveness(Number(e.target.value))} style={{ width: "100%", accentColor: "var(--theme-accent, #ff3b30)" }} />
+          </div>
+          <div>
+            <span style={{ display: "block", fontSize: 10, color: "#8A8A8F", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>XP Balance</span>
+            <div style={{ color: "#ef9f27", fontSize: 18, fontWeight: 700 }}>{fmt(earnedXP)} XP</div>
+            <div style={{ color: "#8A8A8F", fontSize: 12 }}>Level {level} · {fmt(totalXP)} total</div>
+          </div>
+          <div>
+            <span style={{ display: "block", fontSize: 10, color: "#8A8A8F", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>Chat History</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {sessions.length === 0 ? (<div style={{ color: "#B0B0B0", fontSize: 13 }}>No previous chats yet.</div>) : (
+                sessions.map((session) => (
+                  <button key={session.id} onClick={() => { loadSession(session.id); setMenuOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 14px", borderRadius: 12, border: activeSessionId === session.id ? "1px solid var(--theme-accent, #ff3b30)" : "1px solid rgba(255,255,255,0.08)", background: activeSessionId === session.id ? "rgba(255,59,48,0.12)" : "rgba(255,255,255,0.03)", color: "#e0e0e0", fontSize: 13, cursor: "pointer" }}>
+                    <div style={{ fontWeight: 600, marginBottom: 2 }}>{formatSessionTitle(session.title, session.createdAt)}</div>
+                    <div style={{ fontSize: 11, color: "#8A8A8F" }}>Updated {new Date(session.updatedAt).toLocaleString()}</div>
+                  </button>
+                ))
+              )}
+            </div>
+            <button onClick={() => { setMenuOpen(false); createNewSession(); }} style={{ marginTop: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "10px 16px", color: "#B0B0B0", fontSize: 13, cursor: "pointer", width: "100%", textAlign: "center" }}>Start new chat</button>
+          </div>
+        </div>
+      )}
+
+      <div ref={chatRef} style={{ flex: 1, overflowY: "auto", padding: "20px 16px 110px 16px", display: "flex", flexDirection: "column", gap: 16, maxHeight: "calc(100vh - 240px)" }}>
         {messages.map((msg) => (
-          <div key={msg.id} style={{ marginBottom: 16, display: "flex", flexDirection: "column", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
-            <div style={{ maxWidth: "85%", background: msg.role === "user" ? "var(--theme-accent, #ff3b30)" : msg.isError ? "rgba(255,59,48,0.15)" : "rgba(255,255,255,0.08)", borderRadius: 18, padding: "12px 16px", color: msg.isError ? "#ff6b6b" : "#e0e0e0", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
-              {msg.role === "user" ? (
-                <>
-                  {msg.imagePreview && (<img src={msg.imagePreview} alt="Attached" style={{ display: "block", width: "100%", maxWidth: 260, maxHeight: 220, objectFit: "cover", borderRadius: 14, marginBottom: 10, border: "1px solid rgba(255,255,255,0.12)" }} />)}
-                  {msg.documentFileName && (<div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "10px 14px", background: "rgba(255,255,255,0.05)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)" }}><span style={{ fontSize: 22 }}>📄</span><div><div style={{ color: "#e0e0e0", fontSize: 13, fontWeight: 600 }}>{msg.documentFileName}</div><div style={{ color: "#8A8A8F", fontSize: 11 }}>Document attached</div></div></div>)}
-                  {msg.content ? (<span style={{ whiteSpace: "pre-wrap" }}>{msg.content}</span>) : null}
-                  {msg.linkUrl && (<a href={msg.linkUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: "var(--theme-accent, #ff3b30)", textDecoration: "underline", wordBreak: "break-all" }}>{msg.linkUrl}</a>)}
-                  {msg.imageDescription && (<details style={{ marginTop: 10, fontSize: 12, color: "#9a9a9a" }}><summary style={{ cursor: "pointer", color: "#B0B0B0", fontWeight: 600 }}>What Opus saw</summary><div style={{ marginTop: 6, whiteSpace: "pre-wrap" }}>{msg.imageDescription}</div></details>)}
-                  {msg.documentText && (<details style={{ marginTop: 10, fontSize: 12, color: "#9a9a9a" }}><summary style={{ cursor: "pointer", color: "#B0B0B0", fontWeight: 600 }}>What Opus read</summary><div style={{ marginTop: 6, whiteSpace: "pre-wrap", maxHeight: 200, overflowY: "auto" }}>{msg.documentText}</div></details>)}
-                </>
-              ) : (
+          <div key={msg.id} style={{ display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
+            <div className={msg.role === "assistant" ? "chat-message" : ""} style={{ maxWidth: "82%", padding: "14px 18px", borderRadius: msg.role === "user" ? "24px 24px 6px 24px" : "24px 24px 24px 6px", background: msg.role === "user" ? "#1a1a1a" : "var(--settings-card-bg, rgba(22, 14, 14, 0.75))", border: msg.role === "user" ? "1px solid #2a2a2a" : "1px solid var(--theme-accent-dim, rgba(255,59,48,0.2))", color: "#e0e0e0", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+              {msg.role === "user" ? (<>
+                {msg.imagePreview && (<img src={msg.imagePreview} alt="Attached" style={{ display: "block", width: "100%", maxWidth: 260, maxHeight: 220, objectFit: "cover", borderRadius: 14, marginBottom: 10, border: "1px solid rgba(255,255,255,0.12)" }} />)}
+                {msg.documentFileName && (<div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "10px 14px", background: "rgba(255,255,255,0.05)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)" }}><span style={{ fontSize: 22 }}>📄</span><div><div style={{ color: "#e0e0e0", fontSize: 13, fontWeight: 600 }}>{msg.documentFileName}</div><div style={{ color: "#8A8A8F", fontSize: 11 }}>Document attached</div></div></div>)}
+                {msg.content ? (<span style={{ whiteSpace: "pre-wrap" }}>{msg.content}</span>) : null}
+                {msg.linkUrl && (<a href={msg.linkUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: "var(--theme-accent, #ff3b30)", textDecoration: "underline", wordBreak: "break-all" }}>{msg.linkUrl}</a>)}
+                {msg.imageDescription && (<details style={{ marginTop: 10, fontSize: 12, color: "#9a9a9a" }}><summary style={{ cursor: "pointer", color: "#B0B0B0", fontWeight: 600 }}>What Opus saw</summary><div style={{ marginTop: 6, whiteSpace: "pre-wrap" }}>{msg.imageDescription}</div></details>)}
+                {msg.documentText && (<details style={{ marginTop: 10, fontSize: 12, color: "#9a9a9a" }}><summary style={{ cursor: "pointer", color: "#B0B0B0", fontWeight: 600 }}>What Opus read</summary><div style={{ marginTop: 6, whiteSpace: "pre-wrap", maxHeight: 200, overflowY: "auto" }}>{msg.documentText}</div></details>)}
+              </>) : (
                 <span dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }} style={{ display: "block" }} />
               )}
               {msg.isStreaming && (<span className="streaming-cursor" style={{ display: "inline", color: "var(--theme-accent, #ff3b30)" }}>▌</span>)}
@@ -539,7 +536,7 @@ export default function MentorChat() {
         </div>
       )}
 
-      <div style={{ position: "absolute", bottom: 94, left: 12, right: 12, background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(18,18,18,0.35) 100%)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderRadius: 28, display: "flex", alignItems: "center", padding: "6px 8px 6px 8px", border: "1px solid rgba(255,59,48,0.5)", boxShadow: "0 0 0 1px rgba(255,59,48,0.4), 0 0 16px rgba(255,59,48,0.25), 0 0 40px rgba(255,59,48,0.08), 0 8px 32px rgba(0,0,0,0.6)" }}>
+      <div style={{ position: "absolute", bottom: 94, left: 12, right: 12, background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(18,18,18,0.35) 100%)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderRadius: 28, display: "flex", alignItems: "center", padding: "6px 6px 6px 8px", border: "1px solid rgba(255,59,48,0.5)", boxShadow: "0 0 0 1px rgba(255,59,48,0.4), 0 0 16px rgba(255,59,48,0.25), 0 0 40px rgba(255,59,48,0.08), 0 8px 32px rgba(0,0,0,0.6)" }}>
         <div ref={attachMenuRef} style={{ position: "relative", flexShrink: 0 }}>
           <button type="button" onClick={() => setAttachMenuOpen((o) => !o)} aria-label="Add attachment" style={{ background: attachMenuOpen ? "var(--theme-accent-dim, rgba(255,59,48,0.2))" : "rgba(255,255,255,0.08)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", padding: 0 }}>
             <AttachIcon size={18} opacity={0.7} />
@@ -547,7 +544,7 @@ export default function MentorChat() {
           {attachMenuOpen && (
             <div style={{ position: "absolute", bottom: 48, left: 0, width: 264, background: "rgba(18, 18, 20, 0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.6)", zIndex: 300 }}>
               <button type="button" onClick={handleDocumentOption} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "10px 12px", borderRadius: 12, cursor: "pointer" }}><span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>📄</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Document</span><span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>PDF, Markdown, DOCX</span></span></button>
-              <button type="button" onClick={() => { setAttachMenuOpen(false); pictureInputRef.current?.click(); }} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "10px 12px", borderRadius: 12, cursor: "pointer" }}><span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>🖼️</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Picture</span><span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>From your library</span></span></button>
+              <button type="button" onClick={() => { setAttachMenuOpen(false); pictureInputRef.current?.click(); }} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "10px 12px", borderRadius: 12, cursor: "pointer" }}><span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>�️</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Picture</span><span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>From your library</span></span></button>
               <button type="button" onClick={() => { setAttachMenuOpen(false); cameraInputRef.current?.click(); }} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "10px 12px", borderRadius: 12, cursor: "pointer" }}><span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>📷</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Camera</span><span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>Take a photo</span></span></button>
               <button type="button" onClick={handleScreenshot} style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "10px 12px", borderRadius: 12, cursor: "pointer" }}><span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>📸</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Screenshot</span><span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>From clipboard</span></span></button>
             </div>
@@ -555,29 +552,21 @@ export default function MentorChat() {
         </div>
 
         <div style={{ position: "relative", flexShrink: 0, marginLeft: 4 }}>
-          {isRecording && (
-            <div style={{ position: "absolute", bottom: 44, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "flex-end", gap: 2, height: 32, background: "rgba(12,12,14,0.9)", borderRadius: 12, padding: "6px 10px", border: "1px solid rgba(255,59,48,0.3)" }}>
-              {Array.from({ length: 8 }).map((_, i) => { const h = 4 + Math.sin((voiceAmplitude * 3) + i * 0.7) * 12 + voiceAmplitude * 16; return (<div key={i} style={{ width: 3, height: Math.max(4, h), borderRadius: 2, background: `hsl(${350 + i * 5}, 90%, ${50 + voiceAmplitude * 30}%)`, transition: "height 0.08s ease, background 0.08s ease" }} />); })}
-            </div>
-          )}
+          {isRecording && (<div style={{ position: "absolute", bottom: 44, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "flex-end", gap: 2, height: 32, background: "rgba(12,12,14,0.9)", borderRadius: 12, padding: "6px 10px", border: "1px solid rgba(255,59,48,0.3)" }}>{Array.from({ length: 8 }).map((_, i) => { const h = 4 + Math.sin((voiceAmplitude * 3) + i * 0.7) * 12 + voiceAmplitude * 16; return (<div key={i} style={{ width: 3, height: Math.max(4, h), borderRadius: 2, background: `hsl(${350 + i * 5}, 90%, ${50 + voiceAmplitude * 30}%)`, transition: "height 0.08s ease, background 0.08s ease" }} />); })}</div>)}
           <button type="button" onClick={handleVoiceInput} aria-label={isRecording ? "Stop recording" : "Voice input"} style={{ background: isRecording ? "var(--theme-accent, #ff3b30)" : "rgba(255,255,255,0.08)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", padding: 0, transition: "background 0.2s ease", color: isRecording ? "#ffffff" : "#B0B0B0" }}>
             <MicIcon size={18} opacity={isRecording ? 1 : 0.7} />
           </button>
         </div>
 
-        <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={isRecording ? "Listening..." : attachment ? "Add a caption (optional)..." : `Message ${MODEL_INFO[activeModel].label.toLowerCase()}...`} disabled={sending || isRecording} style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: 15, padding: "0 8px", minWidth: 0 }} />
+        <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder={isRecording ? "Listening..." : attachment ? "Add a caption (optional)..." : `Message ${MODEL_INFO[activeModel].label.toLowerCase()}...`} disabled={sending || isRecording} style={{ flex: 1, background: "transparent", border: "none", color: "#ffffff", fontSize: 15, outline: "none", fontFamily: "inherit", paddingLeft: 12 }} />
 
         <div ref={voiceMenuRef} style={{ position: "relative", flexShrink: 0, marginRight: 4 }}>
           <button type="button" onClick={() => setVoiceMenuOpen((o) => !o)} aria-label="Select voice" style={{ background: "rgba(255,255,255,0.06)", border: "none", width: 30, height: 30, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", fontSize: 12, color: "#B0B0B0" }}>🔊</button>
-          {voiceMenuOpen && (
-            <div style={{ position: "absolute", bottom: 40, right: 0, width: 220, background: "rgba(18,18,20,0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: 6, boxShadow: "0 8px 32px rgba(0,0,0,0.6)", zIndex: 300 }}>
-              {DEEPGRAM_VOICES.map((v) => (<button key={v.id} type="button" onClick={() => { setSelectedVoice(v.id); setVoiceMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left", background: selectedVoice === v.id ? "rgba(255,59,48,0.15)" : "transparent", border: "none", padding: "8px 10px", borderRadius: 10, cursor: "pointer" }}><span style={{ fontSize: 14 }}>{selectedVoice === v.id ? "🔊" : "🔈"}</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#e0e0e0" }}>{v.label}</span><span style={{ display: "block", fontSize: 10, color: "#8A8A8F" }}>{v.description}</span></span></button>))}
-            </div>
-          )}
+          {voiceMenuOpen && (<div style={{ position: "absolute", bottom: 40, right: 0, width: 220, background: "rgba(18,18,20,0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, padding: 6, boxShadow: "0 8px 32px rgba(0,0,0,0.6)", zIndex: 300 }}>{DEEPGRAM_VOICES.map((v) => (<button key={v.id} type="button" onClick={() => { setSelectedVoice(v.id); setVoiceMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left", background: selectedVoice === v.id ? "rgba(255,59,48,0.15)" : "transparent", border: "none", padding: "8px 10px", borderRadius: 10, cursor: "pointer" }}><span style={{ fontSize: 14 }}>{selectedVoice === v.id ? "🔊" : "🔈"}</span><span style={{ flex: 1 }}><span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#e0e0e0" }}>{v.label}</span><span style={{ display: "block", fontSize: 10, color: "#8A8A8F" }}>{v.description}</span></span></button>))}</div>)}
         </div>
 
-        <button type="button" onClick={sendMessage} disabled={sending || (!input.trim() && !attachment)} aria-label="Send" style={{ background: sending || (!input.trim() && !attachment) ? "rgba(255,255,255,0.06)" : "var(--theme-accent, #ff3b30)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: sending || (!input.trim() && !attachment) ? "default" : "pointer", transition: "background 0.2s ease" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+        <button onClick={sendMessage} disabled={sending || (!input.trim() && !attachment)} aria-label="Send" style={{ background: input.trim() || attachment ? "var(--theme-accent, #ff3b30)" : "#2a2a2a", border: "none", width: 44, height: 44, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: input.trim() || attachment ? "pointer" : "default", transition: "background 0.25s ease" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
 
