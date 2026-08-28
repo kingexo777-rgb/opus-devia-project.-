@@ -3,8 +3,21 @@ import { Link } from "react-router-dom";
 import BottomNav from "../components/home/BottomNav";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../lib/supabase";
-import micIcon from "../assets/mic-icon.png";
-import attachIcon from "../assets/attach-icon.png";
+
+const MicIcon = ({ size = 18, opacity = 0.7 }: { size?: number; opacity?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={opacity}>
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+    <line x1="8" y1="23" x2="16" y2="23" />
+  </svg>
+);
+
+const AttachIcon = ({ size = 18, opacity = 0.7 }: { size?: number; opacity?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={opacity}>
+    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+  </svg>
+);
 
 type ModelId = "MENTOR" | "ASSISTANT";
 
@@ -529,7 +542,7 @@ export default function MentorChat() {
       <div style={{ position: "absolute", bottom: 94, left: 12, right: 12, background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(18,18,18,0.35) 100%)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderRadius: 28, display: "flex", alignItems: "center", padding: "6px 8px 6px 8px", border: "1px solid rgba(255,59,48,0.5)", boxShadow: "0 0 0 1px rgba(255,59,48,0.4), 0 0 16px rgba(255,59,48,0.25), 0 0 40px rgba(255,59,48,0.08), 0 8px 32px rgba(0,0,0,0.6)" }}>
         <div ref={attachMenuRef} style={{ position: "relative", flexShrink: 0 }}>
           <button type="button" onClick={() => setAttachMenuOpen((o) => !o)} aria-label="Add attachment" style={{ background: attachMenuOpen ? "var(--theme-accent-dim, rgba(255,59,48,0.2))" : "rgba(255,255,255,0.08)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", padding: 0 }}>
-            <img src={attachIcon} alt="Attach" style={{ width: 18, height: 18, opacity: 0.7 }} />
+            <AttachIcon size={18} opacity={0.7} />
           </button>
           {attachMenuOpen && (
             <div style={{ position: "absolute", bottom: 48, left: 0, width: 264, background: "rgba(18, 18, 20, 0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 18, padding: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.6)", zIndex: 300 }}>
@@ -547,8 +560,8 @@ export default function MentorChat() {
               {Array.from({ length: 8 }).map((_, i) => { const h = 4 + Math.sin((voiceAmplitude * 3) + i * 0.7) * 12 + voiceAmplitude * 16; return (<div key={i} style={{ width: 3, height: Math.max(4, h), borderRadius: 2, background: `hsl(${350 + i * 5}, 90%, ${50 + voiceAmplitude * 30}%)`, transition: "height 0.08s ease, background 0.08s ease" }} />); })}
             </div>
           )}
-          <button type="button" onClick={handleVoiceInput} aria-label={isRecording ? "Stop recording" : "Voice input"} style={{ background: isRecording ? "var(--theme-accent, #ff3b30)" : "rgba(255,255,255,0.08)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", padding: 0, transition: "background 0.2s ease" }}>
-            <img src={micIcon} alt="Mic" style={{ width: 18, height: 18, opacity: isRecording ? 1 : 0.7, filter: isRecording ? "brightness(0) invert(1)" : undefined }} />
+          <button type="button" onClick={handleVoiceInput} aria-label={isRecording ? "Stop recording" : "Voice input"} style={{ background: isRecording ? "var(--theme-accent, #ff3b30)" : "rgba(255,255,255,0.08)", border: "none", width: 36, height: 36, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", cursor: "pointer", padding: 0, transition: "background 0.2s ease", color: isRecording ? "#ffffff" : "#B0B0B0" }}>
+            <MicIcon size={18} opacity={isRecording ? 1 : 0.7} />
           </button>
         </div>
 
