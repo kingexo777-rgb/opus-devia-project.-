@@ -27,11 +27,6 @@ export default function PriorityTask({ task, loading }: PriorityTaskProps) {
   const [detailOpen, setDetailOpen] = useState(false);
   const [starting, setStarting] = useState(false);
 
-  const handleViewTask = useCallback(() => {
-    if (!task) return;
-    navigate("/roadmap", { state: { taskId: task.id } });
-  }, [navigate, task]);
-
   const difficultyLabel = task?.difficulty
     ? task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1)
     : undefined;
@@ -45,9 +40,7 @@ export default function PriorityTask({ task, loading }: PriorityTaskProps) {
         .update({ status: "in_progress" })
         .eq("id", task.id)
         .eq("user_id", user.id);
-      if (error) {
-        console.warn("Failed to mark task in progress:", error.message);
-      }
+      if (error) console.warn("Failed to mark task in progress:", error.message);
       setStarting(false);
     }
     setDetailOpen(true);
@@ -68,21 +61,20 @@ export default function PriorityTask({ task, loading }: PriorityTaskProps) {
     navigate("/mentor");
   }, [navigate, task]);
 
+  /* LOADING STATE */
   if (loading) {
     return (
-      <div style={{ margin: "0 12px" }}>
-        <div className="card-glass" style={{ padding: "6px 10px", marginTop: 2, minHeight: 64, opacity: 0.6 }} />
+      <div>
+        <div className="priority-task" style={{ minHeight: 80, opacity: 0.6 }} />
       </div>
     );
   }
 
+  /* NO TASKS LEFT */
   if (!task) {
     return (
-      <div style={{ margin: "0 10px" }}>
-        <div className="card-glass" style={{
-          padding: "8px 10px 6px", marginTop: 2,
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 4
-        }}>
+      <div>
+        <div className="priority-task" style={{ padding: "20px", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent, #9a0000)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
@@ -94,60 +86,103 @@ export default function PriorityTask({ task, loading }: PriorityTaskProps) {
     );
   }
 
+  /* MAIN TASK CARD */
   return (
-    <div style={{ margin: "0 10px" }}>
-      <div
-        role="button"
-        onClick={handleViewTask}
-        style={{ padding: "6px 10px", marginTop: 2, cursor: task ? "pointer" : "default" }}
-      >
-        <div className="card-glass" style={{ padding: "10px 12px" }}>
-          <p style={{ color: "var(--theme-accent, #9a0000)", fontSize: 10, fontWeight: 500, margin: 0 }}>Priority Task</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginTop: 8 }}>
-            <div style={{ flex: 1 }}>
-              <h3 style={{
-                fontSize: 14, fontWeight: 800, margin: 0,
-                color: "#F5F5F5", lineHeight: 1.3
-              }}>
-                {task.title}
-              </h3>
-              <p style={{ color: "#A8A8A8", fontSize: 11, lineHeight: 1.4, margin: "8px 0 0" }}>
-                {task.description
-                  ? task.description.slice(0, 70) + (task.description.length > 70 ? "..." : "")
-                  : "Finish this priority task and submit proof when complete."}
-              </p>
-            </div>
+      {/* PRIMARY TASK */}
+      <div className="priority-task">
+        {/* Top row — title + button */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 15, fontWeight: 800, color: "#F5F5F5", lineHeight: 1.25, margin: 0, flex: 1 }}>
+            {task.title}
+          </h3>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); openTaskDetails(); }}
+            style={{
+              flexShrink: 0,
+              background: "var(--glossy-pill-bg, var(--theme-accent, #9a0000))",
+              color: "#fff",
+              border: "1px solid var(--glossy-pill-border, transparent)",
+              borderRadius: 999,
+              padding: "8px 18px",
+              fontWeight: 700,
+              fontSize: 12,
+              cursor: "pointer",
+              boxShadow: "var(--glossy-pill-shadow, none)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {starting ? "Opening..." : "Start"}
+          </button>
+        </div>
 
-            <div style={{ textAlign: "right", minWidth: 90 }}>
-              <span style={{ display: "block", fontSize: 10, color: "#A8A8A8", marginBottom: 6 }}>
-                {difficultyLabel ?? "Focused work"}
-              </span>
-              <strong style={{ fontSize: 12, color: "#F5F5F5" }}>+{task.xp_reward.toLocaleString()} XP</strong>
-            </div>
-          </div>
+        {/* Type label */}
+        <p style={{ color: "var(--theme-accent, #9a0000)", fontSize: 11, fontWeight: 600, margin: "0 0 12px" }}>
+          Priority task
+        </p>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                openTaskDetails();
-              }}
-              style={{
-                background: "var(--glossy-pill-bg, var(--theme-accent, #9a0000))",
-                color: "#fff", border: "1px solid var(--glossy-pill-border, transparent)", borderRadius: 999,
-                padding: "8px 14px", fontWeight: 700, fontSize: 11, cursor: "pointer",
-                boxShadow: "var(--glossy-pill-shadow, none)",
-                minWidth: 100, flex: "0 0 auto"
-              }}
-            >
-              {starting ? "Opening..." : "Start Task"}
-            </button>
-          </div>
+        {/* Divider */}
+        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 12 }} />
+
+        {/* Meta pills */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {task.estimated_hours && (
+            <span style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.06)", borderRadius: 999, padding: "5px 12px", fontSize: 12, color: "#C7C9D1" }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C7C9D1" strokeWidth="2" strokeLinecap="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              {task.estimated_hours}hr{task.estimated_hours !== 1 ? "s" : ""}
+            </span>
+          )}
+          <span style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.06)", borderRadius: 999, padding: "5px 12px", fontSize: 12, color: "#C7C9D1" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C7C9D1" strokeWidth="2" strokeLinecap="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            {task.xp_reward.toLocaleString()} XP
+          </span>
         </div>
       </div>
 
+      {/* CHALLENGE CARD */}
+      <div className="priority-task" style={{ opacity: 0.75 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 15, fontWeight: 800, color: "#F5F5F5", lineHeight: 1.25, margin: 0, flex: 1 }}>
+            Coming Soon
+          </h3>
+          <button
+            type="button"
+            disabled
+            style={{ flexShrink: 0, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 999, padding: "8px 18px", fontWeight: 700, fontSize: 12, cursor: "not-allowed", whiteSpace: "nowrap" }}
+          >
+            Locked
+          </button>
+        </div>
+
+        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontWeight: 600, margin: "0 0 12px" }}>
+          Challenge
+        </p>
+
+        <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 12 }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", borderRadius: 999, padding: "5px 12px", fontSize: 12, color: "rgba(255,255,255,0.25)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            --
+          </span>
+          <span style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.04)", borderRadius: 999, padding: "5px 12px", fontSize: 12, color: "rgba(255,255,255,0.25)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            -- XP
+          </span>
+        </div>
+      </div>
+
+      {/* TASK DETAILS MODAL */}
       {detailOpen && (
         <div className="task-modal-overlay" onClick={() => setDetailOpen(false)}>
           <div className="task-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -161,66 +196,19 @@ export default function PriorityTask({ task, loading }: PriorityTaskProps) {
               </button>
             </div>
             <h2 className="task-modal-title">{task.title}</h2>
-            <p className="task-modal-desc">{task.description || "No description provided for this task."}</p>
+            <p className="task-modal-desc">{task.description || "No description provided."}</p>
             <div className="task-modal-meta">
-              {task.difficulty && (
-                <span className="task-modal-badge task-type-badge">{difficultyLabel ?? task.difficulty}</span>
-              )}
-              {task.task_type && (
-                <span className="task-modal-badge task-type-badge">{task.task_type}</span>
-              )}
+              {task.difficulty && <span className="task-modal-badge task-type-badge">{difficultyLabel}</span>}
+              {task.task_type && <span className="task-modal-badge task-type-badge">{task.task_type}</span>}
               <span className="task-modal-badge task-xp-badge">+{task.xp_reward.toLocaleString()} XP</span>
             </div>
-            <div className="task-modal-section">
-              <h3 className="task-modal-section-heading">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                </svg>
-                What to deliver
-              </h3>
-              <p className="task-modal-section-text">
-                {task.description || "Describe the work you will deliver, then return with proof of completion."}
-              </p>
-            </div>
-            {(task.goal_description || task.difficulty_rationale) && (
-              <div className="task-modal-section">
-                <h3 className="task-modal-section-heading">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 20l9-5-9-5-9 5 9 5z" />
-                    <path d="M12 12l9-5-9-5-9 5 9 5z" opacity="0.3" />
-                  </svg>
-                  Why it matters
-                </h3>
-                <p className="task-modal-section-text">
-                  {task.goal_description || task.difficulty_rationale || "This task moves your roadmap forward and makes your next milestone easier to unlock."}
-                </p>
-              </div>
-            )}
-            <div className="task-modal-section">
-              <h3 className="task-modal-section-heading">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 11l3 3L22 4" />
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                </svg>
-                How to complete it
-              </h3>
-              <p className="task-modal-section-text">
-                {task.description
-                  ? `Start by working through this task step-by-step, then capture a short proof of completion and submit it to your mentor.`
-                  : "Complete the task in a way that shows the result clearly, then share proof in the mentor chat."}
-              </p>
-            </div>
-            <button
-              className="task-modal-complete-btn"
-              onClick={handleSubmitProof}
-            >
+            <button className="task-modal-complete-btn" onClick={handleSubmitProof}>
               Submit proof of completion
             </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -43,7 +43,7 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 auth-bg">
-      <div className="w-full max-w-sm p-8 flex flex-col gap-5 auth-card">
+      <div className="w-full max-w-sm flex flex-col gap-5 auth-card">
         {/* Logo */}
         <img
           src={logo}

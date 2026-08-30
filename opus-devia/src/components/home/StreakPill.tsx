@@ -1,16 +1,17 @@
+const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
+
 interface StreakPillProps {
   streakCount: number;
   weeklyDays: boolean[];
   loading: boolean;
 }
 
-const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
-
 export default function StreakPill({ streakCount, weeklyDays, loading }: StreakPillProps) {
   if (loading) {
     return (
-      <div style={{ margin: "0 12px" }}>
-        <div className="card-glass" style={{ padding: "6px 10px", minHeight: 80, opacity: 0.6 }} />
+      <div style={{ margin: "0 16px 12px", display: "flex", gap: 10, height: 110, opacity: 0.6 }}>
+        <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 18, flex: "0 0 110px" }} />
+        <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 18, flex: 1 }} />
       </div>
     );
   }
@@ -20,74 +21,97 @@ export default function StreakPill({ streakCount, weeklyDays, loading }: StreakP
   const monBased = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 
   return (
-    <div style={{ margin: "0 10px" }}>
-      <div className="card-glass" style={{ padding: "6px 10px" }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* Flame */}
-            <span style={{ fontSize: 18, lineHeight: 1 }}>🔥</span>
-            <div>
-              <p style={{ color: "#A8A8A8", fontSize: 10, fontWeight: 500, marginBottom: 0 }}>{streakCount} Day</p>
-              <h2 style={{ fontSize: 15, fontWeight: 800, letterSpacing: "normal", color: "#F5F5F5" }}>Streak</h2>
-            </div>
-          </div>
-          <button style={{
-            padding: "4px 10px", borderRadius: 999,
-            background: "var(--glossy-pill-bg, rgba(255,255,255,0.04))",
-            border: "1px solid var(--glossy-pill-border, rgba(255,255,255,0.08))",
-            color: "rgba(255,255,255,0.8)",
-            boxShadow: "var(--glossy-pill-shadow, none)",
-            fontSize: 8, letterSpacing: "0.12em", fontWeight: 700, cursor: "pointer",
-            position: "relative", overflow: "hidden",
-          }}>
-            KEEP GOING
-          </button>
-        </div>
+    <div style={{ margin: "12px 16px 12px", display: "flex", gap: 10, alignItems: "stretch" }}>
 
-        {/* Divider */}
-        <div style={{ margin: "4px 0", height: 1, background: "rgba(255,255,255,0.05)" }} />
+      {/* Left card — flame + count */}
+      <div style={{
+        background: "rgba(154,0,0,0.15)",
+        border: "1px solid rgba(154,0,0,0.25)",
+        borderRadius: 18,
+        padding: "18px 16px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minWidth: 110,
+        gap: 4,
+      }}>
+        <span style={{ fontSize: 36, lineHeight: 1 }}>🔥</span>
+        <p style={{ fontSize: 20, fontWeight: 800, color: "#F5F5F5", margin: "6px 0 0" }}>
+          {streakCount} Days
+        </p>
+        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", margin: 0, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          Streak
+        </p>
+      </div>
+
+      {/* Right card — days + button */}
+      <div style={{
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(255,255,255,0.06)",
+        borderRadius: 18,
+        padding: "16px",
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        gap: 12,
+      }}>
 
         {/* Week days */}
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {weeklyDays.map((completed, i) => {
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {DAY_LABELS.map((label, i) => {
+            const isCompleted = weeklyDays[i];
             const isCurrent = i === monBased;
-            const isCompleted = completed;
-
-            let bg = "#1c1c1e";
-            let border = "none";
-            let textColor = "#A8A8A8";
-            let content: React.ReactNode = DAY_LABELS[i];
-
-            if (isCompleted) {
-              bg = "linear-gradient(180deg, color-mix(in srgb, var(--theme-accent, #9a0000) 22%, transparent), color-mix(in srgb, var(--theme-accent, #9a0000) 8%, transparent))";
-              border = "1px solid color-mix(in srgb, var(--theme-accent, #9a0000) 50%, transparent)";
-              textColor = "#fff";
-              content = "✓";
-            } else if (isCurrent) {
-              bg = "rgba(255,255,255,0.03)";
-              border = "2px solid rgba(255,255,255,0.25)";
-              textColor = "rgba(255,255,255,0.8)";
-              content = streakCount > 0 ? "•" : DAY_LABELS[i];
-            }
 
             return (
-              <div key={i} className={`day ${isCurrent ? "current" : ""}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                <div className="day-circle" style={{
-                  width: 24, height: 24, borderRadius: "50%",
-                  background: bg, border: border,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 9, color: textColor, fontWeight: 600,
-                  transition: "0.35s ease",
-                  boxShadow: isCompleted ? "0 0 8px var(--theme-accent-dim, rgba(154,0,0,0.2))" : undefined,
+              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                <div style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  background: isCompleted
+                    ? "rgba(154,0,0,0.3)"
+                    : isCurrent
+                    ? "rgba(255,255,255,0.03)"
+                    : "rgba(255,255,255,0.02)",
+                  border: isCompleted
+                    ? "1px solid rgba(154,0,0,0.5)"
+                    : isCurrent
+                    ? "2px solid rgba(255,255,255,0.25)"
+                    : "1px solid rgba(255,255,255,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 9,
+                  color: isCompleted ? "#fff" : "rgba(255,255,255,0.3)",
+                  fontWeight: 600,
+                  opacity: !isCompleted && !isCurrent ? 0.45 : 1,
                 }}>
-                  {content}
+                  {isCompleted ? "✓" : label}
                 </div>
-                <span style={{ fontSize: 8, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>{DAY_LABELS[i]}</span>
+                <span style={{ fontSize: 8, color: "rgba(255,255,255,0.4)" }}>{label}</span>
               </div>
             );
           })}
         </div>
+
+        {/* Keep Going button */}
+        <button style={{
+          width: "100%",
+          background: "rgba(154,0,0,0.7)",
+          border: "none",
+          borderRadius: 999,
+          padding: "9px 0",
+          fontSize: 10,
+          fontWeight: 700,
+          color: "#fff",
+          letterSpacing: "0.12em",
+          cursor: "pointer",
+        }}>
+          KEEP GOING
+        </button>
+
       </div>
     </div>
   );

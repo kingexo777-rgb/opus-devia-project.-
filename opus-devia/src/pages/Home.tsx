@@ -324,7 +324,7 @@ export default function Home() {
         maxWidth: 430,
         margin: "0 auto",
         minHeight: "100vh",
-        padding: "2px 0 70px",
+        padding: "2px 0 105px",
       }}
     >
       {/* Header */}
@@ -349,7 +349,7 @@ export default function Home() {
       </div>
 
       {/* Streak Pill */}
-      <div className="streak-card">
+      <div className="streak-container">
         <StreakPill
           streakCount={data.streakCount}
           weeklyDays={data.weeklyDays}
@@ -358,23 +358,21 @@ export default function Home() {
       </div>
 
       {/* Roadmap Completion */}
-      <div className="roadmap-card" style={{ marginTop: 8 }}>
         <RoadmapBar
           completionPercentage={data.roadmapCompletion}
           loading={loading}
         />
-      </div>
 
       {/* Today's Task header */}
       <TaskSectionHeader />
 
       {/* Priority Task Card */}
-      <div className="quest-grid">
+      <div style={{ padding: "12px 16px 0", display: "flex", flexDirection: "column", gap: 0 }}>
         <PriorityTask task={data.priorityTask} loading={loading} />
       </div>
-
+      
       {/* Mentor Button */}
-      <div className="mentor-card">
+      <div style={{ padding: "0 16px" }}>
         <MentorButton />
       </div>
 
