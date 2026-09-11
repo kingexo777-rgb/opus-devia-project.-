@@ -219,6 +219,7 @@ export default function Roadmap() {
     useState<string | null>(null);
 
   const [initialTaskId, setInitialTaskId] = useState<string | null>(null);
+  const [completionNotice, setCompletionNotice] = useState<string | null>(null);
 
   const displayName =
     profile?.display_name ??
@@ -447,7 +448,7 @@ export default function Roadmap() {
 
       if (newCompleted) {
         try {
-          const { error } = await supabase.functions.invoke(
+          const { data, error } = await supabase.functions.invoke(
             "roadmap-generator",
             {
               body: {
@@ -467,6 +468,13 @@ export default function Roadmap() {
 
             setRoadmap(prevRoadmap);
           } else {
+            if (data?.capped || data?.fullyPaid === false) {
+              setCompletionNotice(
+                `Task complete! +${data.xpEarned ?? 0} XP. Your monthly grind cap is reached; the full reward is available next cycle.`
+              );
+            } else {
+              setCompletionNotice(`Task complete! +${data?.xpEarned ?? task.xp_reward ?? 0} XP.`);
+            }
             window.dispatchEvent(new Event("user_xp_updated"));
           }
         } catch (err) {
@@ -717,6 +725,21 @@ export default function Roadmap() {
       </h1>
 
       <div className="roadmap-divider" />
+
+      {completionNotice && (
+        <p
+          role="status"
+          style={{
+            textAlign: "center",
+            margin: "12px auto 0",
+            maxWidth: 420,
+            color: "#d9d9df",
+            fontSize: 13,
+          }}
+        >
+          {completionNotice}
+        </p>
+      )}
 
       {/* Progress */}
 
