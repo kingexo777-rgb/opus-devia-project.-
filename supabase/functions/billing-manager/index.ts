@@ -28,6 +28,14 @@ const ESTIMATED_XP_COST: Record<string, number> = {
   chat_pattern_analysis: 0,
 }
 
+const XP_MULTIPLIERS: Record<string, number> = {
+  free: 1,
+  builder: 1.5,
+  operator: 2,
+  founder: 3,
+}
+
+// NEW: Grind economy constants
 type PlanId = "free" | "builder" | "operator" | "founder"
 
 interface PlanConfig {
@@ -44,48 +52,32 @@ interface PlanConfig {
 
 const PLANS: Record<PlanId, PlanConfig> = {
   free: {
-    baseXp: 150,
-    grindRatio: 0.50,
-    imageAllowanceMonthly: 150,
-    imageDailyAllowance: 10,
+    baseXp: 150, grindRatio: 0.50,
+    imageAllowanceMonthly: 150, imageDailyAllowance: 10,
     voiceAllowanceMinutes: 30,
-    assistantXpCost: 1,
-    mentorXpCost: 2,
-    imageOverageXpCost: 5,
-    voiceOverageXpPerTwoMinutes: 1,
+    assistantXpCost: 1, mentorXpCost: 2,
+    imageOverageXpCost: 5, voiceOverageXpPerTwoMinutes: 1,
   },
   builder: {
-    baseXp: 225,
-    grindRatio: 0.75,
-    imageAllowanceMonthly: 300,
-    imageDailyAllowance: 20,
+    baseXp: 225, grindRatio: 0.75,
+    imageAllowanceMonthly: 300, imageDailyAllowance: 20,
     voiceAllowanceMinutes: 90,
-    assistantXpCost: 1,
-    mentorXpCost: 2,
-    imageOverageXpCost: 5,
-    voiceOverageXpPerTwoMinutes: 1,
+    assistantXpCost: 1, mentorXpCost: 2,
+    imageOverageXpCost: 5, voiceOverageXpPerTwoMinutes: 1,
   },
   operator: {
-    baseXp: 300,
-    grindRatio: 0.75,
-    imageAllowanceMonthly: 300,
-    imageDailyAllowance: 20,
+    baseXp: 300, grindRatio: 0.75,
+    imageAllowanceMonthly: 300, imageDailyAllowance: 20,
     voiceAllowanceMinutes: 180,
-    assistantXpCost: 1,
-    mentorXpCost: 2,
-    imageOverageXpCost: 5,
-    voiceOverageXpPerTwoMinutes: 1,
+    assistantXpCost: 1, mentorXpCost: 2,
+    imageOverageXpCost: 5, voiceOverageXpPerTwoMinutes: 1,
   },
   founder: {
-    baseXp: 500,
-    grindRatio: 0.75,
-    imageAllowanceMonthly: 450,
-    imageDailyAllowance: 25,
+    baseXp: 500, grindRatio: 0.75,
+    imageAllowanceMonthly: 450, imageDailyAllowance: 25,
     voiceAllowanceMinutes: 450,
-    assistantXpCost: 1,
-    mentorXpCost: 2,
-    imageOverageXpCost: 5,
-    voiceOverageXpPerTwoMinutes: 1,
+    assistantXpCost: 1, mentorXpCost: 2,
+    imageOverageXpCost: 5, voiceOverageXpPerTwoMinutes: 1,
   },
 }
 
@@ -96,11 +88,7 @@ function getGrindCap(plan: PlanConfig): number {
 type GrindDifficulty = 1 | 2 | 3 | 4 | 5
 
 const GRIND_REWARDS: Record<GrindDifficulty, number> = {
-  1: 2,
-  2: 4,
-  3: 8,
-  4: 10,
-  5: 15,
+  1: 2, 2: 4, 3: 8, 4: 10, 5: 15,
 }
 
 interface DifficultyProbability {
@@ -141,47 +129,73 @@ const DIFFICULTY_DISTRIBUTIONS: Record<PlanId, DifficultyProbability[]> = {
 
 const BILLING_CYCLE_DAYS = 28
 
-function selectWeightedDifficulty(
-  distribution: DifficultyProbability[]
-): GrindDifficulty {
+async function checkAndResetCycleIfNeeded(userId: string, tier: PlanId) {
+  const { data: xp, error } = await supabase
+    .from("user_xp")
+    .select("cycle_ends_at")
+    .eq("user_id", userId)
+    .maybeSingle()
+
+  if (error || !xp) return
+
+  const now = new Date()
+  const cycleEnded = !xp.cycle_ends_at || new Date(xp.cycle_ends_at) <= now
+
+  if (!cycleEnded) return
+
+  const plan = PLANS[tier]
+  const newCycleEnd = new Date(now)
+  newCycleEnd.setUTCDate(newCycleEnd.getUTCDate() + BILLING_CYCLE_DAYS)
+
+  await supabase.from("user_xp").update({
+    monthly_earn_cap: getGrindCap(plan),
+    monthly_earned: 0,
+    grind_locked: false,
+    cycle_started_at: now.toISOString(),
+    cycle_ends_at: newCycleEnd.toISOString(),
+    updated_at: now.toISOString(),
+  }).eq("user_id", userId)
+
+  await supabase.from("image_voice_quotas").upsert({
+    user_id: userId,
+    images_used_this_month: 0,
+    voice_seconds_used_this_month: 0,
+    cycle_started_at: now.toISOString(),
+    cycle_ends_at: newCycleEnd.toISOString(),
+    updated_at: now.toISOString(),
+  }, { onConflict: "user_id" })
+
+  await writeTransactionLog(userId, "reset", 0, `28-day cycle reset (${tier})`)
+}
+
+// NEW: Pure functions for difficulty selection (no behavior change yet)
+function selectWeightedDifficulty(distribution: DifficultyProbability[]): GrindDifficulty {
   const random = Math.random()
   let cumulative = 0
-
   for (const item of distribution) {
     cumulative += item.probability
     if (random < cumulative) return item.difficulty
   }
-
   return distribution[distribution.length - 1].difficulty
 }
 
-function canFitReward(
-  difficulty: GrindDifficulty,
-  remainingXp: number
-): boolean {
+function canFitReward(difficulty: GrindDifficulty, remainingXp: number): boolean {
   return GRIND_REWARDS[difficulty] <= remainingXp
 }
 
-function selectEligibleDifficulty(
-  plan: PlanId,
-  remainingXp: number
-): GrindDifficulty | null {
-  const eligible = DIFFICULTY_DISTRIBUTIONS[plan].filter((item) =>
-    canFitReward(item.difficulty, remainingXp)
-  )
+function selectEligibleDifficulty(plan: PlanId, remainingXp: number): GrindDifficulty | null {
+  const distribution = DIFFICULTY_DISTRIBUTIONS[plan]
+  const eligible = distribution.filter((item) => canFitReward(item.difficulty, remainingXp))
 
   if (eligible.length === 0) return null
 
-  const totalProbability = eligible.reduce(
-    (sum, item) => sum + item.probability,
-    0
-  )
-  return selectWeightedDifficulty(
-    eligible.map((item) => ({
-      difficulty: item.difficulty,
-      probability: item.probability / totalProbability,
-    }))
-  )
+  const totalProbability = eligible.reduce((sum, item) => sum + item.probability, 0)
+  const normalized = eligible.map((item) => ({
+    difficulty: item.difficulty,
+    probability: item.probability / totalProbability,
+  }))
+
+  return selectWeightedDifficulty(normalized)
 }
 
 async function deductFromPools(
@@ -259,55 +273,8 @@ async function writeTransactionLog(
   })
 }
 
-async function checkAndResetCycleIfNeeded(
-  userId: string,
-  tier: PlanId
-): Promise<void> {
-  const { data: xp } = await supabase
-    .from("user_xp")
-    .select("cycle_ends_at")
-    .eq("user_id", userId)
-    .single()
-
-  const now = new Date()
-  const cycleEnded = !xp?.cycle_ends_at || new Date(xp.cycle_ends_at) <= now
-  if (!cycleEnded) return
-
-  const newCycleEnd = new Date(now)
-  newCycleEnd.setUTCDate(newCycleEnd.getUTCDate() + BILLING_CYCLE_DAYS)
-  const cycleStartedAt = now.toISOString()
-  const cycleEndsAt = newCycleEnd.toISOString()
-
-  await supabase
-    .from("user_xp")
-    .update({
-      monthly_earn_cap: getGrindCap(PLANS[tier]),
-      monthly_earned: 0,
-      grind_locked: false,
-      cycle_started_at: cycleStartedAt,
-      cycle_ends_at: cycleEndsAt,
-      updated_at: cycleStartedAt,
-    })
-    .eq("user_id", userId)
-
-  await supabase.from("image_voice_quotas").upsert(
-    {
-      user_id: userId,
-      images_used_this_month: 0,
-      images_used_today: 0,
-      images_today_date: now.toISOString().slice(0, 10),
-      voice_seconds_used_this_month: 0,
-      cycle_started_at: cycleStartedAt,
-      cycle_ends_at: cycleEndsAt,
-      updated_at: cycleStartedAt,
-    },
-    { onConflict: "user_id" }
-  )
-
-  await writeTransactionLog(userId, "reset", 0, `28-day cycle reset (${tier})`)
-}
-
 serve(async (req) => {
+  const payload = await req.json()
   const {
     action,
     userId,
@@ -317,10 +284,10 @@ serve(async (req) => {
     reservedAmount,
     amount,
     source,
-    difficulty,
-    taskId,
-    durationSeconds,
-  } = await req.json()
+    body,
+  } = payload
+
+  const requestBody = (body && typeof body === "object") ? body as Record<string, any> : {}
 
   // ─────────────────────────────────────────
   // PREFLIGHT — check XP and lock reservation
@@ -334,15 +301,9 @@ serve(async (req) => {
       .eq("id", userId)
       .single()
 
-    if (!user) {
-      return new Response(
-        JSON.stringify({ allowed: false, reason: "user_not_found" }),
-        { status: 404 }
-      )
+    if (user) {
+      await checkAndResetCycleIfNeeded(userId, (user.tier ?? "free") as PlanId)
     }
-
-    const tier = (user.tier ?? "free") as PlanId
-    await checkAndResetCycleIfNeeded(userId, PLANS[tier] ? tier : "free")
 
     const { data: xp } = await supabase
       .from("user_xp")
@@ -350,7 +311,7 @@ serve(async (req) => {
       .eq("user_id", userId)
       .single()
 
-    if (!xp) {
+    if (!user || !xp) {
       return new Response(
         JSON.stringify({ allowed: false, reason: "user_not_found" }),
         { status: 404 }
@@ -441,6 +402,9 @@ serve(async (req) => {
     )
   }
 
+  // ─────────────────────────────────────────
+  // CHECK_GRIND_ELIGIBILITY — called by roadmap-generator before generating tasks
+  // ─────────────────────────────────────────
   if (action === "check_grind_eligibility") {
     const { data: user } = await supabase
       .from("users")
@@ -448,15 +412,9 @@ serve(async (req) => {
       .eq("id", userId)
       .single()
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: "user_not_found" }), {
-        status: 404,
-      })
+    if (user) {
+      await checkAndResetCycleIfNeeded(userId, (user.tier ?? "free") as PlanId)
     }
-
-    const tier = (user.tier ?? "free") as PlanId
-    const plan = PLANS[tier] ? tier : "free"
-    await checkAndResetCycleIfNeeded(userId, plan)
 
     const { data: xp } = await supabase
       .from("user_xp")
@@ -464,50 +422,45 @@ serve(async (req) => {
       .eq("user_id", userId)
       .single()
 
-    if (!xp) {
-      return new Response(JSON.stringify({ error: "user_not_found" }), {
-        status: 404,
-      })
+    if (!user || !xp) {
+      return new Response(JSON.stringify({ error: "user_not_found" }), { status: 404 })
     }
 
     if (xp.grind_locked) {
-      return new Response(
-        JSON.stringify({ eligible: false, reason: "grind_locked" }),
-        { status: 200 }
-      )
+      return new Response(JSON.stringify({ eligible: false, reason: "grind_locked" }), { status: 200 })
     }
 
+    const plan = (user.tier ?? "free") as PlanId
     const remaining = Math.max(0, xp.monthly_earn_cap - xp.monthly_earned)
     const difficulty = selectEligibleDifficulty(plan, remaining)
 
     if (difficulty === null) {
-      return new Response(
-        JSON.stringify({ eligible: false, reason: "cap_exhausted" }),
-        { status: 200 }
-      )
+      return new Response(JSON.stringify({ eligible: false, reason: "cap_exhausted" }), { status: 200 })
     }
 
-    return new Response(
-      JSON.stringify({
-        eligible: true,
-        difficulty,
-        xpReward: GRIND_REWARDS[difficulty],
-        remaining,
-      }),
-      { status: 200 }
-    )
+    return new Response(JSON.stringify({
+      eligible: true,
+      difficulty,
+      xpReward: GRIND_REWARDS[difficulty],
+      remaining,
+    }), { status: 200 })
   }
 
+  // ─────────────────────────────────────────
+  // AUTHORIZE_IMAGE — preflight for image quota and overage
+  // ─────────────────────────────────────────
   if (action === "authorize_image") {
     const { data: user } = await supabase
       .from("users")
       .select("tier")
       .eq("id", userId)
-      .single()
-    const tier = (user?.tier ?? "free") as PlanId
-    const planId = PLANS[tier] ? tier : "free"
-    await checkAndResetCycleIfNeeded(userId, planId)
-    const plan = PLANS[planId]
+      .maybeSingle()
+
+    if (user) {
+      await checkAndResetCycleIfNeeded(userId, (user.tier ?? "free") as PlanId)
+    }
+
+    const plan = PLANS[(user?.tier ?? "free") as PlanId]
 
     let { data: quota } = await supabase
       .from("image_voice_quotas")
@@ -516,205 +469,165 @@ serve(async (req) => {
       .maybeSingle()
 
     if (!quota) {
-      const { data: createdQuota } = await supabase
+      const { data: newQuota } = await supabase
         .from("image_voice_quotas")
         .insert({ user_id: userId })
         .select()
         .single()
-      quota = createdQuota
+      quota = newQuota
     }
 
-    if (!quota) {
-      return new Response(JSON.stringify({ allowed: false, reason: "quota_unavailable" }), {
-        status: 500,
-      })
+    const today = new Date().toISOString().split("T")[0]
+    if (quota?.images_today_date !== today) {
+      await supabase.from("image_voice_quotas").update({
+        images_used_today: 0,
+        images_today_date: today,
+      }).eq("user_id", userId)
+      quota = { ...quota, images_used_today: 0, images_today_date: today }
     }
 
-    const today = new Date().toISOString().slice(0, 10)
-    if (quota.images_today_date !== today) {
-      await supabase
-        .from("image_voice_quotas")
-        .update({ images_used_today: 0, images_today_date: today })
-        .eq("user_id", userId)
-      quota.images_used_today = 0
+    if ((quota?.images_used_today ?? 0) >= plan.imageDailyAllowance) {
+      return new Response(JSON.stringify({ allowed: false, reason: "daily_image_limit_reached" }), { status: 200 })
     }
 
-    if (quota.images_used_today >= plan.imageDailyAllowance) {
-      return new Response(
-        JSON.stringify({ allowed: false, reason: "daily_image_limit_reached" }),
-        { status: 200 }
-      )
-    }
+    const included = (quota?.images_used_this_month ?? 0) < plan.imageAllowanceMonthly
 
-    if (quota.images_used_this_month < plan.imageAllowanceMonthly) {
-      await supabase
-        .from("image_voice_quotas")
-        .update({
-          images_used_this_month: quota.images_used_this_month + 1,
-          images_used_today: quota.images_used_today + 1,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId)
+    if (included) {
+      await supabase.from("image_voice_quotas").update({
+        images_used_this_month: (quota?.images_used_this_month ?? 0) + 1,
+        images_used_today: (quota?.images_used_today ?? 0) + 1,
+        updated_at: new Date().toISOString(),
+      }).eq("user_id", userId)
 
-      return new Response(
-        JSON.stringify({ allowed: true, xpCost: 0, included: true }),
-        { status: 200 }
-      )
+      return new Response(JSON.stringify({ allowed: true, xpCost: 0, included: true }), { status: 200 })
     }
 
     const estimate = plan.imageOverageXpCost
-    const { data: xp } = await supabase
-      .from("user_xp")
-      .select("earned, purchased, rollover, reserved_xp")
-      .eq("user_id", userId)
-      .single()
-    const availableXp = xp
-      ? xp.earned + xp.purchased + xp.rollover - xp.reserved_xp
-      : 0
+    const { data: xp } = await supabase.from("user_xp").select("*").eq("user_id", userId).single()
+    const availableXp = (xp?.earned ?? 0) + (xp?.purchased ?? 0) + (xp?.rollover ?? 0) - (xp?.reserved_xp ?? 0)
 
     if (availableXp < estimate) {
-      return new Response(JSON.stringify({ allowed: false, reason: "insufficient_xp" }), {
-        status: 200,
-      })
+      return new Response(JSON.stringify({ allowed: false, reason: "insufficient_xp" }), { status: 200 })
     }
 
-    const { data: reserved, error: reservationError } = await supabase.rpc(
-      "reserve_xp",
-      { p_user_id: userId, p_amount: estimate }
-    )
-    if (reservationError || !reserved) {
-      return new Response(JSON.stringify({ allowed: false, reason: "reservation_failed" }), {
-        status: 200,
-      })
+    const { data: reserved } = await supabase.rpc("reserve_xp", { p_user_id: userId, p_amount: estimate })
+    if (!reserved) {
+      return new Response(JSON.stringify({ allowed: false, reason: "reservation_failed" }), { status: 200 })
     }
 
-    return new Response(
-      JSON.stringify({
-        allowed: true,
-        xpCost: estimate,
-        included: false,
-        reservedAmount: estimate,
-      }),
-      { status: 200 }
-    )
+    return new Response(JSON.stringify({ allowed: true, xpCost: estimate, included: false, reservedAmount: estimate }), { status: 200 })
   }
 
+  // ─────────────────────────────────────────
+  // RECORD_VOICE_USAGE — basic monthly usage tracking
+  // ─────────────────────────────────────────
   if (action === "record_voice_usage") {
-    const duration = Number(durationSeconds ?? 0)
-    if (duration <= 0) {
-      return new Response(JSON.stringify({ success: true }), { status: 200 })
-    }
-
     const { data: user } = await supabase
       .from("users")
       .select("tier")
       .eq("id", userId)
-      .single()
-    const tier = (user?.tier ?? "free") as PlanId
-    await checkAndResetCycleIfNeeded(userId, PLANS[tier] ? tier : "free")
+      .maybeSingle()
+
+    if (user) {
+      await checkAndResetCycleIfNeeded(userId, (user.tier ?? "free") as PlanId)
+    }
+
+    const durationSeconds = Number(requestBody.durationSeconds ?? payload.durationSeconds ?? 0)
+    if (!durationSeconds || durationSeconds <= 0) {
+      return new Response(JSON.stringify({ success: true }), { status: 200 })
+    }
 
     const { data: quota } = await supabase
       .from("image_voice_quotas")
       .select("voice_seconds_used_this_month")
       .eq("user_id", userId)
-      .single()
+      .maybeSingle()
 
-    const current = quota?.voice_seconds_used_this_month ?? 0
-    const { error } = await supabase
-      .from("image_voice_quotas")
-      .update({
-        voice_seconds_used_this_month: current + Math.floor(duration),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", userId)
+    await supabase.from("image_voice_quotas").update({
+      voice_seconds_used_this_month: (quota?.voice_seconds_used_this_month ?? 0) + durationSeconds,
+      updated_at: new Date().toISOString(),
+    }).eq("user_id", userId)
 
-    return new Response(JSON.stringify({ success: !error }), { status: error ? 500 : 200 })
+    return new Response(JSON.stringify({ success: true }), { status: 200 })
   }
 
-  // EARN — every earn source is constrained by the shared cycle cap.
+  // ─────────────────────────────────────────
+  // EARN — shared grind-cap enforcement for all earn sources
+  // ─────────────────────────────────────────
   if (action === "earn") {
-    const validSources = [
-      "daily_quest",
-      "treasure_map_reward",
-      "roadmap_task_completion",
-    ]
-    if (!validSources.includes(source)) {
-      return new Response(JSON.stringify({ success: false, reason: "invalid_source" }), {
-        status: 400,
-      })
+    const taskId = requestBody.taskId ?? payload.taskId
+    const difficulty = (requestBody.difficulty ?? payload.difficulty) as GrindDifficulty | undefined
+    const validSources = ["daily_quest", "treasure_map_reward", "roadmap_task_completion"]
+
+    if (!source || !validSources.includes(source)) {
+      return new Response(JSON.stringify({ success: false, reason: "invalid_source" }), { status: 400 })
     }
 
-    const { data: user } = await supabase
-      .from("users")
-      .select("tier")
-      .eq("id", userId)
-      .single()
+    const { data: user } = await supabase.from("users").select("tier").eq("id", userId).maybeSingle()
     if (!user) {
-      return new Response(JSON.stringify({ success: false, reason: "user_not_found" }), {
-        status: 404,
-      })
+      return new Response(JSON.stringify({ success: false, reason: "user_not_found" }), { status: 404 })
     }
 
-    const tier = (user.tier ?? "free") as PlanId
-    await checkAndResetCycleIfNeeded(userId, PLANS[tier] ? tier : "free")
+    await checkAndResetCycleIfNeeded(userId, (user.tier ?? "free") as PlanId)
 
-    let expectedReward: number
+    let expectedReward = 0
+
     if (source === "roadmap_task_completion") {
+      if (!taskId) {
+        return new Response(JSON.stringify({ success: false, reason: "task_id_required" }), { status: 400 })
+      }
+
       const { data: task } = await supabase
         .from("tasks")
         .select("xp_reward, is_completed")
         .eq("id", taskId)
         .eq("user_id", userId)
-        .single()
+        .maybeSingle()
 
       if (!task) {
-        return new Response(JSON.stringify({ success: false, reason: "task_not_found" }), {
-          status: 404,
-        })
+        return new Response(JSON.stringify({ success: false, reason: "task_not_found" }), { status: 404 })
       }
+
       if (task.is_completed) {
-        return new Response(JSON.stringify({ success: false, reason: "task_already_paid" }), {
-          status: 400,
-        })
+        return new Response(JSON.stringify({ success: false, reason: "task_already_paid" }), { status: 400 })
       }
-      expectedReward = task.xp_reward ?? 0
+
+      expectedReward = Number(task.xp_reward ?? 0)
     } else {
-      const taskDifficulty = difficulty as GrindDifficulty
-      if (![1, 2, 3, 4, 5].includes(taskDifficulty) || !GRIND_REWARDS[taskDifficulty]) {
-        return new Response(JSON.stringify({ success: false, reason: "invalid_difficulty" }), {
-          status: 400,
-        })
+      if (!difficulty || !GRIND_REWARDS[difficulty]) {
+        return new Response(JSON.stringify({ success: false, reason: "invalid_difficulty" }), { status: 400 })
       }
-      expectedReward = GRIND_REWARDS[taskDifficulty]
-      if (amount !== expectedReward) {
-        return new Response(JSON.stringify({ success: false, reason: "invalid_task_reward" }), {
-          status: 400,
-        })
+
+      expectedReward = GRIND_REWARDS[difficulty]
+      const expectedAmount = Number(amount ?? 0)
+      if (expectedAmount !== expectedReward) {
+        return new Response(JSON.stringify({ success: false, reason: "invalid_task_reward" }), { status: 400 })
       }
+    }
+
+    if (expectedReward <= 0) {
+      return new Response(JSON.stringify({ success: false, reason: "invalid_task_reward" }), { status: 400 })
     }
 
     const { data: result, error } = await supabase.rpc("award_grind_xp", {
       p_user_id: userId,
       p_amount: expectedReward,
     })
+
     if (error || !result || result.length === 0) {
-      return new Response(JSON.stringify({ success: false, reason: "grind_award_failed" }), {
-        status: 500,
-      })
+      return new Response(JSON.stringify({ success: false, reason: "grind_award_failed" }), { status: 500 })
     }
 
     const { awarded, locked } = result[0]
     await writeTransactionLog(userId, "earn", awarded, `${source} (requested ${expectedReward})`)
-    return new Response(
-      JSON.stringify({
-        success: true,
-        xpEarned: awarded,
-        grindLocked: locked,
-        fullyPaid: awarded === expectedReward,
-        capped: awarded < expectedReward,
-      }),
-      { status: 200 }
-    )
+
+    return new Response(JSON.stringify({
+      success: true,
+      xpEarned: awarded,
+      grindLocked: locked,
+      fullyPaid: awarded === expectedReward,
+      capped: awarded < expectedReward,
+    }), { status: 200 })
   }
 
   return new Response(

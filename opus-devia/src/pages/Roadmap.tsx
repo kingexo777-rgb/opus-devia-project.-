@@ -219,7 +219,6 @@ export default function Roadmap() {
     useState<string | null>(null);
 
   const [initialTaskId, setInitialTaskId] = useState<string | null>(null);
-  const [completionNotice, setCompletionNotice] = useState<string | null>(null);
 
   const displayName =
     profile?.display_name ??
@@ -468,12 +467,9 @@ export default function Roadmap() {
 
             setRoadmap(prevRoadmap);
           } else {
-            if (data?.capped || data?.fullyPaid === false) {
-              setCompletionNotice(
-                `Task complete! +${data.xpEarned ?? 0} XP. Your monthly grind cap is reached; the full reward is available next cycle.`
-              );
-            } else {
-              setCompletionNotice(`Task complete! +${data?.xpEarned ?? task.xp_reward ?? 0} XP.`);
+            const payload = data as { xpEarned?: number; fullyPaid?: boolean; capped?: boolean; grindLocked?: boolean } | null;
+            if (payload?.fullyPaid === false) {
+              console.warn("Roadmap task was only partially paid:", payload);
             }
             window.dispatchEvent(new Event("user_xp_updated"));
           }
@@ -725,21 +721,6 @@ export default function Roadmap() {
       </h1>
 
       <div className="roadmap-divider" />
-
-      {completionNotice && (
-        <p
-          role="status"
-          style={{
-            textAlign: "center",
-            margin: "12px auto 0",
-            maxWidth: 420,
-            color: "#d9d9df",
-            fontSize: 13,
-          }}
-        >
-          {completionNotice}
-        </p>
-      )}
 
       {/* Progress */}
 

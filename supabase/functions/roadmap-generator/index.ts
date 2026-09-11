@@ -15,15 +15,6 @@ type Archetype = "Closer" | "Creator" | "Strategist" | "Operator" | "Maverick"
 type TaskDifficulty = "small" | "medium" | "large"
 type TaskType = "deep" | "shallow"
 
-type PlanId = "free" | "builder" | "operator" | "founder"
-
-const MAX_ROADMAPS_PER_CYCLE: Record<PlanId, number> = {
-  free: 1,
-  builder: 2,
-  operator: 3,
-  founder: 5,
-}
-
 // ─────────────────────────────────────────
 // DIFFICULTY SCORE 1–5
 // Computed from task attributes so every
@@ -930,6 +921,33 @@ serve(async (req) => {
       .eq("id", userId)
       .single()
 
+    const { data: xpState } = await supabase
+      .from("user_xp")
+      .select("cycle_started_at")
+      .eq("user_id", userId)
+      .maybeSingle()
+
+    const { count: roadmapsThisCycle } = await supabase
+      .from("roadmaps")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", xpState?.cycle_started_at ?? new Date(0).toISOString())
+
+    const MAX_ROADMAPS_PER_CYCLE: Record<"free" | "builder" | "operator" | "founder", number> = {
+      free: 1,
+      builder: 2,
+      operator: 3,
+      founder: 5,
+    }
+
+    const planLimit = MAX_ROADMAPS_PER_CYCLE[(user?.tier ?? "free") as "free" | "builder" | "operator" | "founder"]
+    if ((roadmapsThisCycle ?? 0) >= planLimit) {
+      return cors(JSON.stringify({
+        error: "roadmap_generation_limit_reached",
+        reason: `You've reached your roadmap generation limit for this cycle (${planLimit}). This resets when your billing cycle renews.`,
+      }), { status: 429 })
+    }
+
     if (!user) {
       return cors(
         JSON.stringify({ error: "user_not_found" }),
@@ -937,8 +955,18 @@ serve(async (req) => {
       )
     }
 
-    const tier = (user.tier ?? "free") as PlanId
-    await fetch(
+    // Free tier — check one free roadmap limit
+    if (user.tier === "free" && user.free_roadmap_used) {
+      return cors(
+        JSON.stringify({
+          error: "free_roadmap_limit_reached",
+          reason: "Free users can generate one roadmap. Upgrade to generate more.",
+        }),
+        { status: 403 }
+      )
+    }
+
+    const eligibilityResponse = await fetch(
       `${Deno.env.get("SUPABASE_URL")}/functions/v1/billing-manager`,
       {
         method: "POST",
@@ -953,37 +981,11 @@ serve(async (req) => {
       }
     )
 
-    const { data: xp } = await supabase
-      .from("user_xp")
-      .select("cycle_started_at")
-      .eq("user_id", userId)
-      .single()
-
-    const { count: roadmapsThisCycle } = await supabase
-      .from("roadmaps")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .gte("created_at", xp?.cycle_started_at ?? new Date(0).toISOString())
-
-    const roadmapLimit = MAX_ROADMAPS_PER_CYCLE[tier] ?? MAX_ROADMAPS_PER_CYCLE.free
-    if ((roadmapsThisCycle ?? 0) >= roadmapLimit) {
+    const eligibility = await eligibilityResponse.json()
+    if (!eligibility?.eligible) {
       return cors(
-        JSON.stringify({
-          error: "roadmap_generation_limit_reached",
-          reason: `You've reached your roadmap generation limit for this cycle (${roadmapLimit}). This resets when your billing cycle renews.`,
-        }),
-        { status: 429 }
-      )
-    }
-
-    // Free tier — check one free roadmap limit
-    if (user.tier === "free" && user.free_roadmap_used) {
-      return cors(
-        JSON.stringify({
-          error: "free_roadmap_limit_reached",
-          reason: "Free users can generate one roadmap. Upgrade to generate more.",
-        }),
-        { status: 403 }
+        JSON.stringify({ error: eligibility?.reason ?? "cap_exhausted" }),
+        { status: 402 }
       )
     }
 
@@ -1513,11 +1515,9 @@ serve(async (req) => {
   // check, checks 85% rule
   // ─────────────────────────────────────────
   if (action === "complete_task") {
-    const { taskId, roadmapId } = payload as {
-      taskId: string
-      roadmapId: string
-    }
+    const { taskId, roadmapId } = payload
 
+    // Fetch task XP reward before marking complete
     const { data: task } = await supabase
       .from("tasks")
       .select("xp_reward, is_completed")
@@ -1530,35 +1530,11 @@ serve(async (req) => {
     }
 
     if (task.is_completed) {
-      return cors(JSON.stringify({ error: "task_already_completed" }), { status: 400 })
-    }
-
-    const billingResponse = await fetch(
-      `${Deno.env.get("SUPABASE_URL")}/functions/v1/billing-manager`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-        },
-        body: JSON.stringify({
-          action: "earn",
-          userId,
-          source: "roadmap_task_completion",
-          taskId,
-        }),
-      }
-    )
-    const billingResult = await billingResponse.json()
-
-    if (!billingResponse.ok || !billingResult.success) {
-      return cors(JSON.stringify({
-        error: billingResult.reason ?? "xp_award_failed",
-      }), { status: billingResponse.status || 500 })
+      return cors(JSON.stringify({ success: false, reason: "task_already_paid" }), { status: 400 })
     }
 
     // Mark task complete
-    const { error: taskUpdateError } = await supabase
+    await supabase
       .from("tasks")
       .update({
         is_completed: true,
@@ -1568,8 +1544,26 @@ serve(async (req) => {
       .eq("id", taskId)
       .eq("user_id", userId)
 
-    if (taskUpdateError) {
-      return cors(JSON.stringify({ error: "task_update_failed" }), { status: 500 })
+    const xpReward = Number(task.xp_reward ?? 0)
+    let earnResult: Record<string, any> | null = null
+    if (xpReward > 0) {
+      const earnResponse = await fetch(
+        `${Deno.env.get("SUPABASE_URL")}/functions/v1/billing-manager`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({
+            action: "earn",
+            userId,
+            source: "roadmap_task_completion",
+            taskId: taskId,
+          }),
+        }
+      )
+      earnResult = await earnResponse.json()
     }
 
     // Check and auto unlock next phase
@@ -1596,12 +1590,13 @@ serve(async (req) => {
     return cors(
       JSON.stringify({
         success: true,
-        xpEarned: billingResult.xpEarned ?? 0,
-        fullyPaid: billingResult.fullyPaid ?? false,
-        capped: billingResult.capped ?? false,
         completionPercentage,
         earlyUnlockEligible: eligible,
         completionPercentageTotal: percentage,
+        xpEarned: earnResult?.xpEarned ?? 0,
+        fullyPaid: earnResult?.fullyPaid ?? true,
+        grindLocked: earnResult?.grindLocked ?? false,
+        capped: earnResult?.capped ?? false,
       }),
       { status: 200 }
     )
@@ -1614,7 +1609,7 @@ serve(async (req) => {
   // Mentor reviews and approves
   // ─────────────────────────────────────────
   if (action === "request_early_unlock") {
-    const { roadmapId } = payload as { roadmapId: string }
+    const { roadmapId } = payload
 
     const { eligible, percentage } = await checkEarlyUnlockEligibility(roadmapId)
 
