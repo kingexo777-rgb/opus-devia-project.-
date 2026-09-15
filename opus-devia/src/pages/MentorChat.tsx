@@ -1,6 +1,8 @@
 ﻿import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import BottomNav from "../components/home/BottomNav";
+import AttachmentSheet from "../components/mentor/AttachmentSheet";
+import VoiceMode from "./VoiceMode";
 import { useAuth } from "../hooks/useAuth";
 import { supabase } from "../lib/supabase";
 
@@ -235,34 +237,12 @@ export default function MentorChat() {
   const [hasLoadedSessions, setHasLoadedSessions] = useState(false);
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
-
-  // ── Voice state ──
-  const [isRecording, setIsRecording] = useState(false);
-  const [voiceAmplitude, setVoiceAmplitude] = useState(0);
-  const [selectedVoice, setSelectedVoice] = useState("aura-2-asteria");
-  const [voiceMenuOpen, setVoiceMenuOpen] = useState(false);
-
-  const DEEPGRAM_VOICES = [
-    { id: "aura-2-asteria", label: "Asteria (F)", description: "Warm, engaging" },
-    { id: "aura-2-orion", label: "Orion (M)", description: "Deep, authoritative" },
-    { id: "aura-2-luna", label: "Luna (F)", description: "Calm, soothing" },
-    { id: "aura-2-arcas", label: "Arcas (M)", description: "Clear, balanced" },
-    { id: "aura-2-stella", label: "Stella (F)", description: "Bright, energetic" },
-    { id: "aura-2-angus", label: "Angus (M)", description: "Rich, resonant" },
-  ];
+  const [isVoiceModeOpen, setIsVoiceModeOpen] = useState(false);
 
   const chatRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const attachMenuRef = useRef<HTMLDivElement>(null);
-  const pictureInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  const documentInputRef = useRef<HTMLInputElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const animFrameRef = useRef<number>(0);
-  const voiceMenuRef = useRef<HTMLDivElement>(null);
 
   const getSessionStorageKey = () => `mentor-chat-sessions-${user?.id ?? "anonymous"}`;
 
@@ -395,16 +375,6 @@ export default function MentorChat() {
   }, [menuOpen]);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (attachMenuRef.current && !attachMenuRef.current.contains(e.target as Node)) {
-        setAttachMenuOpen(false);
-      }
-    };
-    if (attachMenuOpen) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [attachMenuOpen]);
-
-  useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
@@ -460,27 +430,6 @@ export default function MentorChat() {
     }
   }, []);
 
-  const handleScreenshot = useCallback(async () => {
-    setAttachMenuOpen(false);
-    try {
-      if (navigator.clipboard && "read" in navigator.clipboard) {
-        const items = await navigator.clipboard.read();
-        for (const item of items) {
-          const imageType = item.types.find((t) => t.startsWith("image/"));
-          if (imageType) {
-            const blob = await item.getType(imageType);
-            const file = new File([blob], "screenshot.png", { type: imageType });
-            await applyImageFile(file);
-            return;
-          }
-        }
-      }
-    } catch {
-      // fall through to file picker
-    }
-    pictureInputRef.current?.click();
-  }, [applyImageFile]);
-
   const handleDocumentFile = useCallback(async (file: File | undefined) => {
     if (!file) return;
     if (!ALLOWED_DOCUMENT_MIMES.includes(file.type)) {
@@ -515,145 +464,22 @@ export default function MentorChat() {
     }
   }, []);
 
-  const handleDocumentOption = useCallback(() => {
+  const handleAttachmentFile = useCallback((file: File) => {
     setAttachMenuOpen(false);
-    documentInputRef.current?.click();
-  }, []);
-
-  // ── Voice recording ──
-  const startRecording = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioCtx = new AudioContext();
-      const source = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      analyserRef.current = analyser;
-
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      const updateAmplitude = () => {
-        if (!analyserRef.current) return;
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-        setVoiceAmplitude(Math.min(1, avg / 128));
-        animFrameRef.current = requestAnimationFrame(updateAmplitude);
-      };
-      updateAmplitude();
-
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-        ? "audio/webm;codecs=opus"
-        : "audio/webm";
-      const recorder = new MediaRecorder(stream, { mimeType });
-      audioChunksRef.current = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
-      };
-      recorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
-        audioCtx.close();
-        if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-        analyserRef.current = null;
-        setVoiceAmplitude(0);
-      };
-      recorder.start();
-      mediaRecorderRef.current = recorder;
-      setIsRecording(true);
-    } catch (err) {
-      console.error("Mic access denied:", err);
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), role: "assistant", content: "Microphone access is needed for voice input. Please allow it in your browser settings.", isError: true },
-      ]);
-    }
-  }, []);
-
-  const stopRecording = useCallback(async (): Promise<string | null> => {
-    return new Promise((resolve) => {
-      const recorder = mediaRecorderRef.current;
-      if (!recorder || recorder.state === "inactive") {
-        setIsRecording(false);
-        resolve(null);
-        return;
-      }
-      recorder.onstop = async () => {
-        setIsRecording(false);
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        const reader = new FileReader();
-        reader.onload = () => {
-          const dataUrl = reader.result as string;
-          const comma = dataUrl.indexOf(",");
-          resolve(comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl);
-        };
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(blob);
-      };
-      recorder.stop();
-    });
-  }, []);
-
-  const handleVoiceInput = useCallback(async () => {
-    if (isRecording) {
-      const audioBase64 = await stopRecording();
-      if (!audioBase64) return;
-
-      const { data: authData } = await supabase.auth.getSession();
-      const token = authData.session?.access_token;
-      if (!token) return;
-
-      const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/model-router`;
-      try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
-          },
-          body: JSON.stringify({ feature: "voice_input", audioBase64 }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const transcription = (data.transcription ?? "") as string;
-          if (transcription) {
-            setInput(transcription);
-            // Auto-send after a brief delay
-            setTimeout(() => {
-              setInput((prev) => {
-                if (prev === transcription) {
-                  // Trigger send via the input state
-                  return prev;
-                }
-                return prev;
-              });
-            }, 300);
-          }
-        }
-      } catch (err) {
-        console.error("Voice input failed:", err);
-      }
+    if (ALLOWED_IMAGE_MIMES.includes(file.type)) {
+      void applyImageFile(file);
     } else {
-      await startRecording();
+      void handleDocumentFile(file);
     }
-  }, [isRecording, startRecording, stopRecording]);
+  }, [applyImageFile, handleDocumentFile]);
 
-  // ── Voice output (TTS) ──
-  // TTS is handled server-side in model-router when voiceOutput flag is set.
-  // The speakText helper below can be used for client-side playback of TTS audio.
+  const handleCameraSelect = useCallback(() => {
+    setAttachMenuOpen(false);
+    cameraInputRef.current?.click();
+  }, []);
 
-  // Close voice menu on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (voiceMenuRef.current && !voiceMenuRef.current.contains(e.target as Node)) {
-        setVoiceMenuOpen(false);
-      }
-    };
-    if (voiceMenuOpen) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [voiceMenuOpen]);
-
-  const sendMessage = useCallback(async () => {
-    const text = input.trim();
+  const sendMessage = useCallback(async (messageOverride?: string) => {
+    const text = (messageOverride ?? input).trim();
     if ((!text && !attachment) || sending) return;
 
     const feature = activeModel === "MENTOR" ? "mentor_message" : "assistant_message";
@@ -887,6 +713,11 @@ export default function MentorChat() {
       setAttachment(null);
     }
   }, [input, sending, activeModel, sessionId, attachment]);
+
+  const handleLinkSubmit = useCallback((url: string) => {
+    setAttachMenuOpen(false);
+    void sendMessage(url);
+  }, [sendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1442,158 +1273,28 @@ export default function MentorChat() {
             "0 0 0 1px rgba(255,59,48,0.4), 0 0 16px rgba(255,59,48,0.25), 0 0 40px rgba(255,59,48,0.08), 0 8px 32px rgba(0,0,0,0.6)",
         }}
       >
-        <div ref={attachMenuRef} style={{ position: "relative", flexShrink: 0 }}>
-          <button
-            type="button"
-            onClick={() => setAttachMenuOpen((o) => !o)}
-            aria-label="Add attachment"
-            style={{
-              background: attachMenuOpen
-                ? "var(--theme-accent-dim, rgba(255,59,48,0.2))"
-                : "rgba(255,255,255,0.08)",
-              border: "none",
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              padding: 0,
-            }}
-          >
-            <AttachIcon size={18} opacity={0.7} />
-          </button>
-
-          {attachMenuOpen && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 48,
-                left: 0,
-                width: 264,
-                background: "rgba(18, 18, 20, 0.98)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 18,
-                padding: 8,
-                boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
-                zIndex: 300,
-              }}
-            >
-              <button
-                type="button"
-                onClick={handleDocumentOption}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12, width: "100%",
-                  textAlign: "left", background: "transparent", border: "none",
-                  padding: "10px 12px", borderRadius: 12, cursor: "pointer",
-                }}
-              >
-                <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>📄</span>
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Document</span>
-                  <span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>PDF, Markdown, DOCX</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => { setAttachMenuOpen(false); pictureInputRef.current?.click(); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12, width: "100%",
-                  textAlign: "left", background: "transparent", border: "none",
-                  padding: "10px 12px", borderRadius: 12, cursor: "pointer",
-                }}
-              >
-                <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>🖼️</span>
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Picture</span>
-                  <span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>From your library</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => { setAttachMenuOpen(false); cameraInputRef.current?.click(); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12, width: "100%",
-                  textAlign: "left", background: "transparent", border: "none",
-                  padding: "10px 12px", borderRadius: 12, cursor: "pointer",
-                }}
-              >
-                <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>📷</span>
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Camera</span>
-                  <span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>Take a photo</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={handleScreenshot}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12, width: "100%",
-                  textAlign: "left", background: "transparent", border: "none",
-                  padding: "10px 12px", borderRadius: 12, cursor: "pointer",
-                }}
-              >
-                <span style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.06)", display: "flex", justifyContent: "center", alignItems: "center", fontSize: 16, flexShrink: 0 }}>📸</span>
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: "#e0e0e0" }}>Screenshot</span>
-                  <span style={{ display: "block", fontSize: 11, color: "#8A8A8F" }}>From clipboard</span>
-                </span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Mic button with sound wave */}
-        <div style={{ position: "relative", flexShrink: 0, marginLeft: 4 }}>
-          {isRecording && (
-            <div style={{
-              position: "absolute", bottom: 44, left: "50%", transform: "translateX(-50%)",
-              display: "flex", alignItems: "flex-end", gap: 2, height: 32,
-              background: "rgba(12,12,14,0.9)", borderRadius: 12, padding: "6px 10px",
-              border: "1px solid rgba(255,59,48,0.3)",
-            }}>
-              {Array.from({ length: 8 }).map((_, i) => {
-                const h = 4 + Math.sin((voiceAmplitude * 3) + i * 0.7) * 12 + voiceAmplitude * 16;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      width: 3,
-                      height: Math.max(4, h),
-                      borderRadius: 2,
-                      background: `hsl(${350 + i * 5}, 90%, ${50 + voiceAmplitude * 30}%)`,
-                      transition: "height 0.08s ease, background 0.08s ease",
-                    }}
-                  />
-                );
-              })}
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={handleVoiceInput}
-            aria-label={isRecording ? "Stop recording" : "Voice input"}
-            style={{
-              background: isRecording
-                ? "var(--theme-accent, #ff3b30)"
-                : "rgba(255,255,255,0.08)",
-              border: "none",
-              width: 36,
-              height: 36,
-              borderRadius: "50%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              padding: 0,
-              transition: "background 0.2s ease",
-              color: isRecording ? "#ffffff" : "#B0B0B0",
-            }}
-          >
-            <MicIcon size={18} opacity={isRecording ? 1 : 0.7} />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setAttachMenuOpen(true)}
+          aria-label="Add attachment"
+          style={{
+            background: attachMenuOpen
+              ? "var(--theme-accent-dim, rgba(255,59,48,0.2))"
+              : "rgba(255,255,255,0.08)",
+            border: "none",
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+            padding: 0,
+            flexShrink: 0,
+          }}
+        >
+          <AttachIcon size={18} opacity={0.7} />
+        </button>
 
         <input
           ref={inputRef}
@@ -1601,8 +1302,8 @@ export default function MentorChat() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={isRecording ? "Listening..." : attachment ? "Add a caption (optional)..." : `Message ${MODEL_INFO[activeModel].label.toLowerCase()}...`}
-          disabled={sending || isRecording}
+          placeholder={attachment ? "Add a caption (optional)..." : `Message ${MODEL_INFO[activeModel].label.toLowerCase()}...`}
+          disabled={sending}
           style={{
             flex: 1,
             background: "transparent",
@@ -1614,86 +1315,54 @@ export default function MentorChat() {
             paddingLeft: 12,
           }}
         />
-        {/* Voice selection */}
-        <div ref={voiceMenuRef} style={{ position: "relative", flexShrink: 0, marginRight: 4 }}>
+        {(input.trim() || attachment) ? (
           <button
             type="button"
-            onClick={() => setVoiceMenuOpen((o) => !o)}
-            aria-label="Select voice"
+            onClick={() => void sendMessage()}
+            disabled={sending}
+            aria-label="Send"
             style={{
-              background: "rgba(255,255,255,0.06)",
+              background: "var(--theme-accent, #ff3b30)",
               border: "none",
-              width: 30,
-              height: 30,
+              width: 44,
+              height: 44,
               borderRadius: "50%",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              cursor: "pointer",
-              fontSize: 12,
+              cursor: sending ? "default" : "pointer",
+              transition: "background 0.25s ease",
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsVoiceModeOpen(true)}
+            disabled={sending}
+            aria-label="Open voice mode"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              border: "none",
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: sending ? "default" : "pointer",
               color: "#B0B0B0",
             }}
           >
-            🔊
+            <MicIcon size={20} opacity={0.7} />
           </button>
-          {voiceMenuOpen && (
-            <div style={{
-              position: "absolute", bottom: 40, right: 0, width: 220,
-              background: "rgba(18,18,20,0.98)", border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: 14, padding: 6, boxShadow: "0 8px 32px rgba(0,0,0,0.6)", zIndex: 300,
-            }}>
-              {DEEPGRAM_VOICES.map((v) => (
-                <button
-                  key={v.id}
-                  type="button"
-                  onClick={() => { setSelectedVoice(v.id); setVoiceMenuOpen(false); }}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 10, width: "100%",
-                    textAlign: "left", background: selectedVoice === v.id ? "rgba(255,59,48,0.15)" : "transparent",
-                    border: "none", padding: "8px 10px", borderRadius: 10, cursor: "pointer",
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>{selectedVoice === v.id ? "🔊" : "🔈"}</span>
-                  <span style={{ flex: 1 }}>
-                    <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#e0e0e0" }}>{v.label}</span>
-                    <span style={{ display: "block", fontSize: 10, color: "#8A8A8F" }}>{v.description}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <button
-          onClick={sendMessage}
-          disabled={sending || (!input.trim() && !attachment)}
-          aria-label="Send"
-          style={{
-            background: input.trim() || attachment ? "var(--theme-accent, #ff3b30)" : "#2a2a2a",
-            border: "none",
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            cursor: input.trim() || attachment ? "pointer" : "default",
-            transition: "background 0.25s ease",
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-        </button>
+        )}
       </div>
 
-      <input
-        ref={pictureInputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp"
-        style={{ display: "none" }}
-        onChange={(e) => { applyImageFile(e.target.files?.[0]); e.target.value = ""; }}
-      />
       <input
         ref={cameraInputRef}
         type="file"
@@ -1702,13 +1371,19 @@ export default function MentorChat() {
         style={{ display: "none" }}
         onChange={(e) => { applyImageFile(e.target.files?.[0]); e.target.value = ""; }}
       />
-      <input
-        ref={documentInputRef}
-        type="file"
-        accept=".pdf,.md,.txt,.docx,application/pdf,text/plain,text/markdown,text/x-markdown,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        style={{ display: "none" }}
-        onChange={(e) => { handleDocumentFile(e.target.files?.[0]); e.target.value = ""; }}
+
+      <AttachmentSheet
+        isOpen={attachMenuOpen}
+        onClose={() => setAttachMenuOpen(false)}
+        onCameraSelect={handleCameraSelect}
+        onPhotoSelect={handleAttachmentFile}
+        onFileSelect={handleAttachmentFile}
+        onLinkSubmit={handleLinkSubmit}
       />
+
+      {isVoiceModeOpen && (
+        <VoiceMode onClose={() => setIsVoiceModeOpen(false)} />
+      )}
 
       <BottomNav />
     </div>
