@@ -1207,7 +1207,7 @@ export default function MentorChat() {
         <div
           style={{
             position: "absolute",
-            bottom: 162,
+            bottom: 188,
             left: 16,
             right: 16,
             display: "flex",
@@ -1258,7 +1258,7 @@ export default function MentorChat() {
       <div
         style={{
           position: "absolute",
-          bottom: 94,
+          bottom: 120,
           left: 12,
           right: 12,
           background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(18,18,18,0.35) 100%)",
@@ -1385,7 +1385,7 @@ export default function MentorChat() {
         <VoiceMode onClose={() => setIsVoiceModeOpen(false)} />
       )}
 
-      <BottomNav />
+      {!isVoiceModeOpen && <BottomNav />}
     </div>
   );
 }
