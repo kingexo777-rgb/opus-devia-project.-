@@ -2,6 +2,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { computeMovement, generateMapLayout, getVisibleMapState } from "../_shared/treasure-map/logic.ts"
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -107,6 +108,123 @@ interface TaskTemplate {
   xp_reward: number
   estimated_hours: number
   order_index: number
+}
+
+async function applyReward(userId: string, mapId: string, node: number, reward: { type: string; value: Record<string, any> }) {
+  await supabase.from("treasure_map_reward_claims").insert({
+    user_id: userId,
+    map_id: mapId,
+    node_position: node,
+    reward_type: reward.type,
+    reward_value: reward.value,
+  })
+
+  if ((reward.type === "xp_bonus" || reward.type === "grand_reward") && typeof reward.value?.amount === "number") {
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/billing-manager`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify({
+        action: "earn",
+        userId,
+        source: "treasure_map_reward",
+        amount: reward.value.amount,
+        fixedAmount: true,
+      }),
+    })
+  }
+
+  if ((reward.type === "xp_multiplier" || (reward.type === "grand_reward" && typeof reward.value?.multiplier === "number")) && typeof reward.value?.duration_days === "number") {
+    const expiresAt = new Date(Date.now() + reward.value.duration_days * 24 * 60 * 60 * 1000)
+
+    await supabase
+      .from("user_xp")
+      .update({
+        active_xp_multiplier: reward.value.multiplier ?? reward.value?.multiplier ?? 1.0,
+        xp_multiplier_expires_at: expiresAt.toISOString(),
+      })
+      .eq("user_id", userId)
+  }
+
+  if ((reward.type === "credit_holiday" || (reward.type === "grand_reward" && typeof reward.value?.free_feature === "string")) && typeof reward.value?.count === "number") {
+    await supabase.from("feature_credits").insert({
+      user_id: userId,
+      feature: reward.value.free_feature,
+      credits_remaining: reward.value.count,
+      source: "treasure_map_reward",
+    })
+  }
+}
+
+async function resolveMovement(
+  userId: string,
+  mapId: string,
+  taskId: string,
+  spaces: number,
+  wasCompleted: boolean
+): Promise<{ newPosition: number; rewardsClaimed: Array<{ node: number; reward: Record<string, any> }>; mapCompleted: boolean }> {
+  const { data: map } = await supabase
+    .from("treasure_maps")
+    .select("*")
+    .eq("id", mapId)
+    .single()
+
+  if (!map) {
+    throw new Error("map_not_found")
+  }
+
+  const oldPosition = Number(map.current_position ?? 0)
+  const movement = computeMovement(oldPosition, spaces)
+  const newPosition = movement.newPosition
+  const mapCompleted = movement.mapCompleted
+  const rewardsClaimed: Array<{ node: number; reward: Record<string, any> }> = []
+
+  for (const node of movement.claimedNodes) {
+    const reward = map.reward_layout?.[node]
+    if (reward) {
+      await applyReward(userId, mapId, node, reward as { type: string; value: Record<string, any> })
+      rewardsClaimed.push({ node, reward: reward as Record<string, any> })
+    }
+  }
+
+  await supabase
+    .from("treasure_maps")
+    .update({
+      current_position: newPosition,
+      completed_at: mapCompleted ? new Date().toISOString() : null,
+      is_active: !mapCompleted,
+    })
+    .eq("id", mapId)
+
+  await supabase
+    .from("treasure_map_daily_tasks")
+    .update({
+      is_completed: wasCompleted,
+      spaces_moved: spaces,
+      resolved_at: new Date().toISOString(),
+    })
+    .eq("id", taskId)
+
+  if (mapCompleted) {
+    const { data: lastMap } = await supabase
+      .from("treasure_maps")
+      .select("map_number")
+      .eq("user_id", userId)
+      .order("map_number", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    await supabase.from("treasure_maps").insert({
+      user_id: userId,
+      current_position: 0,
+      reward_layout: generateMapLayout(),
+      map_number: (lastMap?.map_number ?? 0) + 1,
+    })
+  }
+
+  return { newPosition, rewardsClaimed, mapCompleted }
 }
 
 interface PhaseTemplate {
@@ -901,6 +1019,192 @@ serve(async (req) => {
       JSON.stringify({ error: "userId is required" }),
       { status: 400 }
     )
+  }
+
+  // ─────────────────────────────────────────
+  // ACTION: GET_OR_CREATE_ACTIVE_MAP
+  // Treasure Map foundation step 3
+  // ─────────────────────────────────────────
+  if (action === "get_or_create_active_map") {
+    const { data: existingMap } = await supabase
+      .from("treasure_maps")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_active", true)
+      .maybeSingle()
+
+    if (existingMap) {
+      return cors(JSON.stringify({ map: getVisibleMapState(existingMap) }), { status: 200 })
+    }
+
+    const { data: lastMap } = await supabase
+      .from("treasure_maps")
+      .select("map_number")
+      .eq("user_id", userId)
+      .order("map_number", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const nextMapNumber = (lastMap?.map_number ?? 0) + 1
+
+    const { data: newMap, error } = await supabase
+      .from("treasure_maps")
+      .insert({
+        user_id: userId,
+        current_position: 0,
+        reward_layout: generateMapLayout(),
+        map_number: nextMapNumber,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return cors(JSON.stringify({ error: error.message }), { status: 500 })
+    }
+
+    return cors(JSON.stringify({ map: getVisibleMapState(newMap) }), { status: 200 })
+  }
+
+  // ─────────────────────────────────────────
+  // ACTION: GET_OR_GENERATE_DAILY_TASK
+  // Treasure Map step 4
+  // ─────────────────────────────────────────
+  if (action === "get_or_generate_daily_task") {
+    const { mapId } = payload as { mapId?: string }
+    const today = new Date().toISOString().split("T")[0]
+
+    const { data: unresolvedPastTasks } = await supabase
+      .from("treasure_map_daily_tasks")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_completed", false)
+      .is("resolved_at", null)
+      .lt("task_date", today)
+      .order("task_date", { ascending: false })
+
+    for (const pastTask of unresolvedPastTasks ?? []) {
+      await resolveMovement(userId, pastTask.map_id, pastTask.id, 1, false)
+    }
+
+    const { data: existing } = await supabase
+      .from("treasure_map_daily_tasks")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("task_date", today)
+      .maybeSingle()
+
+    if (existing) {
+      return cors(JSON.stringify({ task: existing }), { status: 200 })
+    }
+
+    let activeMapId = mapId
+    if (!activeMapId) {
+      const { data: activeMap } = await supabase
+        .from("treasure_maps")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("is_active", true)
+        .maybeSingle()
+
+      activeMapId = activeMap?.id ?? null
+    }
+
+    if (!activeMapId) {
+      return cors(JSON.stringify({ error: "active_map_not_found" }), { status: 404 })
+    }
+
+    const { data: activeRoadmap } = await supabase
+      .from("roadmaps")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const { data: activePhase } = await supabase
+      .from("roadmap_phases")
+      .select("title, description")
+      .eq("roadmap_id", activeRoadmap?.id ?? "")
+      .eq("status", "active")
+      .limit(1)
+      .maybeSingle()
+
+    const { data: yesterdayTask } = await supabase
+      .from("treasure_map_daily_tasks")
+      .select("title")
+      .eq("user_id", userId)
+      .lt("task_date", today)
+      .order("task_date", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const taskCatalog = [
+      "Quick momentum check",
+      "One-step win",
+      "Micro progress sprint",
+      "Proof-of-work task",
+      "Bridge task",
+      "Alignment check",
+      "Focused follow-through",
+    ]
+
+    const title = taskCatalog[Math.floor(Math.random() * taskCatalog.length)]
+    const description = `Spend 15–30 focused minutes on the most important next action for ${activePhase?.title ?? "your current roadmap phase"}. Keep it simple and finish one concrete piece of momentum.`
+
+    const expiresAt = new Date()
+    expiresAt.setUTCHours(23, 59, 59, 999)
+
+    const { data: newTask, error } = await supabase
+      .from("treasure_map_daily_tasks")
+      .insert({
+        user_id: userId,
+        map_id: activeMapId,
+        task_date: today,
+        title,
+        description,
+        phase_theme: activePhase?.title ?? null,
+        expires_at: expiresAt.toISOString(),
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return cors(JSON.stringify({ error: error.message }), { status: 500 })
+    }
+
+    return cors(JSON.stringify({ task: newTask, previousTaskAvoided: yesterdayTask?.title ?? null }), { status: 200 })
+  }
+
+  // ─────────────────────────────────────────
+  // ACTION: COMPLETE_DAILY_TASK
+  // Treasure Map step 5
+  // ─────────────────────────────────────────
+  if (action === "complete_daily_task") {
+    const { taskId } = payload as { taskId?: string }
+
+    if (!taskId) {
+      return cors(JSON.stringify({ error: "taskId is required" }), { status: 400 })
+    }
+
+    const { data: task } = await supabase
+      .from("treasure_map_daily_tasks")
+      .select("*")
+      .eq("id", taskId)
+      .eq("user_id", userId)
+      .maybeSingle()
+
+    if (!task) {
+      return cors(JSON.stringify({ error: "task_not_found" }), { status: 404 })
+    }
+
+    if (task.is_completed) {
+      return cors(JSON.stringify({ error: "already_completed" }), { status: 400 })
+    }
+
+    const spacesMoved = Math.random() < 0.5 ? 2 : 3
+    const result = await resolveMovement(userId, task.map_id, task.id, spacesMoved, true)
+    return cors(JSON.stringify({ ...result, taskId: task.id, spacesMoved }), { status: 200 })
   }
 
   // ─────────────────────────────────────────

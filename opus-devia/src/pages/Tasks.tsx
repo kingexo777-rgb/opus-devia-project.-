@@ -6,6 +6,7 @@ import BottomNav from "../components/home/BottomNav";
 import Header from "../components/home/Header";
 import QuestPriorityTask from "../components/tasks/QuestPriorityTask";
 import QuestChallengeCard from "../components/tasks/QuestChallengeCard";
+import TreasureMap from "../components/tasks/TreasureMap";
 import lv1_10 from "../assets/badges/lv_1_10.svg";
 import lv10_20 from "../assets/badges/lv_10_20.svg";
 import lv20_30 from "../assets/badges/lv_20_30.svg";
@@ -419,6 +420,9 @@ export default function Tasks() {
         loading={loading || startingTask}
         onStart={handleStartTask}
       />
+
+      {/* Treasure Map — daily progression path */}
+      <TreasureMap />
 
       {/* Challenge Card */}
       <QuestChallengeCard />
