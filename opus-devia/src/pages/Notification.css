@@ -1,0 +1,253 @@
+/* =========================================================
+   NOTIFICATIONS PAGE
+   Notification-specific styling
+   Shared layout comes from SettingsSubPage.css
+========================================================= */
+
+
+/* =========================================================
+   TOGGLE
+========================================================= */
+
+.toggle {
+  position: relative;
+
+  width: 50px;
+  height: 28px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #2c1a1a;
+
+  flex-shrink: 0;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.toggle.active {
+  background: #4a1515;
+
+  box-shadow:
+    0 0 12px rgba(190, 0, 0, 0.16);
+}
+
+.toggle-knob {
+  position: absolute;
+
+  width: 22px;
+  height: 22px;
+
+  top: 3px;
+  left: 3px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      #ff4d4d 0%,
+      #990000 100%
+    );
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4);
+
+  transition:
+    transform 0.25s ease;
+}
+
+.toggle.active .toggle-knob {
+  transform: translateX(22px);
+}
+
+
+/* =========================================================
+   QUIET HOURS
+========================================================= */
+
+.time-row {
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 12px 20px;
+
+  box-sizing: border-box;
+
+  color: #8a8a8f;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.time-row > span {
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   SELECT WRAPPER
+========================================================= */
+
+.select-wrapper {
+  position: relative;
+
+  height: 43px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+.select-wrapper.small {
+  max-width: 120px;
+}
+
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0 34px 0 16px;
+
+  box-sizing: border-box;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.10);
+
+  border-radius: 7px;
+
+  background: #1c1c1c;
+
+  color: #e7e7e8;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+.select-wrapper select:focus {
+  border-color:
+    rgba(255, 59, 48, 0.45);
+}
+
+.select-wrapper svg {
+  position: absolute;
+
+  right: 10px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  pointer-events: none;
+
+  color: #777982;
+}
+
+
+/* =========================================================
+   SELECT SETTINGS
+========================================================= */
+
+.select-setting-row {
+  min-height: 96px;
+
+  padding: 14px 20px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.04);
+}
+
+.select-setting-row.last {
+  border-bottom: none;
+}
+
+.select-setting-row .select-wrapper {
+  flex: 1;
+
+  min-width: 0;
+
+  max-width: 270px;
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 430px) {
+
+  .time-row {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .select-setting-row {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .toggle {
+    width: 46px;
+    height: 27px;
+  }
+
+  .toggle-knob {
+    width: 21px;
+    height: 21px;
+  }
+
+  .toggle.active .toggle-knob {
+    transform: translateX(19px);
+  }
+
+  .time-row {
+    gap: 7px;
+
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .select-wrapper.small {
+    max-width: 110px;
+  }
+
+  .select-setting-row {
+    gap: 10px;
+
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

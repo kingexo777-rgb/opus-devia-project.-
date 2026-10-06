@@ -1,0 +1,1293 @@
+.profile-settings-page {
+  width: 100%;
+  max-width: 402px;
+  min-height: 930px;
+  margin: 0 auto;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background: transparent;
+  color: #ffffff;
+
+  font-family: Inter, sans-serif;
+
+  scrollbar-width: none;
+}
+
+.profile-settings-page::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.profile-settings-header {
+  width: 100%;
+  height: 74px;
+  padding: 0 18px;
+
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+  align-items: center;
+}
+
+.profile-settings-header h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  text-align: center;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  letter-spacing: -0.2px;
+}
+
+.profile-settings-header-spacer {
+  width: 50px;
+  height: 1px;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.profile-settings-back {
+  width: 42px;
+  height: 42px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.profile-settings-back:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.profile-settings-back:active {
+  transform: scale(0.94);
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.profile-settings-content {
+  width: 100%;
+
+  padding: 0 20px 40px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PROFILE HERO
+   ========================================================= */
+
+.profile-settings-hero {
+  padding: 16px 10px 30px;
+
+  text-align: center;
+}
+
+.profile-settings-avatar {
+  width: 78px;
+  height: 78px;
+
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  border: 2px solid #ff3b30;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 59, 48, 0.14),
+      rgba(20, 5, 5, 0.96) 70%
+    );
+
+  box-shadow:
+    0 0 0 6px rgba(255, 59, 48, 0.035),
+    0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+.profile-settings-avatar span {
+  color: #ffffff;
+
+  font-size: 30px;
+  font-weight: 900;
+
+  letter-spacing: -0.5px;
+}
+
+.profile-settings-hero h2 {
+  margin: 0 0 7px;
+
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 800;
+
+  letter-spacing: -0.3px;
+}
+
+.profile-settings-hero p {
+  max-width: 300px;
+
+  margin: 0 auto;
+
+  color: #85858b;
+
+  font-size: 11.5px;
+  font-weight: 500;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.profile-settings-section {
+  width: 100%;
+
+  margin-bottom: 27px;
+}
+
+.profile-settings-label {
+  margin: 0 4px 12px;
+
+  color: #85858b;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.45px;
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.profile-settings-card {
+  width: 100%;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  background: rgba(22, 14, 14, 0.78);
+
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+
+/* =========================================================
+   ROWS
+   ========================================================= */
+
+.profile-settings-row {
+  width: 100%;
+  min-height: 82px;
+
+  padding: 15px 16px;
+
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 20px;
+
+  align-items: center;
+
+  column-gap: 13px;
+
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+
+  background: transparent;
+
+  color: #ffffff;
+
+  text-align: left;
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease;
+}
+
+.profile-settings-row:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.profile-settings-row:active {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.profile-settings-row.last {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   ROW ICON
+   ========================================================= */
+
+.profile-settings-row-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(255, 59, 48, 0.075);
+
+  color: #ff3b30;
+}
+
+
+/* =========================================================
+   ROW CONTENT
+   ========================================================= */
+
+.profile-settings-row-content {
+  min-width: 0;
+}
+
+.profile-settings-row-content h3 {
+  margin: 0 0 4px;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 750;
+
+  line-height: 1.2;
+}
+
+.profile-settings-row-content p {
+  margin: 0;
+
+  color: #85858b;
+
+  font-size: 10.5px;
+  font-weight: 500;
+
+  line-height: 1.4;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   ARROW
+   ========================================================= */
+
+.profile-settings-row-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #68686e;
+}
+
+
+/* =========================================================
+   ACCOUNT STATUS
+   ========================================================= */
+
+.profile-settings-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin: 2px 0 8px;
+
+  color: #66666c;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.profile-settings-note-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #4caf50;
+
+  box-shadow:
+    0 0 8px rgba(76, 175, 80, 0.45);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 430px) {
+  .profile-settings-content {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .profile-settings-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .profile-settings-row {
+    grid-template-columns: 36px minmax(0, 1fr) 18px;
+    column-gap: 11px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .profile-settings-row-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .profile-settings-row-content h3 {
+    font-size: 13px;
+  }
+
+  .profile-settings-row-content p {
+    font-size: 10px;
+  }
+}
+
+.username-hero {
+  padding-bottom: 28px;
+}
+
+.username-hero-icon {
+  width: 58px;
+  height: 58px;
+
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: rgba(255, 59, 48, 0.10);
+
+  color: #ff3b30;
+}
+
+
+/* =========================================================
+   USERNAME FORM
+   ========================================================= */
+
+.username-form-card {
+  padding: 16px;
+}
+
+.username-input-wrapper {
+  width: 100%;
+  height: 54px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.username-input-wrapper:focus-within {
+  border-color: rgba(255, 59, 48, 0.55);
+
+  background: rgba(255, 59, 48, 0.025);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 59, 48, 0.06);
+}
+
+.username-input-prefix {
+  padding-left: 16px;
+
+  color: #ff3b30;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.username-input-wrapper input {
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 100%;
+
+  padding: 0 15px 0 7px;
+
+  box-sizing: border-box;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Inter, sans-serif;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.username-input-wrapper input::placeholder {
+  color: #66666c;
+}
+
+.username-input-wrapper input:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+.username-character-count {
+  margin-top: 9px;
+
+  color: #66666c;
+
+  text-align: right;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   INFORMATION NOTE
+   ========================================================= */
+
+.username-info {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin: 0 5px 24px;
+
+  color: #66666c;
+}
+
+.username-info-icon {
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1px;
+
+  border: 1px solid #66666c;
+
+  border-radius: 50%;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.username-info p {
+  margin: 0;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.username-save-button {
+  width: 100%;
+  height: 52px;
+
+  border: none;
+  border-radius: 17px;
+
+  background: #ff3b30;
+
+  color: #ffffff;
+
+  font-family: Inter, sans-serif;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 24px rgba(255, 59, 48, 0.16);
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.username-save-button:hover:not(:disabled) {
+  background: #ff453a;
+
+  box-shadow:
+    0 12px 28px rgba(255, 59, 48, 0.22);
+
+  transform: translateY(-1px);
+}
+
+.username-save-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.username-save-button:disabled {
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #66666c;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+.username-save-button.is-saved {
+  background: rgba(76, 175, 80, 0.85);
+
+  box-shadow:
+    0 10px 24px rgba(76, 175, 80, 0.12);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 360px) {
+  .username-input-wrapper {
+    height: 50px;
+  }
+
+  .username-save-button {
+    height: 50px;
+  }
+}
+
+/* =========================================================
+   EMAIL PAGE
+   ========================================================= */
+
+.email-hero {
+  padding-bottom: 28px;
+}
+
+.email-hero-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: rgba(255, 59, 48, 0.10);
+  color: #ff3b30;
+}
+
+.email-form-card {
+  padding: 16px;
+}
+
+.email-input-wrapper {
+  width: 100%;
+  height: 54px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #66666c;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.email-input-wrapper:focus-within {
+  border-color: rgba(255, 59, 48, 0.55);
+
+  background: rgba(255, 59, 48, 0.025);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 59, 48, 0.06);
+}
+
+.email-input-wrapper input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #fff;
+
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.email-input-wrapper input::placeholder {
+  color: #66666c;
+}
+
+.email-input-wrapper input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.email-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  margin: 0 5px 24px;
+
+  color: #66666c;
+}
+
+.email-info-icon {
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1px;
+
+  border: 1px solid #66666c;
+  border-radius: 50%;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.email-info p {
+  margin: 0;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.email-save-button {
+  width: 100%;
+  height: 52px;
+
+  border: none;
+  border-radius: 17px;
+
+  background: #ff3b30;
+  color: #fff;
+
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow: 0 10px 24px rgba(255, 59, 48, 0.16);
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.email-save-button:hover:not(:disabled) {
+  background: #ff453a;
+
+  box-shadow:
+    0 12px 28px rgba(255, 59, 48, 0.22);
+
+  transform: translateY(-1px);
+}
+
+.email-save-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.email-save-button:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: #66666c;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+.email-save-button.is-saved {
+  background: rgba(76, 175, 80, 0.85);
+
+  box-shadow:
+    0 10px 24px rgba(76, 175, 80, 0.12);
+}
+
+@media (max-width: 360px) {
+  .email-input-wrapper {
+    height: 50px;
+  }
+
+  .email-save-button {
+    height: 50px;
+  }
+}
+
+/* =========================================================
+   DISPLAY NAME PAGE
+   ========================================================= */
+
+.display-name-hero {
+  padding-bottom: 28px;
+}
+
+.display-name-hero-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: rgba(255, 59, 48, 0.10);
+  color: #ff3b30;
+}
+
+.display-name-form-card {
+  padding: 16px;
+}
+
+.display-name-input-wrapper {
+  width: 100%;
+  height: 54px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 15px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #66666c;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.display-name-input-wrapper:focus-within {
+  border-color: rgba(255, 59, 48, 0.55);
+
+  background: rgba(255, 59, 48, 0.025);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 59, 48, 0.06);
+}
+
+.display-name-input-wrapper input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #fff;
+
+  font-family: Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.display-name-input-wrapper input::placeholder {
+  color: #66666c;
+}
+
+.display-name-input-wrapper input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.display-name-character-count {
+  margin-top: 9px;
+
+  color: #66666c;
+
+  text-align: right;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.display-name-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  margin: 0 5px 24px;
+
+  color: #66666c;
+}
+
+.display-name-info-icon {
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1px;
+
+  border: 1px solid #66666c;
+  border-radius: 50%;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.display-name-info p {
+  margin: 0;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.display-name-save-button {
+  width: 100%;
+  height: 52px;
+
+  border: none;
+  border-radius: 17px;
+
+  background: #ff3b30;
+  color: #fff;
+
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 24px rgba(255, 59, 48, 0.16);
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.display-name-save-button:hover:not(:disabled) {
+  background: #ff453a;
+
+  box-shadow:
+    0 12px 28px rgba(255, 59, 48, 0.22);
+
+  transform: translateY(-1px);
+}
+
+.display-name-save-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.display-name-save-button:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: #66666c;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+.display-name-save-button.is-saved {
+  background: rgba(76, 175, 80, 0.85);
+
+  box-shadow:
+    0 10px 24px rgba(76, 175, 80, 0.12);
+}
+
+@media (max-width: 360px) {
+  .display-name-input-wrapper {
+    height: 50px;
+  }
+
+  .display-name-save-button {
+    height: 50px;
+  }
+}
+
+/* =========================================================
+   CHANGE PASSWORD PAGE
+   ========================================================= */
+
+.change-password-hero {
+  padding-bottom: 28px;
+}
+
+.change-password-hero-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: rgba(255, 59, 48, 0.10);
+  color: #ff3b30;
+}
+
+.change-password-form-card {
+  padding: 18px 16px;
+}
+
+.password-field {
+  margin-bottom: 18px;
+}
+
+.password-field.last {
+  margin-bottom: 0;
+}
+
+.password-field label {
+  display: block;
+
+  margin: 0 0 8px 2px;
+
+  color: #85858b;
+
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.password-input-wrapper {
+  width: 100%;
+  height: 52px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.password-input-wrapper:focus-within {
+  border-color: rgba(255, 59, 48, 0.55);
+
+  background: rgba(255, 59, 48, 0.025);
+
+  box-shadow:
+    0 0 0 3px rgba(255, 59, 48, 0.06);
+}
+
+.password-input-wrapper.has-error {
+  border-color: rgba(255, 59, 48, 0.55);
+}
+
+.password-input-wrapper input {
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  padding: 0 12px 0 15px;
+
+  box-sizing: border-box;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #fff;
+
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.password-input-wrapper input::placeholder {
+  color: #66666c;
+}
+
+.password-visibility-button {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 5px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: #66666c;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.password-visibility-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.password-error {
+  display: block;
+
+  margin: 7px 2px 0;
+
+  color: #ff5b52;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.change-password-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  margin: 0 5px 24px;
+
+  color: #66666c;
+}
+
+.change-password-info-icon {
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1px;
+
+  border: 1px solid #66666c;
+  border-radius: 50%;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.change-password-info p {
+  margin: 0;
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.change-password-save-button {
+  width: 100%;
+  height: 52px;
+
+  border: none;
+  border-radius: 17px;
+
+  background: #ff3b30;
+  color: #fff;
+
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 24px rgba(255, 59, 48, 0.16);
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.change-password-save-button:hover:not(:disabled) {
+  background: #ff453a;
+
+  box-shadow:
+    0 12px 28px rgba(255, 59, 48, 0.22);
+
+  transform: translateY(-1px);
+}
+
+.change-password-save-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.change-password-save-button:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: #66666c;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+.change-password-save-button.is-saved {
+  background: rgba(76, 175, 80, 0.85);
+
+  box-shadow:
+    0 10px 24px rgba(76, 175, 80, 0.12);
+}
+
+@media (max-width: 360px) {
+  .password-input-wrapper {
+    height: 50px;
+  }
+
+  .change-password-save-button {
+    height: 50px;
+  }
+}

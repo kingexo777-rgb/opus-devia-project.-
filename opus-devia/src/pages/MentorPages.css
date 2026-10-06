@@ -1,0 +1,553 @@
+/* =========================================================
+   MENTOR FEATURE PAGES
+   Shared by:
+   - Your Mentor
+   - Chat with Mentor
+   - Progress & Feedback
+   - Mentor Settings
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.mentor-page {
+    width: 100%;
+    max-width: 402px;
+    min-height: 930px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    background: transparent;
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+}
+
+.mentor-page::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.mentor-header {
+    width: 100%;
+    height: 74px;
+
+    display: grid;
+    grid-template-columns: 50px 1fr 50px;
+    align-items: center;
+
+    padding: 12px 20px 4px;
+    box-sizing: border-box;
+}
+
+.mentor-header h1 {
+    margin: 0;
+
+    color: #ffffff;
+    text-align: center;
+
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.mentor-header-spacer {
+    width: 50px;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.mentor-back-button {
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.mentor-back-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mentor-back-button:active {
+    transform: scale(0.94);
+}
+
+.mentor-back-button svg {
+    display: block;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.mentor-content {
+    width: 100%;
+
+    padding: 8px 20px 40px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.mentor-hero {
+    text-align: center;
+
+    padding: 18px 20px 28px;
+
+    margin-bottom: 4px;
+}
+
+.mentor-hero-icon {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: rgba(255, 59, 48, 0.10);
+    color: #ff3b30;
+
+    font-size: 27px;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.mentor-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    margin-bottom: 7px;
+
+    color: #ff3b30;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+.mentor-status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #ff3b30;
+}
+
+.mentor-hero p {
+    max-width: 330px;
+
+    margin: 0 auto;
+
+    color: #8a8a8f;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.mentor-section {
+    margin: 0 0 24px;
+}
+
+.mentor-section-label {
+    margin: 0 0 9px 4px;
+
+    color: #8a8a8f;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* =========================================================
+   GENERAL CARD
+   ========================================================= */
+
+.mentor-card {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    background: rgba(22, 14, 14, 0.75);
+
+    border-radius: 24px;
+
+    overflow: hidden;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   STATUS CARD
+   ========================================================= */
+
+.mentor-status-card {
+    min-height: 92px;
+
+    padding: 12px 20px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+.mentor-card-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: rgba(255, 59, 48, 0.10);
+    color: #ff3b30;
+
+    font-size: 20px;
+}
+
+.mentor-card-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.mentor-card-content h3 {
+    margin: 0 0 5px;
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+.mentor-card-content p {
+    margin: 0;
+
+    color: #8a8a8f;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    line-height: 1.4;
+}
+
+.mentor-active-indicator {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    color: #ff3b30;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    flex-shrink: 0;
+}
+
+.mentor-active-indicator span {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #ff3b30;
+}
+
+
+/* =========================================================
+   YOUR MENTOR PROFILE
+   ========================================================= */
+
+.your-mentor-page .mentor-profile-card {
+    padding: 0;
+}
+
+.your-mentor-page .mentor-info-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 0;
+
+    padding: 16px 18px;
+
+    box-sizing: border-box;
+}
+
+.your-mentor-page .mentor-info-row {
+    min-width: 0;
+    min-height: 110px;
+
+    padding: 12px 8px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 7px;
+}
+
+.your-mentor-page .mentor-info-icon {
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ff3b30;
+
+    font-size: 18px;
+
+    order: 2;
+}
+
+.your-mentor-page .mentor-info-row > div:last-child {
+    min-width: 0;
+    width: 100%;
+
+    order: 1;
+}
+
+.your-mentor-page .mentor-info-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #8a8a8f;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.your-mentor-page .mentor-info-row p {
+    width: 100%;
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.35;
+
+    overflow-wrap: break-word;
+}
+
+
+/* =========================================================
+   YOUR MENTOR HELP SECTION
+   ========================================================= */
+
+.your-mentor-page .mentor-help-card {
+    padding: 0;
+}
+
+.your-mentor-page .mentor-help-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 0;
+
+    padding: 18px;
+
+    box-sizing: border-box;
+}
+
+.your-mentor-page .mentor-help-row {
+    min-width: 0;
+    min-height: 120px;
+
+    padding: 14px 10px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 10px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.your-mentor-page .mentor-help-row:nth-child(odd) {
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.your-mentor-page .mentor-help-row:nth-child(3),
+.your-mentor-page .mentor-help-row:nth-child(4) {
+    border-bottom: none;
+}
+
+.your-mentor-page .mentor-help-icon {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: rgba(255, 59, 48, 0.08);
+    color: #ff3b30;
+
+    font-size: 17px;
+}
+
+.your-mentor-page .mentor-help-row > div:last-child {
+    min-width: 0;
+    width: 100%;
+}
+
+.your-mentor-page .mentor-help-row h3 {
+    margin: 0 0 5px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+.your-mentor-page .mentor-help-row p {
+    margin: 0;
+
+    color: #8a8a8f;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.4;
+
+    overflow-wrap: break-word;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.mentor-primary-button {
+    width: 100%;
+    min-height: 56px;
+
+    margin-top: 4px;
+
+    padding: 0 20px;
+
+    box-sizing: border-box;
+
+    border: none;
+    border-radius: 18px;
+
+    background: #ff3b30;
+    color: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    font-family: inherit;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        background 0.2s ease;
+}
+
+.mentor-primary-button:hover {
+    background: #ff4b43;
+}
+
+.mentor-primary-button:active {
+    transform: scale(0.98);
+}
+
+.mentor-primary-button svg {
+    display: block;
+}

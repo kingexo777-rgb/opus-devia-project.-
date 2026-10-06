@@ -1,0 +1,809 @@
+/* =========================================================
+   DATA & PRIVACY PAGES
+   Shared styling for:
+   - Privacy Settings
+   - Data Usage
+   - Terms & Conditions
+   - Delete Account
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.data-privacy-page {
+    width: 100%;
+    max-width: 402px;
+    min-height: 930px;
+
+    margin: 0 auto;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    font-family: Inter, sans-serif;
+
+    scrollbar-width: none;
+}
+
+.data-privacy-page::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.data-privacy-header {
+    width: 100%;
+    height: 74px;
+
+    padding: 0 18px;
+
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: 50px 1fr 50px;
+
+    align-items: center;
+}
+
+.data-privacy-header h1 {
+    margin: 0;
+
+    text-align: center;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    letter-spacing: -0.2px;
+}
+
+.data-privacy-back {
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 13px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+.data-privacy-back:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.data-privacy-back:active {
+    transform: scale(0.94);
+}
+
+.data-privacy-header-spacer {
+    width: 42px;
+    height: 42px;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.data-privacy-content {
+    width: 100%;
+
+    padding: 0 20px 35px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.data-privacy-hero {
+    padding: 8px 10px 28px;
+
+    text-align: center;
+}
+
+.data-privacy-hero-icon {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background: rgba(255, 59, 48, 0.10);
+
+    color: #ff3b30;
+
+    font-size: 25px;
+}
+
+.data-privacy-hero p {
+    max-width: 310px;
+
+    margin: 0 auto;
+
+    color: #85858b;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.data-privacy-section {
+    width: 100%;
+
+    margin-bottom: 27px;
+}
+
+.data-privacy-label {
+    margin: 0 4px 12px;
+
+    color: #85858b;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.data-privacy-card {
+    width: 100%;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    background: rgba(22, 14, 14, 0.78);
+
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+
+/* =========================================================
+   NAVIGATION ROW
+   ========================================================= */
+
+.data-privacy-row {
+    width: 100%;
+    min-height: 88px;
+
+    padding: 15px 16px;
+
+    box-sizing: border-box;
+
+    display: grid;
+
+    grid-template-columns:
+        38px
+        minmax(0, 1fr)
+        20px;
+
+    align-items: center;
+
+    column-gap: 13px;
+
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+
+    border-radius: 0;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    text-align: left;
+
+    font-family: inherit;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease;
+}
+
+.data-privacy-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   ROW HOVER
+   ========================================================= */
+
+.data-privacy-row:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+
+/* =========================================================
+   ROW CORNERS
+   ========================================================= */
+
+.data-privacy-row:first-child {
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+}
+
+.data-privacy-row:last-child {
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+}
+
+
+/* =========================================================
+   ROW ICON
+   ========================================================= */
+
+.data-privacy-row-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: rgba(255, 59, 48, 0.075);
+
+    color: #ff3b30;
+
+    font-size: 16px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ROW CONTENT
+   ========================================================= */
+
+.data-privacy-row-content {
+    min-width: 0;
+}
+
+.data-privacy-row-content h3 {
+    margin: 0 0 4px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    line-height: 1.2;
+}
+
+.data-privacy-row-content p {
+    margin: 0;
+
+    color: #85858b;
+
+    font-size: 10.5px;
+    font-weight: 500;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   CHEVRON
+   ========================================================= */
+
+.data-privacy-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #85858b;
+
+    transition:
+        color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.data-privacy-row:hover .data-privacy-chevron {
+    color: #ffffff;
+    transform: translateX(2px);
+}
+
+
+/* =========================================================
+   TOGGLE ROW
+   ========================================================= */
+
+.data-privacy-toggle-row {
+    width: 100%;
+    min-height: 88px;
+
+    padding: 15px 18px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.data-privacy-toggle-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   TOGGLE CONTENT
+   ========================================================= */
+
+.data-privacy-toggle-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.data-privacy-toggle-content h3 {
+    margin: 0 0 4px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    line-height: 1.2;
+}
+
+.data-privacy-toggle-content p {
+    margin: 0;
+
+    color: #85858b;
+
+    font-size: 10.5px;
+    font-weight: 500;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   TOGGLE
+   ========================================================= */
+
+.data-privacy-toggle {
+    width: 42px;
+    height: 24px;
+
+    padding: 2px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease;
+}
+
+.data-privacy-toggle span {
+    width: 20px;
+    height: 20px;
+
+    display: block;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    transform: translateX(0);
+
+    transition:
+        transform 0.2s ease;
+}
+
+.data-privacy-toggle.is-on {
+    background: #ff3b30;
+}
+
+.data-privacy-toggle.is-on span {
+    transform: translateX(18px);
+}
+
+
+/* =========================================================
+   INFO NOTE
+   ========================================================= */
+
+.data-privacy-note {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 8px;
+
+    margin: 0 4px;
+
+    color: #66666c;
+
+    font-size: 10px;
+    font-weight: 500;
+
+    line-height: 1.45;
+}
+
+.data-privacy-note-icon {
+    color: #ff3b30;
+
+    font-size: 13px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .data-privacy-content {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .data-privacy-hero {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .data-privacy-row {
+        min-height: 88px;
+
+        padding: 15px;
+    }
+
+    .data-privacy-toggle-row {
+        min-height: 88px;
+
+        padding: 15px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+    .data-privacy-content {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .data-privacy-row {
+        min-height: 84px;
+
+        grid-template-columns:
+            36px
+            minmax(0, 1fr)
+            20px;
+
+        column-gap: 10px;
+
+        padding: 13px;
+    }
+
+    .data-privacy-row-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .data-privacy-row-content h3 {
+        font-size: 13px;
+    }
+
+    .data-privacy-row-content p {
+        font-size: 9.5px;
+    }
+
+    .data-privacy-toggle-row {
+        min-height: 84px;
+
+        padding: 13px;
+    }
+
+    .data-privacy-toggle-content h3 {
+        font-size: 13px;
+    }
+
+    .data-privacy-toggle-content p {
+        font-size: 9.5px;
+    }
+
+}
+
+/* =========================================================
+   STATIC INFORMATION ROW
+   ========================================================= */
+
+.data-privacy-static-row {
+    cursor: default;
+}
+
+.data-privacy-static-row:hover {
+    background: transparent;
+}
+
+/* =========================================================
+   TERMS & CONDITIONS
+   ========================================================= */
+
+.terms-card {
+    padding: 0;
+}
+
+.terms-section {
+    padding: 20px 20px 19px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+}
+
+.terms-section-last {
+    border-bottom: none;
+}
+
+.terms-section h3 {
+    margin: 0 0 8px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    line-height: 1.3;
+}
+
+.terms-section p {
+    margin: 0;
+
+    color: #85858b;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.55;
+}
+
+.terms-section h4 {
+    margin: 18px 0 8px;
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+.terms-section p + p {
+    margin-top: 12px;
+}
+
+.terms-section strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* =========================================================
+   DELETE ACCOUNT
+   ========================================================= */
+
+.delete-account-icon {
+    color: #ff3b30;
+}
+
+.delete-account-action .data-privacy-row-icon {
+    background: rgba(255, 59, 48, 0.12);
+}
+
+.delete-account-action h3 {
+    color: #ff6b63;
+}
+
+.delete-account-action:hover {
+    background: rgba(255, 59, 48, 0.045);
+}
+
+
+/* =========================================================
+   DELETE CONFIRMATION
+   ========================================================= */
+
+.delete-confirmation-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.delete-confirmation {
+    width: 100%;
+    max-width: 350px;
+
+    padding: 26px 22px 22px;
+
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 59, 48, 0.14);
+    border-radius: 26px;
+
+    background: rgba(22, 14, 14, 0.96);
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.55);
+
+    text-align: center;
+}
+
+.delete-confirmation-icon {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background: rgba(255, 59, 48, 0.12);
+
+    color: #ff3b30;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.delete-confirmation h2 {
+    margin: 0 0 9px;
+
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.delete-confirmation p {
+    margin: 0 auto;
+
+    max-width: 290px;
+
+    color: #85858b;
+
+    font-size: 11px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+.delete-confirmation-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 22px;
+}
+
+.delete-cancel-button,
+.delete-confirm-button {
+    flex: 1;
+
+    min-height: 44px;
+
+    border: none;
+    border-radius: 13px;
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        transform 0.15s ease;
+}
+
+.delete-cancel-button {
+    background: rgba(255, 255, 255, 0.06);
+
+    color: #ffffff;
+}
+
+.delete-cancel-button:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.delete-confirm-button {
+    background: #ff3b30;
+
+    color: #ffffff;
+}
+
+.delete-confirm-button:hover {
+    background: #ff5047;
+}
+
+.delete-cancel-button:active,
+.delete-confirm-button:active {
+    transform: scale(0.96);
+}
